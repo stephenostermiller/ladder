@@ -1,0 +1,66 @@
+<%bte.doc output="false"%>
+<%bte.tpl name=page %><!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head><title><%bte.inc name=pageTitle %></title><%bte.grp onNoResolve=warning %>
+<meta name="description" content="<%bte.inc name=description %>"><%/bte.grp %><%bte.grp onNoResolve=warning %>
+<meta name="keywords" content="<%bte.inc name=keywords %>"><%/bte.grp %>
+<base href="http://ostermiller.org/ladder/">
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+<link rel="stylesheet" media="screen" title="Web View" href="style.css" type="text/css">
+<link rel="stylesheet" media="print" href="printable.css" type="text/css">
+<link rel="alternate stylesheet" media="screen" title="Print Preview" href="printable.css" type="text/css">
+<%bte.grp onNoResolve=ok %><%bte.inc name=headContent %><%/bte.grp %>
+</head>
+<body>
+<table align=left hspace=10 width=200 class=sidebar><tr><td>
+<ul class=sidebar>
+<li><%bte.grp onDefault=ok %><%bte.inc 
+name=homeLinkText %><%/bte.grp %></li>
+<li><%bte.grp onDefault=ok %><%bte.inc 
+name=downloadLinkText %><%/bte.grp %><%bte.grp onNoResolve=ok %>
+<%bte.inc name=downloadLinks %><%/bte.grp %></li>
+<li><%bte.grp onDefault=ok %><%bte.inc 
+name=instructionsLinkText %><%/bte.grp %></li>
+<li><%bte.grp onDefault=ok %><%bte.inc 
+name=levelsLinkText %><%/bte.grp %><%bte.grp onNoResolve=ok %>
+<%bte.inc name=levelLinks %><%/bte.grp %></li>
+<li><%bte.grp onDefault=ok %><%bte.inc 
+name=differencesLinkText %><%/bte.grp %></li>
+<li><%bte.grp onDefault=ok %><%bte.inc 
+name=historyLinkText %><%/bte.grp %></li>
+<li><%bte.grp onDefault=ok %><%bte.inc 
+name=forumsLinkText %><%/bte.grp %></li>
+<li><%bte.grp onDefault=ok %><%bte.inc 
+name=announcementsLinkText %><%/bte.grp %></li>
+<li><%bte.grp onDefault=ok %><%bte.inc 
+name=sourceLinkText %><%/bte.grp %></li>
+<li><%bte.grp onDefault=ok %><%bte.inc 
+name=javadocLinkText %><%/bte.grp %></li>
+<li><%bte.grp onDefault=ok %><%bte.inc 
+name=bugsLinkText %><%/bte.grp %></li>
+<li><%bte.grp onDefault=ok %><%bte.inc 
+name=featuresLinkText %><%/bte.grp %></li>
+<li><%bte.grp onDefault=ok %><%bte.inc 
+name=licenseLinkText %><%/bte.grp %></li>
+</ul>
+</td></tr></table>
+<h1 align=center><a name="content"><%bte.inc name=pageTitle %></a></h1>
+<div class=content><%bte.inc name=pageContent %></div>
+<br clear=all>
+<div class=copyright><p>Copyright &copy; <a href="mailto:ladder@ostermiller.com" class=mail>Stephen Ostermiller</a> 1999-2002</p></div>
+</body>
+</html><%/bte.tpl%>
+<%bte.tpl name=homeLinkText %><a href="./">Home</a> - Ladder main page.<%/bte.tpl%>
+<%bte.tpl name=levelsLinkText %><a href="levels.html">Levels</a> - Existing levels, and creating and submitting new levels.<%/bte.tpl%>
+<%bte.tpl name=differencesLinkText %><a href="differences.html">Differences</a> - Changes in this version from the original for Kaypro and CP/M.<%/bte.tpl%>
+<%bte.tpl name=downloadLinkText %><a href="download.html">Download</a> - Get Ladder and the source code (free).<%/bte.tpl%>
+<%bte.tpl name=instructionsLinkText %><a href="instructions.html">Instructions</a> - How to play.<%/bte.tpl%>
+<%bte.tpl name=historyLinkText %><a href="history.html">History</a> - List of features and bug fixes in each release.<%/bte.tpl%>
+<%bte.tpl name=forumsLinkText %><a href="http://sourceforge.net/forum/forum.php?forum_id=179106">Forums</a> - Unmoderated game disscussion.<%/bte.tpl%>
+<%bte.tpl name=announcementsLinkText %><a href="http://lists.sourceforge.net/lists/listinfo/laddergame-updates">Announcements</a> - Subscribe to a moderated mailing list used only for announcing new versions.<%/bte.tpl%>
+<%bte.tpl name=sourceLinkText %><a href="http://www.gjt.org/servlets/JCVSlet/list/gjt/com/Ostermiller/Ladder/">Source Code</a> - Browse the source code for the game in your web browser.<%/bte.tpl%>
+<%bte.tpl name=javadocLinkText %><a href="http://www.gjt.org/javadoc/com/Ostermiller/Ladder/package-summary.html">JavaDoc</a> - Documentation for the source code.<%/bte.tpl%>
+<%bte.tpl name=bugsLinkText %><a href="http://sourceforge.net/tracker/?group_id=53718&atid=471349">Bugs</a> - View existing bugs and submit new ones.<%/bte.tpl%>
+<%bte.tpl name=featuresLinkText %><a href="http://sourceforge.net/tracker/?func=browse&group_id=53718&atid=471352">Feature Requests</a> - View features that others want, or ask for your own.<%/bte.tpl%>
+<%bte.tpl name=licenseLinkText %><a href="license.html">License</a> - Ladder is freely available under the GNU General Public License.<%/bte.tpl%>
+<%/bte.doc%>
