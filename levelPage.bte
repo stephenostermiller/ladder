@@ -14,7 +14,7 @@ name=submitLinkText %><%/bte.grp %></li>
 <%bte.tpl name=ladder1levelsLinkText %><a href="ladder1levels.html">Ladder 1 Levels</a><%/bte.tpl%>
 <%bte.tpl name=ladder2levelsLinkText %><a href="ladder2levels.html">Ladder 2 Levels</a><%/bte.tpl%>
 <%bte.tpl name=newLevelLinkText %><a href="newLevel.html">New Levels</a><%/bte.tpl%>
-<%bte.tpl name=submitLinkText %><a href="http://gccprinters.com/servlets/FormGen/ladder.html">Submit</a><%/bte.tpl%>
+<%bte.tpl name=submitLinkText %><a href="contact.pl?regarding=New+Ladder+Level">Submit</a><%/bte.tpl%>
 
 
 <%/bte.doc%>
