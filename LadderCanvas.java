@@ -1,17 +1,17 @@
 /*
  * Part of Ladder, a game.
- * Copyright (C) 1999  Stephen Ostermiller <Ladder@Ostermiller.com>
- * 
+ * Copyright (C) 1999, 2000 Stephen Ostermiller <Ladder@Ostermiller.com>
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * See COPYING.TXT for details.
  */
 
@@ -26,7 +26,7 @@ import java.util.*;
 /** 
  * The LadderCanvas is basically the executable part of the game.  The canvas
  * draws the game on itself.
- * 
+ *
  */
 public class LadderCanvas extends JPanel implements Runnable, KeyListener{
     /** 
@@ -37,23 +37,12 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
      * Minimum size
      */
     private Dimension minSize;
-    /** 
-     * Number of columns
-     */
-    private int columns;
-    /** 
-     * Number of rows
-     */
-    private int rows;
-    /** 
-     * What should be displayed at some at the current time and on start of level respectively.
-     */
-    private StringBuffer screenData, levelData;
-    /** 
-     * A string representing the level being played.
-     */
-    private String level;
-    /** 
+
+	private Level screenLevel = new Level();
+
+	private Level realLevel = new Level();
+
+    /**
      * The lad that is controlled by the player.
      */
     private Lad lad;
@@ -61,9 +50,9 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
      * Charactaristics of the font.
      */
     private int letterWidth, letterHeight, letterAcsent;
-        /** 
-         * Size of the font being used.
-         */
+    /**
+     * Size of the font being used.
+     */
 	private int fontSize;
     /** 
      * The font being used.
@@ -77,7 +66,9 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
      * If the lad should jump on the next frame.
      */
     public boolean jumpCommand;
-    /**      */
+    /**      
+	 *
+	 */
     private Barrel barrel;
     /** 
      * A list of squares that need to be repainted.
@@ -100,9 +91,12 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
      */
     private Color fgColor;
     /** 
+     *
      */
     public int gameOver;
-    /**      */
+    /**     
+	 *
+	 */
     private boolean gameStop;
     /**      */
     public Thread ladderCanvasThread;
@@ -192,17 +186,29 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
     /**      */
     private static final int IMPOSSIBLE_SPEED = 55;
 	
-    /** 
+    /**
      * Create a ladder canvas.
-     * 
+     *
      * @param level String representation of the level
-     * @param caller The instance of ladder that called this, which we can  
+     * @param caller The instance of ladder that called this, which we can
      *     report back to with scores and such
      */
     public LadderCanvas(String level, Ladder caller){
+        this (new Level(level), caller);
+    }
+
+    /**
+     * Create a ladder canvas.
+     *
+     * @param level the level to use.
+     * @param caller The instance of ladder that called this, which we can
+     *     report back to with scores and such
+     */
+    public LadderCanvas(Level level, Ladder caller){
 	    lastBeep = 0;
 		ladStartPosX = 1;
 		ladStartPosY = 1;
+        lad = new Lad(ladStartPosX,ladStartPosY,Creature.STATIONARY);
         gameStop = false;
         this.caller = caller;
         bgColor = Color.black;
@@ -212,19 +218,17 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
         this.addKeyListener(this);
         nextCommand = Lad.STOP;
         jumpCommand = false;
-        //columns = 82;
-        //rows = 26;
         setBackground(bgColor);
         setFontSize(12);
-        screenData = new StringBuffer();
-        levelData = new StringBuffer();
+        realLevel = new Level(level);
+        screenLevel = new Level(realLevel);
 		repaintAll = true;
-        setLevelPaint(level);        
+        setLevelPaint(level);
         cycles = 2000;
         score = 0;
         ladsLeft = 3;
         nextNewLad = 10000;
-        caller.setLads(ladsLeft);        
+        caller.setLads(ladsLeft);
 		setDifficulty(MEDIUM);
 		setOpaque(true);
     }
@@ -240,8 +244,8 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
         letterWidth = fontMetrics.charWidth('m');
         letterHeight = fontMetrics.getHeight();
         letterAcsent = fontMetrics.getAscent();
-		minSize = new Dimension(letterWidth*(columns - 2), letterHeight*(rows - 2));
-		fontSize = size;   
+		minSize = new Dimension(letterWidth*(realLevel.getColumnCount()), letterHeight*(realLevel.getRowCount()));
+		fontSize = size;
 	}
 	
     /** get the size of the font being used.
@@ -252,9 +256,9 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
 	    return fontSize;
 	}
         
-    /** 
+    /**
      * Set the background color.
-     * 
+     *
      * @param bg Color to use for the background.
      */
     public void setBGColor(Color bg){
@@ -264,10 +268,10 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
         repaintAll = true;
         repaint();
     }
-    
-    /** 
+
+    /**
      * Set the foreground color.
-     * 
+     *
      * @param fg Color to use for the foreground.
      */
     public void setFGColor(Color fg){
@@ -276,74 +280,73 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
         repaint();
     }
 
-    /** 
+    /**
+     * Get the background color.
+     *
+     * @return Color currently used for the background.
+     */
+    public Color getBGColor(){
+        return(new Color(bgColor.getRGB()));
+    }
+
+    /**
+     * Get the foreground color.
+     *
+     * @return Color currently used for the foreground.
+     */
+    public Color getFGColor(){
+        return(new Color(fgColor.getRGB()));
+    }
+
+    /**
      * Change the level to the one given and repaint.
-     * 
+     *
      * @param level A string representing the desired level.
      */
     private void setLevelPaint(String level){
+        setLevel(new Level(level));
+    }
+
+    /**
+     * Change the level to the one given and repaint.
+     *
+     * @param level A string representing the desired level.
+     */
+    private void setLevelPaint(Level level){
         setLevel(level);
         repaintAll = true;
         repaint();
     }
-    
-    /** 
+
+    /**
      * Set the level to the given level without a repaint.
      * 
      * @param level A string representing the desired level.
      */
     public void setLevel(String level){
-	    ladStartPosX = 1;
+	    setLevel(new Level(level));
+	}
+
+    public void setLevel(Level level){
+        ladStartPosX = 1;
 		ladStartPosY = 1;
-        this.level = level;
-        StringTokenizer levelTok = new StringTokenizer(level, "\n");
-        StringBuffer levelLine = new StringBuffer();
-        screenData.setLength(0);
-        levelData.setLength(0);
-        levelLine.setLength(0);
-        if (levelTok.hasMoreTokens()){
-            levelLine.append(levelTok.nextToken());
+
+        realLevel = new Level(level);
+        screenLevel = new Level(level);
+
+		Dimension p = realLevel.positionOf('p');
+        if (p == null){
+            ladStartPosY = 1;
+            ladStartPosX = 1;
+
         } else {
-            levelLine.append(" ");// make room for the lad if an empty string is given
+            ladStartPosY = p.height+1;
+            ladStartPosX = p.width+1;
         }
-        columns = levelLine.length() + 2;
-        for (int i=0; i < columns; i++){
-            screenData.append('=');
-            levelData.append('=');
-        }
-        screenData.append('|').append(levelLine).append('|');
-        levelData.append('|').append(levelLine).append('|');
-        int i = 1;
-        while (levelTok.hasMoreTokens()){
-            i++;
-            levelLine.setLength(0);
-            levelLine.append(levelTok.nextToken());
-            // ensure that each line is the same size
-            if (levelLine.length() > columns - 2){
-                levelLine.setLength(columns - 2);
-            }
-            if (levelLine.length() < columns - 2){
-                for (int j = levelLine.length(); j<columns - 2; j++){
-                    levelLine.append(' ');
-                }
-            }
-            screenData.append('|').append(levelLine).append('|');
-            levelData.append('|').append(levelLine).append('|');
-        }
-        rows = i + 2;
-        for (int j=0; j < columns; j++){
-            screenData.append('=');
-            levelData.append('=');
-        }
-		int p = levelData.toString().indexOf('p');
-        if (p > -1){
-            ladStartPosY = (int)Math.floor((double)p/columns);
-            ladStartPosX = p - ladStartPosY * columns;
-        }
-        minSize = new Dimension(letterWidth*(columns - 2), letterHeight*(rows - 2));        
+        minSize = new Dimension(letterWidth*(realLevel.getColumnCount()), letterHeight*(realLevel.getRowCount()));
     }
-    
-    /** 
+
+    /**
      * get the preferred size
      * 
      * @return the preferred size in pixels
@@ -361,74 +364,39 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
         return minSize;
     }
 
-    /** 
+    /**
      * paints the canvas
-     * 
+     *
      * @param g graphics object for this component
      */
     public void paintComponent(Graphics g){
-	    //if(isOpaque()){
-		//    System.out.println("Painting everything");
-		//}
         g.setFont(font);
 		g.setColor(fgColor);
-        //if (repaintAll){
-		if (true){
-		    g.clearRect(g.getClipBounds().x, g.getClipBounds().y, g.getClipBounds().width, g.getClipBounds().height);
-            //g.setColor(bgColor);
-			//g.fillRect(g.getClipBounds().x, g.getClipBounds().y, g.getClipBounds().width, g.getClipBounds().height);
-			g.setFont(font);
-            g.setColor(fgColor);
-            //System.out.println(g.getClipBounds().toString());
-            int a = (int)Math.floor((double)g.getClipBounds().y/letterHeight);
-            int b = (int)Math.ceil((double)(g.getClipBounds().y + g.getClipBounds().height + letterHeight - letterAcsent)/letterHeight + 1);
-            int c = (int)Math.floor((double)g.getClipBounds().x/letterWidth);
-            int d = (int)Math.ceil((double)(g.getClipBounds().x + g.getClipBounds().width + letterWidth)/letterWidth);
-            //System.out.println("Vert: " + (a+1) + " to " + (b) + " Horz: " + (c+1) + " to " + (d)); 
-            for (int i=a+1; i<b && i<rows - 1; i++){
-                for(int j=c+1; j<d && j<columns - 1; j++){
-                    //g.setColor(bgColor);
-					//g.fillRect((j-1)*letterWidth, (i-1)*letterHeight, letterWidth, letterHeight);
-                    //g.setColor(fgColor);
-					char[] ch = new char[1];
-                    ch[0] = screenData.charAt(i*columns + j);
-                    g.drawChars(ch,0,1,(j-1)*letterWidth,(i-1)*letterHeight+letterAcsent);
-                }
-            }
-        } else {
-            int i, j;
-			for(int k=repaintList.size()-1; k>=0; k--){			    
-                j = ((Dimension)repaintList.elementAt(k)).width;
-                i = ((Dimension)repaintList.elementAt(k)).height;
-				// only redraw this character if it is in the clip rectangle.
-				// otherwise we would have no effect and the element would be removed and 
-				// never repainted.
-				if(g.getClipBounds().contains((j-1)*letterWidth, (i-1)*letterHeight)){
-                    //g.setColor(bgColor);
-					//g.fillRect((j-1)*letterWidth, (i-1)*letterHeight, letterWidth,letterHeight);
-                    g.clearRect((j-1)*letterWidth, (i-1)*letterHeight, letterWidth,letterHeight);
-					g.setColor(fgColor);
-					char[] ch = new char[1];
-                    ch[0] = screenData.charAt(i*columns + j);
-                    g.drawChars(ch,0,1,(j-1)*letterWidth,(i-1)*letterHeight+letterAcsent);
-    				repaintList.removeElementAt(k);
-				}
-            }
+        g.clearRect(g.getClipBounds().x, g.getClipBounds().y, g.getClipBounds().width, g.getClipBounds().height);
+        g.setFont(font);
+        g.setColor(fgColor);
+        int rowStart = (int)Math.floor((double)g.getClipBounds().y/letterHeight);
+        int rowEnd = (int)Math.ceil((double)(g.getClipBounds().y + g.getClipBounds().height + letterHeight - letterAcsent)/letterHeight + 1);
+        int columnStart = (int)Math.floor((double)g.getClipBounds().x/letterWidth);
+        int columnEnd = (int)Math.ceil((double)(g.getClipBounds().x + g.getClipBounds().width + letterWidth)/letterWidth);
+        for (int i=rowStart+1; i<rowEnd && i<realLevel.getRowCount() + 1; i++){
+           g.drawChars(screenLevel.getCharsAt(i-1, columnStart, columnEnd-columnStart-1), 0, columnEnd-columnStart-1,
+				(columnStart)*letterWidth,(i-1)*letterHeight+letterAcsent);
         }
 		repaintAll = true;
-    }        
-    
-    /** 
+    }
+
+    /**
      * repaints just the region containing a character on the screen
-     * 
+     *
      * @param xpos the x postion of the character
      * @param ypos the y position of the character
      */
     private void repaintCharAt(int xpos, int ypos){
         repaint((xpos-1)*letterWidth, (ypos-1)*letterHeight, letterWidth,letterHeight);
     }
-   
-    /** 
+
+    /**
      * start the game moving
      */
     public void start(){
@@ -438,17 +406,17 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
         ladderCanvasThread.start();
         //System.out.println("Started!");
     }
-    
-    /** 
+
+    /**
      * stop the game from moving
      */
     public void stop(){
+        // set a flag that will make the run method exit.
 		stopThread = true;
-        //ladderCanvasThread.stop();  // deprecated
     }
 
-    /** 
-     * reset the game to its initial state, (score, lads, level, (everything) etc.)
+    /**
+     * reset the game to its initial state, (score, lads, (everything))
      */
     public void resetGame(){
         //System.out.println("Reseting Game, repainting");
@@ -456,13 +424,12 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
         ladsLeft = 3;
         nextNewLad = 10000;
         caller.setLads(ladsLeft);
-		setLevelPaint(level);
         reset();
         repaintAll = true;
         repaint();
     }
 
-    /** 
+    /**
      * resets the clocks for the game, but not the score, lives left, etc.
      */
     public void reset(){
@@ -471,28 +438,21 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
         gameOver = G_O_NOT_OVER;
         nextCommand = Lad.STOP;
         jumpCommand = false;
-        //setLevelPaint(level);
-		screenData.setLength(0);
-		screenData.append(levelData.toString());
+        screenLevel = new Level(realLevel);
+
         barrelProducers.setSize(0);
-        Dimension pos = new Dimension(1,1);
-        String ld = levelData.toString();
-        lad = new Lad(ladStartPosX,ladStartPosY,Creature.STATIONARY);
-		screenData.setCharAt(ladStartPosY*columns + ladStartPosX, 'p');
-        levelData.setCharAt(ladStartPosY*columns + ladStartPosX,' ');
-        int p = ld.indexOf('V');
-        pos.height = (int)Math.floor((double)p/columns);
-        pos.width = p - pos.height * columns;
-        while (p != -1){
-            BarrelProducer brl = new BarrelProducer(pos.width, pos.height);
+        lad.reset(ladStartPosX,ladStartPosY,Creature.STATIONARY);
+        screenLevel.setCharAt(ladStartPosY-1, ladStartPosX-1, 'p');
+        realLevel.setCharAt(ladStartPosY-1, ladStartPosX-1, ' ');
+        Dimension p = realLevel.positionOf('V');
+        while (p != null){
+            BarrelProducer brl = new BarrelProducer(p.width+1, p.height+1);
             brl.setMinBarrels(difficulty);
             barrelProducers.addElement(brl);
             
-            p = ld.indexOf('V',p+1);
-            pos.height = (int)Math.floor((double)p/columns);
-            pos.width = p - pos.height * columns;
+            p.width++;
+            p = realLevel.positionOf('V', p);
         }
-        
     }
     
     /** 
@@ -544,11 +504,10 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
                         throw (new GameOverException());
      				}
                     // move the lad
-                    screenData.setCharAt(lad.getYPos()*columns + lad.getXPos(),levelData.charAt(lad.getYPos()*columns + lad.getXPos()));
-                    repaintList.addElement(new Dimension(lad.getXPos(), lad.getYPos()));
+                    screenLevel.setCharAt(lad.getYPos()-1, lad.getXPos()-1, realLevel.charAt(lad.getYPos()-1, lad.getXPos()-1));
+				 	repaintList.addElement(new Dimension(lad.getXPos() - 1, lad.getYPos() - 1));
                     int oldx = lad.getXPos();
                     int oldy = lad.getYPos();
-                    //repaintCharAt(lad.getXPos(), lad.getYPos());
                     lad.setCommand(nextCommand);
                     nextCommand = Lad.NONE;
                     if (jumpCommand){
@@ -556,39 +515,40 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
                     }
                     jumpCommand = false;
                     // tell the lad about its surroundings so that it knows how it can move
-                    lad.update(levelData.charAt((lad.getYPos() + 1)*columns + (lad.getXPos() - 1)),
-                        levelData.charAt((lad.getYPos() + 1)*columns + (lad.getXPos())),
-                        levelData.charAt((lad.getYPos() + 1)*columns + (lad.getXPos() + 1)),
-                        levelData.charAt((lad.getYPos())*columns + (lad.getXPos() - 1)),
-                        levelData.charAt((lad.getYPos())*columns + (lad.getXPos())),
-                        levelData.charAt((lad.getYPos())*columns + (lad.getXPos() + 1)),
-                        levelData.charAt((lad.getYPos() - 1)*columns + (lad.getXPos() - 1)),
-                        levelData.charAt((lad.getYPos() - 1)*columns + (lad.getXPos())),
-                        levelData.charAt((lad.getYPos() - 1)*columns + (lad.getXPos() + 1)));
+                    lad.update(
+					    realLevel.charAt(lad.getYPos() - 1 + 1 , lad.getXPos() - 1 - 1),
+                        realLevel.charAt(lad.getYPos() - 1 + 1 , lad.getXPos() - 1),
+                        realLevel.charAt(lad.getYPos() - 1 + 1 , lad.getXPos() - 1 + 1),
+                        realLevel.charAt(lad.getYPos() - 1 , lad.getXPos() - 1 - 1),
+                        realLevel.charAt(lad.getYPos() - 1 , lad.getXPos() - 1),
+                        realLevel.charAt(lad.getYPos() - 1 , lad.getXPos() - 1 + 1),
+                        realLevel.charAt(lad.getYPos() - 1 - 1 , lad.getXPos() - 1 - 1),
+                        realLevel.charAt(lad.getYPos() - 1 - 1 , lad.getXPos() - 1),
+                        realLevel.charAt(lad.getYPos() - 1 - 1 , lad.getXPos() - 1 + 1));
                     // redraw the lad
-                    screenData.setCharAt(lad.getYPos()*columns + lad.getXPos(),lad.getSymbol());
+                    screenLevel.setCharAt(lad.getYPos()-1, lad.getXPos()-1, lad.getSymbol());
                     repaintList.addElement(new Dimension(lad.getXPos(), lad.getYPos()));
-                    if(levelData.charAt(lad.getYPos()*columns + lad.getXPos()) == '$'){
+                    if(realLevel.charAt(lad.getYPos() -1, lad.getXPos() - 1) == '$'){
                         gameOver = G_O_MONEY; // Found the goal, game over
 						repaint();
 						throw (new GameOverException());
                         
                     }
-                    if(levelData.charAt(lad.getYPos()*columns + lad.getXPos()) == '^'){
+                    if(realLevel.charAt(lad.getYPos() - 1, lad.getXPos() - 1) == '^'){
                         gameOver = G_O_SPIKE; // Found the goal, game over
                         throw (new GameOverException());
 					}
-                    if(levelData.charAt(lad.getYPos()*columns + lad.getXPos()) == '&'){
+                    if(realLevel.charAt(lad.getYPos() - 1, lad.getXPos() - 1) == '&'){
                         // found a statue, adjust the score, remove the statue
                         updateScore(SCORE_STATUE);
-                        levelData.setCharAt(lad.getYPos()*columns + lad.getXPos(), ' ');
+                        realLevel.setCharAt(lad.getYPos()-1, lad.getXPos()-1, ' ');
                     }
                     // get rid of dissapearing flooring
-                    if ((lad.getXPos() != oldx && lad.getYPos() >= oldy) && levelData.charAt((oldy + 1)*columns + oldx) == '-'){
+                    if ((lad.getXPos() != oldx && lad.getYPos() >= oldy) && realLevel.charAt(oldy - 1 + 1, oldx - 1) == '-'){
                         // get rid of flooring only if the lad moved over it without jumping.
                         // so don't remove if he stayed in the same place or if his y pos has gone up.
-                        screenData.setCharAt((oldy + 1)*columns + oldx, ' ');
-                        levelData.setCharAt((oldy + 1)*columns + oldx, ' ');
+                        screenLevel.setCharAt(oldy, oldx-1, ' ');
+                        realLevel.setCharAt(oldy, oldx-1, ' ');
                         repaintList.addElement(new Dimension(oldx, oldy + 1));
                         //repaintCharAt(oldx, oldy + 1);
                     }
@@ -604,51 +564,51 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
                                     throw (new GameOverException());
 								} 
                                 // score for jumping barrels
-                                if (levelData.charAt((lad.getYPos())*columns + (lad.getXPos())) != 'H'){ // no score if on ladder
+                                if (realLevel.charAt(lad.getYPos() - 1, lad.getXPos() - 1) != 'H'){ // no score if on ladder
                                     if(barrel.getYPos() - 1 == lad.getYPos() &&  lad.getXPos()  == barrel.getXPos()){
                                         updateScore(SCORE_BARREL);
                                     } else if(barrel.getYPos() - 2 == lad.getYPos() &&  lad.getXPos()  == barrel.getXPos() &&
-                                        levelData.charAt((lad.getYPos() + 1)*columns + (lad.getXPos())) != '=' &&
-                                        levelData.charAt((lad.getYPos() + 1)*columns + (lad.getXPos())) != '|' &&
-                                        levelData.charAt((lad.getYPos() + 1)*columns + (lad.getXPos())) != '-'){
+                                        realLevel.charAt((lad.getYPos() - 1 + 1), lad.getXPos() - 1) != '=' &&
+                                        realLevel.charAt((lad.getYPos() - 1 + 1), lad.getXPos() - 1) != '|' &&
+                                        realLevel.charAt((lad.getYPos() - 1 + 1), lad.getXPos() - 1) != '-'){
                                         updateScore(SCORE_BARREL);
                                     } 
                                 }
-                                screenData.setCharAt(barrel.getYPos()*columns + barrel.getXPos(),levelData.charAt(barrel.getYPos()*columns + barrel.getXPos()));
+                                screenLevel.setCharAt(barrel.getYPos() - 1, barrel.getXPos() - 1 ,
+									realLevel.charAt(barrel.getYPos() - 1, barrel.getXPos() - 1));
+								repaintList.addElement(new Dimension(barrel.getXPos(), barrel.getYPos()));
+                                barrel.update(
+                                    realLevel.charAt(barrel.getYPos() - 1 + 1 , barrel.getXPos() - 1 - 1),
+                                    realLevel.charAt(barrel.getYPos() - 1 + 1 , barrel.getXPos() - 1),
+                                    realLevel.charAt(barrel.getYPos() - 1 + 1 , barrel.getXPos() - 1 + 1),
+                                    realLevel.charAt(barrel.getYPos() - 1 , barrel.getXPos() - 1 - 1),
+                                    realLevel.charAt(barrel.getYPos() - 1 , barrel.getXPos() - 1),
+                                    realLevel.charAt(barrel.getYPos() - 1 , barrel.getXPos() - 1 + 1),
+                                    realLevel.charAt(barrel.getYPos() - 1 - 1 , barrel.getXPos() - 1 - 1),
+                                    realLevel.charAt(barrel.getYPos() - 1 - 1 , barrel.getXPos() - 1),
+                                    realLevel.charAt(barrel.getYPos() - 1 - 1 , barrel.getXPos() - 1 + 1));
+                                screenLevel.setCharAt(barrel.getYPos() - 1, barrel.getXPos() - 1, barrel.getSymbol());
                                 repaintList.addElement(new Dimension(barrel.getXPos(), barrel.getYPos()));
-                                //repaintCharAt(barrel.getXPos(), barrel.getYPos());
-                                barrel.update(levelData.charAt((barrel.getYPos() + 1)*columns + (barrel.getXPos() - 1)),
-                                    levelData.charAt((barrel.getYPos() + 1)*columns + (barrel.getXPos())),
-                                    levelData.charAt((barrel.getYPos() + 1)*columns + (barrel.getXPos() + 1)),
-                                    levelData.charAt((barrel.getYPos())*columns + (barrel.getXPos() - 1)),
-                                    levelData.charAt((barrel.getYPos())*columns + (barrel.getXPos())),
-                                    levelData.charAt((barrel.getYPos())*columns + (barrel.getXPos() + 1)),
-                                    levelData.charAt((barrel.getYPos() - 1)*columns + (barrel.getXPos() - 1)),
-                                    levelData.charAt((barrel.getYPos() - 1)*columns + (barrel.getXPos())),
-                                    levelData.charAt((barrel.getYPos() - 1)*columns + (barrel.getXPos() + 1)));
-                                screenData.setCharAt(barrel.getYPos()*columns + barrel.getXPos(),barrel.getSymbol());
-                                repaintList.addElement(new Dimension(barrel.getXPos(), barrel.getYPos()));
-                                //repaintCharAt(barrel.getXPos(), barrel.getYPos());
                                 if(barrel.getYPos() == lad.getYPos() &&  lad.getXPos() == barrel.getXPos()){
                                     gameOver = G_O_BARREL;
                                     throw (new GameOverException());
 								}
                                 // score for jumping barrels
                                 if (lad.getDirection() != Creature.UP && lad.getDirection() != Creature.DOWN && // no score this time if the lad is moving up or down to avoid double counting of score
-								    levelData.charAt((lad.getYPos())*columns + (lad.getXPos())) != 'H'){ // no score if on ladder
+								    realLevel.charAt(lad.getYPos() - 1, lad.getXPos() - 1) != 'H'){ // no score if on ladder
                                     if(barrel.getYPos() - 1 == lad.getYPos() &&  lad.getXPos()  == barrel.getXPos()){
                                         updateScore(SCORE_BARREL);
                                     } else if(barrel.getYPos() - 2 == lad.getYPos() &&  lad.getXPos()  == barrel.getXPos() &&
-                                        levelData.charAt((lad.getYPos() + 1)*columns + (lad.getXPos())) != '=' &&
-                                        levelData.charAt((lad.getYPos() + 1)*columns + (lad.getXPos())) != '|' &&
-                                        levelData.charAt((lad.getYPos() + 1)*columns + (lad.getXPos())) != '-'){
+                                        realLevel.charAt(lad.getYPos() - 1 + 1, lad.getXPos() - 1) != '=' &&
+                                        realLevel.charAt(lad.getYPos() - 1 + 1, lad.getXPos() - 1) != '|' &&
+                                        realLevel.charAt(lad.getYPos() - 1 + 1, lad.getXPos() - 1) != '-'){
                                         updateScore(SCORE_BARREL);
                                     } 
                                 }
-                                if (levelData.charAt(barrel.getYPos()*columns + barrel.getXPos()) == '*'){
-                                    screenData.setCharAt(barrel.getYPos()*columns + barrel.getXPos(),levelData.charAt(barrel.getYPos()*columns + barrel.getXPos()));
+                                if (realLevel.charAt(barrel.getYPos() - 1, barrel.getXPos() - 1) == '*'){
+                                    screenLevel.setCharAt(barrel.getYPos()-1, barrel.getXPos()-1,
+										realLevel.charAt(barrel.getYPos() - 1, barrel.getXPos() - 1));
                                     repaintList.addElement(new Dimension(barrel.getXPos(), barrel.getYPos()));
-                                    //repaintCharAt(barrel.getXPos(), barrel.getYPos());
                                     BP.recycleBarrel(barrel);
                                 }
                             }
@@ -720,7 +680,7 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
             updateScore(SCORE_MONEY);                    
             cycles -= 10;
 			try{
-                Thread.sleep(1);
+                Thread.sleep(10);
             } catch (InterruptedException e){
             }
         }
@@ -741,58 +701,28 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
          */
 	private void ladDeath(){
 	    int i;
-		long beginLoopTime = System.currentTimeMillis();
-        long endLoopTime;
+		long beginLoopTime, endLoopTime;
+        char[] symbols = {'!', '@', '#', '/', '+', '%', '?', '\\', '*', 'b'};
         int sleepTime;
-        for (i=0; i<10; i++){
+        for (i=0; i<symbols.length; i++){
+            beginLoopTime = System.currentTimeMillis();
 		    beep();
-		    switch(i){
-			    case 0:
-				    screenData.setCharAt( lad.getYPos()*columns + lad.getXPos(), '!');
-				break;
-				case 1:
-				    screenData.setCharAt( lad.getYPos()*columns + lad.getXPos(), '@');
-				break;
-				case 2:
-				    screenData.setCharAt( lad.getYPos()*columns + lad.getXPos(), '#');
-				break;
-				case 3:
-				    screenData.setCharAt( lad.getYPos()*columns + lad.getXPos(), '/');
-				break;
-				case 4:
-				    screenData.setCharAt( lad.getYPos()*columns + lad.getXPos(), '+');
-				break;
-				case 5:
-				    screenData.setCharAt( lad.getYPos()*columns + lad.getXPos(), '%');
-				break;
-				case 6:
-				    screenData.setCharAt( lad.getYPos()*columns + lad.getXPos(), '?');
-				break;
-				case 7:
-				    screenData.setCharAt( lad.getYPos()*columns + lad.getXPos(), '\\');
-				break;
-				case 8:
-				    screenData.setCharAt( lad.getYPos()*columns + lad.getXPos(), '*');
-				break;
-				case 9:
-				    screenData.setCharAt( lad.getYPos()*columns + lad.getXPos(), 'b');
-				break;
-			}
-			repaint();       
+		    screenLevel.setCharAt(lad.getYPos()-1, lad.getXPos()-1, symbols[i]);
+			repaint();
     		endLoopTime = System.currentTimeMillis();
             sleepTime = (int)(gameSpeed - (endLoopTime - beginLoopTime));
             if (sleepTime > 0){
                 try{
-                    Thread.sleep(sleepTime);
+                    Thread.sleep(50);
                 } catch (InterruptedException e){
                 }
             }
 		}
     }
 
-    /** 
+    /**
      * Adjusts the score according to some event.
-     * 
+     *
      * @param scoreind Type of scoring event
      */
     private void updateScore(int scoreind){
@@ -809,8 +739,8 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
 			beep();
         break;
         case SCORE_MONEY:
-            score += 10; 
-			beep();          
+            score += 10;
+			beep();
         break;
         }
         // give a new lad if over 10,000 points
@@ -823,10 +753,10 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
         //System.out.println(score);
 
     }
-    
-   /** 
+
+   /**
     * Some key has been pressed, react to it.
-    * 
+    *
     * @param ke The key event corresponding to the key
     */
    public void keyPressed(KeyEvent ke){
