@@ -33,7 +33,7 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
      * The instance of Ladder which we should report back to.
      */
     private Ladder caller; // the caller of this
-    /** 
+    /**
      * Minimum size
      */
     private Dimension minSize;
@@ -98,13 +98,17 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
 	 *
 	 */
     private boolean gameStop;
-    /**      */
+    /**      
+	 *
+	 */
     public Thread ladderCanvasThread;
     /** 
      * The level of difficulty for the game.
      */
     private int difficulty;
-    /**      */
+    /**      
+	 *
+	 */
     private int cycles;
     /** 
      * The score of the game.
@@ -114,30 +118,39 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
      * The number of lives left.
      */
     private int ladsLeft;
-    /**      */
-    private int gameSpeed; // pause in ms between frames.
+    /**      
+	 * pause in ms between frames.
+	 */
+    private int gameSpeed;
     /** 
-     * pause in ms between frames.
+     *
      */
     private long nextNewLad;
-        /**          */
+    /**          
+	 *
+	 */
 	boolean stopThread;
-        /**          */
+    /**          
+	 *
+	 */
 	private boolean go_on = false;
-        /** 
-         * The starting x postition of the lad.
-         */
+    /**
+     * The starting x postition of the lad.
+     */
 	private int ladStartPosX;
-        /** 
-         * The starting y position of the lad.
-         */
+    /**
+     * The starting y position of the lad.
+     */
 	private int ladStartPosY;
-        /** 
-		 * The time at which the last beep occurred.
-         */
+    /**
+     * The time at which the last beep occurred.
+     */
 	private long lastBeep;
 	
-        /**          */
+    /**
+     * Debug mode that lets us move the game one frame at a time
+     * by pressing enter between each frame.
+     */
 	private static final boolean STEP_MODE = false;
 
     /**      */
@@ -163,7 +176,7 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
     public static final int G_O_SPIKE = 5;
 	
 	// minimum number of barrels per producer at the level
-        /**          */
+    /**      */
 	public static final int EASY = 3;
     /**      */
     public static final int MEDIUM = 5;
@@ -175,7 +188,7 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
     public static final int IMPOSSIBLE = 15;
 	
 	// game speed at the level (milliseconds between frames)
-    /**          */
+    /**      */
 	private static final int EASY_SPEED = 130;
     /**      */
     private static final int MEDIUM_SPEED = 100;
@@ -373,8 +386,8 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
         g.setFont(font);
 		g.setColor(fgColor);
         g.clearRect(g.getClipBounds().x, g.getClipBounds().y, g.getClipBounds().width, g.getClipBounds().height);
-        g.setFont(font);
-        g.setColor(fgColor);
+        //g.setFont(font);
+        //g.setColor(fgColor);
         int rowStart = (int)Math.floor((double)g.getClipBounds().y/letterHeight);
         int rowEnd = (int)Math.ceil((double)(g.getClipBounds().y + g.getClipBounds().height + letterHeight - letterAcsent)/letterHeight + 1);
         int columnStart = (int)Math.floor((double)g.getClipBounds().x/letterWidth);
@@ -382,6 +395,19 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
         for (int i=rowStart+1; i<rowEnd && i<realLevel.getRowCount() + 1; i++){
            g.drawChars(screenLevel.getCharsAt(i-1, columnStart, columnEnd-columnStart-1), 0, columnEnd-columnStart-1,
 				(columnStart)*letterWidth,(i-1)*letterHeight+letterAcsent);
+        }
+        if (gameStop){
+            g.setColor(Color.red);
+            g.setFont(new Font("SansSerif", Font.BOLD, font.getSize() * 2));
+            String p = "GAME OVER";
+            g.drawString(p, (getWidth() - g.getFontMetrics().stringWidth(p)) / 2,
+				(getHeight()	) / 2);
+        } else if (stopThread){
+            g.setColor(Color.red);
+            g.setFont(new Font("SansSerif", Font.BOLD, font.getSize() * 2));
+            String p = "PAUSED";
+            g.drawString(p, (getWidth() - g.getFontMetrics().stringWidth(p)) / 2,
+				(getHeight()	) / 2);
         }
 		repaintAll = true;
     }
@@ -404,7 +430,7 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
             ladderCanvasThread = new Thread(this);
         }
         ladderCanvasThread.start();
-        //System.out.println("Started!");
+        repaint();
     }
 
     /**
@@ -413,6 +439,7 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
     public void stop(){
         // set a flag that will make the run method exit.
 		stopThread = true;
+        repaint();
     }
 
     /**
@@ -642,7 +669,6 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
         
             switch (gameOver){
             case G_O_BARREL: case G_O_TIME: case G_O_SPIKE:
-                //System.out.println("Killed " + gameOver);
 				ladDeath();
                 if (ladsLeft > 0){
                     ladsLeft--;
@@ -652,6 +678,8 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
                     gameStop = false;
                 } else {
                     gameStop = true;
+                    caller.gameOver(score);
+                    repaint();
                 }
             break;
             case G_O_MONEY:
@@ -665,6 +693,7 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
 			break;
             default:
                 gameStop = true;
+                repaint();
             break;        
             }  
         }
@@ -771,27 +800,28 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
             nextCommand = Lad.RIGHT;
         } else if (keycode == KeyEvent.VK_SPACE){
             jumpCommand = true;
+        } else if (keycode == KeyEvent.VK_ESCAPE){
+            //escape is used to pause the game, lets ignore it here
+            //it should be caught by main ladder class.
+        } else if (STEP_MODE && keycode == KeyEvent.VK_ENTER){
+        	go_on = true;
         } else {
-            if (STEP_MODE && keycode == KeyEvent.VK_ENTER){
-                go_on = true;               
-            } else {
-                nextCommand = Lad.STOP;
-            }
+            nextCommand = Lad.STOP;
         }
     }
 	
-    /** 
+    /**
      * Key released (not really used)
-     * 
-     * @param ke 
+     *
+     * @param ke
      */
     public void keyReleased(KeyEvent ke){
     }
-	
-    /** 
+
+    /**
      * Key typed (not really used)
-     * 
-     * @param ke 
+     *
+     * @param ke
      */
     public void keyTyped(KeyEvent ke){
     }
