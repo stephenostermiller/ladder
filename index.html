@@ -68,15 +68,15 @@ With the new Ladder, written in Java you can:
 
 <h3>Downloading:</h3>
 
-<P><a href="http://java.sun.com/j2se/" target="_new">Download</a> and install the Java2 Runtime Environment (JRE)  from java.sun.com if you do not already have it installed.</P>
+<P><a href="http://java.sun.com/j2se/" target="_new">Download</a> and install the Java2 Runtime Environment (JRE v1.3 or later) from java.sun.com if you do not already have it installed.</P>
 
-<P><a href="LadderSource.jar">Download</a> the latest version of Ladder (Executable Jar - 166k)</p>
+<P><a href="Ladder.jar">Download</a> the latest version of Ladder (Executable Jar - 86k)</p>
 
 <p>All you need to do is double click the jar file to start Ladder!</p>
 
 <p>Some systems may not support executable jar files correctly.  If double clicking on the jar file does not work, try the following command lines:<br>
-<b>java -jar LadderSource.jar</b><br>
-<b>java -classpath LadderSource.jar com.Ostermiller.Ladder.Ladder</b></p>
+<b>java&nbsp;-jar&nbsp;Ladder.jar</b><br>
+<b>java&nbsp;-classpath&nbsp;Ladder.jar&nbsp;com.Ostermiller.Ladder.Ladder</b></p>
 
 <hr>
 
@@ -99,73 +99,60 @@ next release.
 Known bugs:</h3>
 
 <ul>
-<li>
-Bonus time is not done correctly. You get 2000 for each level.</li>
-
-<li>
-Finishing all the levels goes back to the first level but the speed does
+<li>Bonus time is not done correctly. You get 2000 for each level.</li>
+<li>Finishing all the levels goes back to the first level but the speed does
 not increase and the bonus time does not decrease.</li>
 </ul>
 
-<h3>
-Upcoming Features:</h3>
+<h3>Upcoming Features:</h3>
 
 <ul>
-<li>
-Remappable keys</li>
-
-<li>
-Even more levels</li>
-
-<li>
-High scores</li>
-
-<li>
-Menu for sound on/off</li>
-
-<li>
-Different scoring for different difficulty levels</li>
-
-<li>
-Help menu, display instructions</li>
-
-<li>
-Ready, set, go!</li>
-
-<li>
-Cut, copy, and paste in the level editor</li>
+<li>Remappable keys</li>
+<li>Even more levels</li>
+<li>Menu for sound on/off</li>
+<li>Different scoring for different difficulty levels</li>
+<li>Help menu, display instructions</li>
+<li>Ready, set, go!</li>
+<li>Cut, copy, and paste in the level editor</li>
 </ul>
 
 <hr>
-<h3>
-Version History:</h3>
+<h3>Version History:</h3>
+<ul>
+<li><b><a href="Ladder_1_1.jar">Ladder 1.1</a></b> (Executable Jar - 86k) December 2000 - Requires Java 1.3<br>
+<ul>
+<li>Major code refactoring that results in improved speed and lower memory usage.</li>
+<li>High score list.</li>
+<li>The order of levels is now like the original: you must play all levels to get a new level.</li>
+<li>Bugs fixed that allowed the lad to go through walls and ceilings under some circumstances.</li>
+<li>Lad death effect retimed.</li>
+<li>The game indicates that it is paused or that the game is over.</li>
+</ul></li>
 
-<h4><a href="LadderSource_1_0.jar">Ladder 1.0</a> (Executable Jar - 166k)</h4>
-
+<li><b><a href="Ladder_1_0.jar">Ladder 1.0</a></b> (Executable Jar - 68k) February 2000 - Requires Java 1.2
 <ul>
 <li>The lad will move up the ladder after a jump if you press the up key during
 the jump, or even before it.</li>
 <li>Better javadoc documentation on the source code.</li>
 <li>New levels: <a href="levels.html#PlinkoPlace">Plinko Place</a> and <a href="levels.html#OneChance">One
 Chance</a>.</li>
-</ul>
+</ul></li>
 
-<h4><a href="LadderSource_0_4.jar">Ladder 0.4</a> (Executable Jar - 24k)</h4>
+<li><b><a href="Ladder_0_4.jar">Ladder 0.4</a></b> (Executable Jar - 24k) December 1999 - Requires Java 1.2
 <ul>
 <li>Occassional gray flashes in the background are gone.</li>
 <li>Ladder is now in the com.Ostermiller.Ladder package.</li>
 <li>Ladder is now in an executable jar file.</li>
-<li>User preferences are stored in $USER_HOME_DIR/.java/Ladder.</li>
-</ul>
+<li>User preferences are stored in $USER_HOME_DIR/.java/Ladder/LadderUser.ini.</li>
+</ul></li>
 
-<h4>Ladder 0.3a</h4>
-
+<li><b>Ladder 0.3a</b>
 <ul>
 <li>Beeps!</li>
 <li>Entire new engine for moving the lad around! The lad now can wait until
 it can move in a any direction to go that way.</li>
 <li>Running the lad into a . makes the lad do more unpredictable things.</li>
-<li>Eisappearing floors and gold statues no longer reappear when you lose a
+<li>Disappearing floors and gold statues no longer reappear when you lose a
 life</li>
 <li>Keyboard shortcuts on menus.</li>
 <li>Adjustable font.</li>
@@ -183,10 +170,9 @@ less.</li>
 move</li>
 <li>Lad moves better. Can now make a second jump in the middle of a first jump.
 Also continues past ladders at the end of a jump now</li>
-</ul>
+</ul></li>
 
-<h4>Ladder 0.2a</h4>
-
+<li><b>Ladder 0.2a</b>
 <ul>
 <li>.ini files to save preferences.</li>
 <li>Scoring, time, and number of lads working.</li>
@@ -202,16 +188,16 @@ Also continues past ladders at the end of a jump now</li>
 <li>Speed change added to level difficulty (as well as more rocks)</li>
 <li>New code for reading in levels that is more robust. (Doesn't care that
 all lines same length for example.)</li>
-</ul>
+</ul></li>
 
-<h4>Ladder 0.1a</h4>
-
+<li><b>Ladder 0.1a</b>
 <ul>
 <li>Basic game functionality.</li>
 <li>Ability to load a level from a text file (And save edited level).</li>
 <li>Simple level editor.</li>
 <li>Preliminary ability to change the color scheme.</li>
 <li>Some level difficulty (more der rocks).</li>
+</ul></li>
 </ul>
 
 <hr>
