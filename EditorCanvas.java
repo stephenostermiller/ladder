@@ -14,7 +14,7 @@
  * 
  * See COPYING.TXT for details.
  */
-
+ 
 package com.Ostermiller.Ladder;
 
 import java.awt.event.*;
@@ -23,19 +23,64 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
+/** 
+ * The text component of the Ladder Editor
+ * 
+ */
 public class EditorCanvas extends JPanel implements KeyListener, MouseListener{
+    /** 
+     * The minimum size of this component.
+     * 
+     */
     private Dimension minSize;
+    /** 
+     * The number columns in this editorcanvas
+     * 
+     */
     private int columns;
+    /** 
+     * the number of rows in this Editor Canvas.
+     * 
+     */
     private int rows;
+        /**          * 
+         */
 	private int cursorX, cursorY, cursorEndX, cursorEndY;
+    /** 
+     * A stringbuffer representing the level we are editing.
+     * 
+     */
     private StringBuffer levelData;
+    /** 
+     * A string representing the level we are editing.
+     * 
+     */
     private String level;
+    /**      */
     private int letterWidth, letterHeight, letterAcsent;
+        /** 
+         * The size of the font to use in this EditorCanvas
+         * 
+         */
 	private int fontSize;
+    /** 
+     * The font to use in this EditorCanvas
+     * 
+     */
     private Font font;
+    /** 
+     * On the next redraw, should we repaint this entire canvas?
+     * 
+     */
     private boolean repaintAll;
+    /**      */
     private Color bgColor, fgColor;
 	
+    /** 
+     * Create a new EditorCanvas
+     * 
+     * @param level A string representing the level to edit.
+     */
     public EditorCanvas(String level){
         bgColor = Color.white;
         fgColor = Color.black;
@@ -60,6 +105,11 @@ public class EditorCanvas extends JPanel implements KeyListener, MouseListener{
         this.addMouseListener(this);
     }
 
+        /** 
+         * set the font size
+         * 
+         * @param size the size of the font
+         */
 	public void setFontSize(int size){
 	    font = new Font("Monospaced", Font.PLAIN, size);
         FontMetrics fontMetrics = this.getFontMetrics(font);
@@ -70,10 +120,20 @@ public class EditorCanvas extends JPanel implements KeyListener, MouseListener{
 		fontSize = size;   
 	}
 	
+        /** 
+         * get the font size
+         * 
+         * @return the size of the current font
+         */
 	public int getFontSize(){
 	    return fontSize;
 	}
         
+    /** 
+     * set the background color
+     * 
+     * @param bg The desired color of the background
+     */
     public void setBGColor(Color bg){
         bgColor = bg;
         setBackground(bgColor);
@@ -81,18 +141,33 @@ public class EditorCanvas extends JPanel implements KeyListener, MouseListener{
         repaint();
     }
     
+    /** 
+     * Set the foreground color
+     * 
+     * @param fg the desired foreground color.
+     */
     public void setFGColor(Color fg){
         fgColor = fg;
         repaintAll = true;
         repaint();
     }
 
+    /** 
+     * change the level that we are editing and repaint the canvas.
+     * 
+     * @param level the new level we are editing.
+     */
     private void setLevelPaint(String level){
         setLevel(level);
         repaintAll = true;
         repaint();
     }
 	
+        /** 
+         * get the contents of the level we are editing
+         * 
+         * @return the level we are editing
+         */
 	public String getLevel(){
 	    StringBuffer sb = new StringBuffer(levelData.length() + rows);
 	    for (int i=0; i<rows; i++){
@@ -101,6 +176,11 @@ public class EditorCanvas extends JPanel implements KeyListener, MouseListener{
 		return(sb.toString());
 	}
     
+    /** 
+     * set the level that we are editing, does not repaint.
+     * 
+     * @param level the contents of the level to edit.
+     */
     public void setLevel(String level){
         this.level = level;
         StringTokenizer levelTok = new StringTokenizer(level, "\n");
@@ -141,14 +221,29 @@ public class EditorCanvas extends JPanel implements KeyListener, MouseListener{
         minSize = new Dimension(letterWidth*(columns), letterHeight*(rows));        
     }
     
+    /** 
+     * gets the preferred size of this canvas.
+     * 
+     * @return the preferred size of this canvas.
+     */
     public Dimension getPreferredSize() {
         return getMinimumSize();
     }
 
+    /** 
+     * get the miminum size of this component
+     * 
+     * @return the minimum size of this component.
+     */
     public synchronized Dimension getMinimumSize() {
         return minSize;
     }
 
+    /** 
+     * paint this component
+     * 
+     * @param g graphics object
+     */
     public void paintComponent(Graphics g){
         //System.out.println("painting Editor");
         //g.setFont(font);
@@ -184,6 +279,13 @@ public class EditorCanvas extends JPanel implements KeyListener, MouseListener{
 		repaintAll = true;
     }
 	
+        /** 
+         * is the given point in the selected are of text
+         * 
+         * @param x x coordinate of point to test
+         * @param y y coordinate of point to test
+         * @return true if its in, false otherwise.
+         */
 	private boolean inSelection(int x, int y){
 	    boolean xYes = false;
 		boolean yYes = false;		
@@ -196,10 +298,28 @@ public class EditorCanvas extends JPanel implements KeyListener, MouseListener{
 		return (xYes && yYes);
 	}        
     
+    /** 
+     * Repaints as single character
+     * 
+     * @param xpos x position of character to paint.
+     * @param ypos y postition of character to paint.
+     */
     private void repaintCharAt(int xpos, int ypos){
         repaint((xpos)*letterWidth, (ypos)*letterHeight, letterWidth,letterHeight);
     }
 	
+        /** 
+         * Repaints a regoin of characters.
+         * 
+         * @param xpos x postion of character in one corner of region to 
+         *     repaint
+         * @param ypos y postion of character in one corner of region to  
+         *     repaint
+         * @param xpos2 x postion of character in opposite corner of region to
+         *      repaint
+         * @param ypos2 y postion of character in opposite corner of region to
+         *      repaint
+         */
 	private void repaintRegion(int xpos, int ypos, int xpos2, int ypos2){
 	    int x, y, width, height;
 		x = Math.min(xpos, xpos2);
@@ -209,6 +329,11 @@ public class EditorCanvas extends JPanel implements KeyListener, MouseListener{
 		repaint(x * letterWidth, y * letterHeight, width * letterWidth, height * letterHeight);
 	}
    
+        /** 
+         * alert this editor canvas that a key was pressed.
+         * 
+         * @param ke the key pressed
+         */
 	public void keyPressed(KeyEvent ke){
 	    int keycode = ke.getKeyCode();
 		switch (keycode){
@@ -291,21 +416,51 @@ public class EditorCanvas extends JPanel implements KeyListener, MouseListener{
 
     }
 	
+    /** 
+     * Alert this editor that a key was released.
+     * 
+     * @param ke key released.
+     */
     public void keyReleased(KeyEvent ke){
     }
 	
+    /** 
+     * Alert this editor that a key was released.
+     * 
+     * @param ke key released.
+     */
     public void keyTyped(KeyEvent ke){
     }
 	
+        /** 
+         * alert this editor that the mouse was clicked.
+         * 
+         * @param e mouse click.
+         */
 	public void mouseClicked(MouseEvent e){
     } 
 
+    /** 
+     * alert this editor that the mouse entered the area.
+     * 
+     * @param e mouse event
+     */
     public void mouseEntered(MouseEvent e){
     }
 
+    /** 
+     * alert this editor that the mouse exited.
+     * 
+     * @param e mouse exit.
+     */
     public void mouseExited(MouseEvent e){
 	}
 
+    /** 
+     * alert this editor that the mouse was pressed.
+     * 
+     * @param e mouse press.
+     */
     public void mousePressed(MouseEvent e){
 	    int mouseX, mouseY;
 		mouseX = e.getX();
@@ -318,6 +473,11 @@ public class EditorCanvas extends JPanel implements KeyListener, MouseListener{
         repaintRegion(cursorX, cursorY, cursorEndX, cursorEndY);
 	}
 
+    /** 
+     * alert this editor that the mouse was released.
+     * 
+     * @param e mouse release.
+     */
     public void mouseReleased(MouseEvent e){
 	    int mouseX, mouseY;
 		mouseX = e.getX();

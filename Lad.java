@@ -19,29 +19,117 @@ package com.Ostermiller.Ladder;
 
 import java.util.*;
 
+/** 
+ * The rules for a Ladder lad, moving around.
+ * 
+ */
 public class Lad extends Creature{
+    /** 
+     * the last command given to the lad.
+     * 
+     */
     private int command;
+        /** 
+         * a command the lad cannot currently execute, but may at some future time.
+         * 
+         */
 	private int futureCommand;
+        /** 
+         * The lad cannot jump now, but may at some future time.
+         * 
+         */
 	private boolean futureJump;
+    /** 
+     * The lad should jump.
+     * 
+     */
     private boolean jumpCommand;
+    /** 
+     * The lad cannot go this direction at the current time, but should as soon as it can.
+     * 
+     */
     private int futureDirection;
+    /** 
+     * The lad should jump.
+     * 
+     */
     private int jump;
+    /** 
+     * Command: stop
+     * 
+     */
     public static final int STOP = 5;
+    /** 
+     * Command: left
+     * 
+     */
     public static final int LEFT = 4;
+    /** 
+     * Command: right
+     * 
+     */
     public static final int RIGHT = 6;
+    /** 
+     * Command: up
+     * 
+     */
     public static final int UP = 8;
+    /** 
+     * Command: down
+     * 
+     */
     public static final int DOWN = 2;
+    /** 
+     * Command: no command
+     * 
+     */
     public static final int NONE = 0;
+    /** 
+     * Command: jump
+     * 
+     */
     public static final int JUMP = 10;
+    /** 
+     * Command: fall
+     * 
+     */
     public static final int FALL = 11;
+    /** 
+     * Command: up left
+     * 
+     */
     public static final int UPLEFT = 7;
+    /** 
+     * Command: up right
+     * 
+     */
     public static final int UPRIGHT = 9;
+    /** 
+     * Command: down left
+     * 
+     */
     public static final int DOWNLEFT = 1;
+    /** 
+     * Command: down right
+     * 
+     */
     public static final int DOWNRIGHT = 3;
+        /** 
+         * Random number generator used by this lad.
+         * 
+         */
 	private Random rand;
 	// the environment around the character
+        /**          */
 	private char one, two, three, four, five, six, seven, eight, nine;
     
+    /** 
+     * create a new lad
+     * 
+     * @param xpos x position of this lad
+     * @param ypos y position of this lad
+     * @param direction direction in which this lad is headed.
+     */
     public Lad(int xpos, int ypos, int direction){
         this.xpos = xpos;
         this.ypos = ypos;
@@ -55,66 +143,130 @@ public class Lad extends Creature{
 		rand = new Random();
     }
     
+    /** 
+     * tell this lad to jump
+     * 
+     */
     public void setJump(){
         jumpCommand = true;
     }        
     
+    /** 
+     * tell this lad to execute the given command.
+     * 
+     * @param command command the lad should do.
+     */
     public void setCommand(int command){
         this.command = command;
     }
 	
+        /** 
+         * can the lad move up?
+         * 
+         * @return true if the lad can move up, false otherwise
+         */
 	private boolean canMoveUp(){
 	    // nothing solid can be above us to be able to move up.
 	    return(eight != '=' && eight != '|' && eight != '-'); 
 	}
 	
+        /** 
+         * true if the lad can climb up, false otherwise.
+         * 
+         * @return true if the lad can climb up, false otherwise.
+         */
 	private boolean canClimbUp(){
 	    // must be a ladder above us to be able to climb up
 		// a $ can hide a ladder
 	    return(eight == 'H' || eight == '$');
     }
 	
+        /** 
+         * true if the lad can move down, false otherwise.
+         * 
+         * @return true if the lad can move down, false otherwise.
+         */
 	private boolean canMoveDown(){
 	    // nothing solid can be below us to be able move down.
 	    return(two != '=' && two != '|' && two != '-');
 	}
 	
+        /** 
+         * true if the lad can move up left, false otherwise.
+         * 
+         * @return true if the lad can move up left, false otherwise.
+         */
 	private boolean canMoveUpLeft(){
 	    // nothing solid can be there to be able move there.
 	    return(seven != '=' && seven != '|' && seven != '-');
 	}
 	
+        /** 
+         * true if the lad can move down left, false otherwise.
+         * 
+         * @return true if the lad can move down left, false otherwise.
+         */
 	private boolean canMoveDownLeft(){
 	    // nothing solid can be there to be able move there.
 	    return(one != '=' && one != '|' && one != '-');
 	}
 	
+        /** 
+         * true if the lad can move up right, false otherwise.
+         * 
+         * @return true if the lad can move up right, false otherwise.
+         */
 	private boolean canMoveUpRight(){
 	    // nothing solid can be there to be able move there.
 	    return(nine != '=' && nine != '|' && nine != '-');
 	}
 	
+        /** 
+         * true if the lad can move down right, false otherwise.
+         * 
+         * @return true if the lad can move down right, false otherwise.
+         */
 	private boolean canMoveDownRight(){
 	    // nothing solid can be there to be able move there.
 	    return(three != '=' && three != '|' && three != '-');
 	}
 	
+        /** 
+         * true if the lad can move right, false otherwise.
+         * 
+         * @return true if the lad can move right, false otherwise.
+         */
 	private boolean canMoveRight(){
 	    // nothing solid can be there to be able move there.
 	    return(six != '=' && six != '|' && six != '-');
 	}
 	
+        /** 
+         * true if the lad can move left, false otherwise.
+         * 
+         * @return true if the lad can move left, false otherwise.
+         */
 	private boolean canMoveLeft(){
 	    // nothing solid can be there to be able move there.
 	    return(four != '=' && four != '|' && four != '-');
 	}
 	
+        /** 
+         * true if the lad can stay where it is, false otherwise.
+         * 
+         * @return true if the lad can stay where it is, false otherwise.
+         */
 	private boolean canStayPut(){
 	    // we have to be standing on something solid,
 		// or be hanging on to something solid
 	    return(two == '=' || two == '|' || two == '-' || five == 'H');
 	}
 	
+        /** 
+         * true if the lad is in the midst of a jump, false otherwise.
+         * 
+         * @return true if the lad is in the midst of a jump, false otherwise.
+         */
 	private boolean inAJump(){
 	    // if we are in the middle of a jump
 		// we know we are in the middle of a jump if the jump
@@ -125,10 +277,20 @@ public class Lad extends Creature{
 		return(jump > 0 && jump < 6);
 	}
 	
+        /** 
+         * true if the lad just landed a jump, false otherwise.
+         * 
+         * @return true if the lad just landed a jump, false otherwise.
+         */
 	private boolean JumpJustOver(){
 	    return (jump>5);
 	}
 	
+        /** 
+         * true if the lad has an impending move, false otherwise.
+         * 
+         * @return true if the lad has an impending move, false otherwise.
+         */
 	private boolean moveScheduled(){
 	    return(command != Lad.NONE && futureCommand != Lad.NONE && !jumpCommand && !futureJump);
 	}
@@ -137,6 +299,10 @@ public class Lad extends Creature{
 	// assume any future jump commands have been moved to jump command
 	// assume there is no command or future command
 	// assume not in the middle of a jump
+    /** 
+     * tell the lad to move as the lads momentum is currently taking him.
+     * 
+     */
     private void moveMomentum(){
 	    if (inAJump()){
 		    return; // we can't handle this.
@@ -211,6 +377,12 @@ public class Lad extends Creature{
 		}
 	}
 	
+        /** 
+         * tell the lad to move as if he is continueing with a jump.
+         * 
+         * @return true if it was able to act immediatly on a command or 
+         *     future command
+         */
 	private boolean moveJump(){
         if (five == 'H'){
             // end a jump on a ladder.
@@ -368,6 +540,12 @@ public class Lad extends Creature{
 	}
 	
 	// returns true if it was able to act immediatly on a command or future command
+        /** 
+         * tell the lad to move, as if it is not in a jump.
+         * 
+         * @return true if it was able to act immediatly on a command or 
+         *     future command
+         */
 	private boolean moveNoJump(){
 	    if (command != Lad.NONE){ // any directional changes cancel future jumps and commands
 		    futureJump = false;
@@ -484,9 +662,12 @@ public class Lad extends Creature{
 		return (false);
 	}
 	
-	/**
-	 * Figure out where we should go if we are on a trampoline
-	 */
+        /** 
+         * Figure out where we should go if we are on a trampoline
+         * 
+         * @return true if it was able to act immediatly on a command or 
+         *     future command
+         */
 	private boolean moveOnTrampoline(){
 	    int count, choice;
 		// allow us to stop on the trampoline and and get a command next time.
@@ -596,6 +777,20 @@ public class Lad extends Creature{
 		return(false); //we were unable to find somewhere to move	
 	}
     
+    /** 
+     * Request that this lad updates itself.
+     * This should be called once per frame of the game.
+     * 
+     * @param one The character DOWNLEFT of this creature.
+     * @param two The character DOWN of this creature.
+     * @param three The character DOWNRIGHT of this creature.
+     * @param four The character LEFT of this creature.
+     * @param five The character on this creature.
+     * @param six The character RIGHT of this creature.
+     * @param seven The character UPLEFT of this creature.
+     * @param eight The character UP of this creature.
+     * @param nine The character UPRIGHT of this creature.
+     */
     public void update(char one, char two, char three, char four, char five, char six,
         char seven, char eight, char nine){
 		this.one = one;

@@ -17,5 +17,9 @@
 
 package com.Ostermiller.Ladder;
 
+/** 
+ * An exception to be thrown when a game is over
+ * 
+ */
 public class GameOverException extends Exception{
 }

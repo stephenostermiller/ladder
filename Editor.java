@@ -23,10 +23,25 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
+/** 
+ * A level editor for Ladder.
+ */
 public class Editor extends JFrame implements WindowListener{
+    /** 
+     * The instance of ladder that calls this.
+     */
     private Ladder parent;
+        /** 
+         * The text component of the editor.
+         */
 	private EditorCanvas theArea;
     
+    /** 
+     * Create an editor.
+     * 
+     * @param level A string representation of the current level.
+     * @param parent The instance of Ladder that called this.
+     */
     public Editor(String level, Ladder parent){
         theArea = new EditorCanvas(level);
         this.parent = parent;
@@ -41,24 +56,59 @@ public class Editor extends JFrame implements WindowListener{
         this.setVisible(true);
     }
 
+        /** 
+         * Window Deiconified
+         * 
+         * @param event window Deiconified
+         */
 	public void windowDeiconified(java.awt.event.WindowEvent event){
 	}
 	
+    /** 
+     * window closed.
+     * 
+     * @param event window closed.
+     */
     public void windowClosed(java.awt.event.WindowEvent event){
 	}
 	
+    /** 
+     * window opened.
+     * 
+     * @param event window opened.
+     */
     public void windowOpened(java.awt.event.WindowEvent event){
 	}
 	
+    /** 
+     * window iconified.
+     * 
+     * @param event window iconified.
+     */
     public void windowIconified(java.awt.event.WindowEvent event){
 	}
 	
+    /** 
+     * window deiconified.
+     * 
+     * @param event window deiconified.
+     */
     public void windowActivated(java.awt.event.WindowEvent event){
     }
     
+    /** 
+     * window deactivated.
+     * 
+     * @param event window deactivated.
+     */
     public void windowDeactivated(java.awt.event.WindowEvent event){
     }
 	
+    /** 
+     * window closing.
+     * 
+     * @param event window closing.
+     */
     public void windowClosing(java.awt.event.WindowEvent event){
         parent.setLevel(theArea.getLevel());
         setVisible(false);       // hide the Frame

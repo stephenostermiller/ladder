@@ -20,18 +20,23 @@ package com.Ostermiller.Ladder;
 import java.util.*;
 
 /** 
- * This class defines a barrel.  Barrels appear as an 'o' on the screen.  
- * The roll down the screen and try to crush the lad.  
+ * This class defines a barrel.  Barrels appear as an 'o' on the screen.
+ * The roll down the screen and try to crush the lad.
+ * 
  */
 public class Barrel extends Creature{
+    /** 
+     * Random Number Generator for this Barrel
+     * 
+     */
     private Random rnum = new Random();
 	
-	/** 
+    /** 
      * Create a new barrel in the given postion, going the proper direction
-	 *
-	 * @param xpos the x coordinate of the barrel's position
- 	 * @param ypos the y coordinate of the barrel's position  
-	 * @param direction the direction in which the barrel is initially moving  
+     * 
+     * @param xpos the x coordinate of the barrel's position
+     * @param ypos the y coordinate of the barrel's position
+     * @param direction the direction in which the barrel is initially moving
      */
     public Barrel(int xpos, int ypos, int direction){
         this.xpos = xpos;
@@ -40,30 +45,46 @@ public class Barrel extends Creature{
         symbol = 'o';
     }
 
+    /** 
+     * The command go  down
+     * 
+     */
     private static final int DOWN = 2;
+    /** 
+     * The command go left
+     * 
+     */
     private static final int LEFT = 4;
+    /** 
+     * The command go right
+     * 
+     */
     private static final int RIGHT = 6;
+    /** 
+     * The command stop
+     * 
+     */
     private static final int STOP = 5;
     
     /** 
-     * cause this barrel to update itself.  This will tell the barrel it 
-	 * is allowed to move.  The context around the barrel is passed to the barrel.
-	 * The barrel uses this context, and its current direction to decide 
-	 * where it will be next.  Basically the barrel will fall down if nothing is
-	 * under it, will move in the direction it was moving if it is not blocked,
-	 * and will move randomly right or left if it hits some obstacle.
-	 * The context is passed as 9 characters.  The characters are numbered like the
-	 * number keypad for easy reference.
-	 *
-	 * @param one the character an the screen in the one position 
-	 * @param two the character an the screen in the two position
-	 * @param three the character an the screen in the three position
-	 * @param four the character an the screen in the four position
-	 * @param five the character an the screen in the five position
-	 * @param six the character an the screen in the six position
-	 * @param seven the character an the screen in the seven position
-	 * @param eight the character an the screen in the eight position
-	 * @param nine the character an the screen in the nine position
+     * Cause this barrel to update itself.  This will tell the barrel it
+     * is allowed to move.  The context around the barrel is passed to the barrel.
+     * The barrel uses this context, and its current direction to decide
+     * where it will be next.  Basically the barrel will fall down if nothing is
+     * under it, will move in the direction it was moving if it is not blocked,
+     * and will move randomly right or left if it hits some obstacle.
+     * The context is passed as 9 characters.  The characters are numbered like the
+     * number keypad for easy reference.
+     * 
+     * @param one the character an the screen in the one position
+     * @param two the character an the screen in the two position
+     * @param three the character an the screen in the three position
+     * @param four the character an the screen in the four position
+     * @param five the character an the screen in the five position
+     * @param six the character an the screen in the six position
+     * @param seven the character an the screen in the seven position
+     * @param eight the character an the screen in the eight position
+     * @param nine the character an the screen in the nine position
      */
     public void update(char one, char two, char three, char four, char five, char six,
         char seven, char eight, char nine){
