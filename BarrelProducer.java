@@ -28,7 +28,7 @@ public class BarrelProducer{
      * The random number producer for this class
      * 
      */
-    private Random rnum;
+    private static Random rnum = new Random();
     /** 
      * The list of barrels available for use.  This list is kept so that we don't have to continually create new instances of barrels, which would slow the application down due to excessive garbage collection.
      * 
@@ -61,9 +61,9 @@ public class BarrelProducer{
     private boolean recycled;
     
     
-    /** 
+    /**
      * Creates a new barrel producer at the given coordinate
-     * 
+     *
      * @param xpos The x coordinate of this barrel producer
      * @param ypos The y coordinate of this barrel producer
      */
@@ -73,11 +73,6 @@ public class BarrelProducer{
         recycled = false;
         barrels = new Vector();
         minBarrels = 7;
-		rnum = new Random();
-		try{
-			Thread.currentThread().sleep(10); // sleep to allow the time to increase and the random number to get seeded differently
-		} catch (InterruptedException e){
-		}
 	}
     
     /** 
@@ -104,7 +99,6 @@ public class BarrelProducer{
         barrel.setXPos(xpos);
         barrel.setYPos(ypos);
         recycled = true;
-        
     }
     
     /** 
