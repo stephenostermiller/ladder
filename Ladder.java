@@ -34,6 +34,12 @@ public class Ladder extends JFrame {
      */
 	private LadderCanvas ladderCanvas;
 
+    /**
+     * Create an instance of a barrel producer to cut down on new barrel production
+     * and prevent barrels from being garbage collected.
+     */
+    private static BarrelProducer barrelProducer = new BarrelProducer(0,0);
+
 	/**
      * menu items in the menus
      */
@@ -175,8 +181,9 @@ public class Ladder extends JFrame {
                     fd.setVisible(true);
                     if (fd.getFile() != null){
                         try {
-                            writeToFile(fd.getFile());
+                            level.store(fd.getFile());
                         } catch (IOException e){
+                            System.err.println(e.getMessage());
                         }
                     }
                 } else if (object == editItem){
@@ -534,28 +541,12 @@ public class Ladder extends JFrame {
     /**
      * Run the game
      *
-     * @param args 
+     * @param args command line arguments are ignored.
      */
     public static void main(String args[]){
         Ladder ladder = new Ladder();
         ladder.setVisible(true);
         ladder.startLevel();
-    }
-
-    /**
-     * write the current level to a file
-     *
-     * @exception java.io.IOException an IOException occurs
-     * @param fileName file name to write
-     */
-    private void writeToFile(String fileName)throws java.io.IOException{
-        File f = new File(fileName);
-        if (f.exists()){
-            f.delete();
-        }
-        RandomAccessFile ra = new RandomAccessFile(f, "rw");
-        ra.writeBytes(level.toString());
-        ra.close();
     }
 
     /**
@@ -649,7 +640,8 @@ public class Ladder extends JFrame {
             int levelNum = currLevel;
             for (int i=0; i<levels.length; levelNum++, i++){
                 try {
-                    LevelMenuItem menuItem = (LevelMenuItem)levels[getLevelIndex(levelNum - 1 % getNumberLevels(levels.length))];
+                    LevelMenuItem menuItem = (LevelMenuItem)levels[
+						getLevelIndex((levelNum - 1) % getNumberLevels(levels.length))];
                     level = menuItem.getLevel();
                     menuItem.setSelected(true);
                     break;
