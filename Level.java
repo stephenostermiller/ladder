@@ -27,6 +27,22 @@ import java.awt.Dimension;
  */
 public class Level implements Cloneable {
 
+	/**
+     * Internally, we will represent this level as a double array of characters.
+     * The arrays should always be the same length and the last arrays should not
+	 * consist of blanks lines.
+     *
+     * in level[i][j], there are i rows that start from 0 at the top of the screen
+     * and there are j columns that start from 0 at the left of the screen.
+     */
+    protected char[][] level;
+
+    /**
+     * indicates that this level has changed since the last time it
+     * was loaded or saved.
+     */
+    protected boolean changed = false;
+
     /**
      * Create an empty level.
      */
@@ -149,22 +165,6 @@ public class Level implements Cloneable {
             System.err.println(e.getMessage());
         }
  	}
-
-    /**
-     * Internally, we will represent this level as a double array of characters.
-     * The arrays should always be the same length and the last arrays should not 
-	 * consist of blanks lines.
-     *
-     * in level[i][j], there are i rows that start from 0 at the top of the screen
-     * and there are j columns that start from 0 at the left of the screen.
-     */
-    protected char[][] level;
-
-    /**
-     * indicates that this level has changed since the last time it
-     * was loaded or saved.
-     */
-    protected boolean changed = false;
 
     /**
      * Has this level changed since it was last loaded or saved?
