@@ -1,54 +1,148 @@
-JFLAGS=
-JAVAC=javac
-JAVA=java
+JFLAGS=-classpath ../../..
+JAVA=java $(JFLAGS)
+JAVAC=javac $(JFLAGS)
 JAVADOC=javadoc
 BTE=$(JAVA) $(JFLAGS) com.Ostermiller.bte.Compiler
 CVS=cvs
 
-all: compile build javadoc web
+.SUFFIXES:
+.SUFFIXES: .java .class
+.SUFFIXES: .bte .html
 
-compile:
-	$(JAVAC) $(JFLAGS) *.java
+.PHONY: all
+all: junkclean spell neaten compile web javadoc build release
 
+
+spell: *.bte *.java
+	@echo Make: Running spell check.
+	@./spell.sh $?
+	@touch spell
+	
+.PHONY : compile
+compile: classes
+
+JAVAFILES=$(wildcard *.java)
+.PHONY: classes
+classes: $(JAVAFILES:.java=.class)
+	@# Write a bash script that will compile the files in the todo list
+	@echo "#!/bin/bash" > tempCommand	
+	@# If the todo list doesn't exist, don't compile anything
+	@echo "if [ -e tempChangedJavaFileList ]" >> tempCommand
+	@echo "then" >> tempCommand
+	@# Make sure each file is only on the todo list once.
+	@echo "sort tempChangedJavaFileList | uniq  > tempChangedJavaFileListUniq" >> tempCommand
+	@echo "FILES=\`cat tempChangedJavaFileListUniq\`" >> tempCommand
+	@# Compile the files.
+	@echo "echo Make: Compiling: $$ FILES" >> tempCommand
+	@echo "$(JAVAC) $$ FILES" >> tempCommand
+	@echo "fi" >> tempCommand
+	@# Remove extra spaces in the script that follow the dollar signs.
+	@sed "s/\$$ /\$$/" tempCommand > tempCommand.sh
+	@# Make the script executable.
+	@chmod +x tempCommand.sh
+	@# Call the script
+	@./tempCommand.sh
+	@rm -f tempCommand tempCommand.sh tempChangedJavaFileList tempChangedJavaFileListUniq
+
+.java.class:
+	@#for each changed java file, add it to the todo list.
+	@echo "$<" >> tempChangedJavaFileList
+
+.PHONY: junkclean
 junkclean:
-	rm -rf *~ ~* *.bak com/ docs/
+	@echo Make: Removing Ladder detritus.
+	@rm -rf *~ ~* core *.bak com/ docs/ spell javadoc
 
+.PHONY: buildclean
 buildclean: junkclean
-	rm -f ladder.jar
+	@echo Make: Removing ladder.jar.
+	@rm -f ladder.jar
         
+.PHONY: javadocclean
 javadocclean: junkclean
-	rm -rf doc/
+	@echo Make: Removing generated JavaDoc.
+	@rm -rf doc/
 
-webclean: junkclean
-	rm -f `find . -name "*.bte" | sed s/.bte/.html/`
-
+.PHONY: clean
 clean: buildclean javadocclean webclean
-	rm -f *.class
+	@echo Make: Removing generated class files.
+	@rm -f *.class
 
-build:
-	rm -f *~
-	rm -f ladder.jar
-	rm -rf com/
-	mkdir -p com/Ostermiller/Ladder
-	cp *.* Makefile com/Ostermiller/Ladder/
-	jar cmfv Ladder.mf ladder.jar com/ > /dev/null
-	rm -rf com/
+ladder.jar: *.bte *.java *.class *.sh *.lvl *.mf *.ini *.dict *.css package.html Makefile	
+	@echo Make: Building jar file
+	@rm -f *~
+	@rm -f ladder.jar
+	@rm -rf com/
+	@mkdir -p com/Ostermiller/Ladder
+	@cp *.bte *.java *.class *.sh *.lvl *.mf *.ini *.dict *.css package.html Makefile com/Ostermiller/Ladder/
+	@jar cmfv Ladder.mf ladder.jar com/ > /dev/null
+	@rm -rf com/
 
-javadoc:
+.PHONY: build
+build: ladder.jar
+
+javadoc: *.java
 	rm -rf doc/
 	mkdir doc
 	mv package.html temp
 	$(JAVADOC) -quiet -d doc/ com.Ostermiller.Ladder > /dev/null
 	mv temp package.html
+	touch javadoc
 
-web:
-	$(BTE) .
+.PHONY: htmlclean
+htmlclean:
+	@echo Make: Removing generated html documents.
+	@rm -f `find . -name "*.bte" | sed s/.bte/.html/`
 
+NOOUTPUTBTE=(downloadPage|form|levelPage|page)
+BTEFILES=$(wildcard *.bte)
+.PHONY: html
+html: $(BTEFILES:.bte=.html)
+	@# Write a bash script that will compile the files in the todo list
+	@echo "#!/bin/bash" > tempCommand	
+	@# If the todo list doesn't exist, don't compile anything
+	@echo "if [ -e tempChangedBTEFileList ]" >> tempCommand
+	@echo "then" >> tempCommand
+	@# Make sure each file is only on the todo list once.
+	@echo "sort tempChangedBTEFileList | uniq | egrep -v \"$(NOOUTPUTBTE)\" > tempChangedBTEFileListUniq" >> tempCommand
+	@echo "FILES=\`cat tempChangedBTEFileListUniq\`" >> tempCommand
+	@echo "if [ \"$$ FILES\" ]" >> tempCommand
+	@echo "then" >> tempCommand
+	@# Compile the files.
+	@echo "echo Make: Compiling: $$ FILES" >> tempCommand
+	@echo "$(BTE) $$ FILES" >> tempCommand
+	@echo "fi" >> tempCommand
+	@echo "fi" >> tempCommand
+	@# Remove extra spaces in the script that follow the dollar signs.
+	@sed "s/\$$ /\$$/" tempCommand > tempCommand.sh
+	@# Make the script executable.
+	@chmod +x tempCommand.sh
+	@# Call the script
+	@./tempCommand.sh
+	@rm -f tempCommand tempCommand.sh tempChangedBTEFileList tempChangedBTEFileListUniq
+
+.bte.html:
+	@#for each changed java file, add it to the todo list.
+	@echo "$<" >> tempChangedBTEFileList
+	
+.PHONY: web
+web: html
+
+.PHONY: webclean
+webclean: htmlclean
+
+.PHONY: update
 update: clean
 	$(CVS) update
         
+.PHONY: commit
 commit: clean
 	$(CVS) commit
 
-release: update all commit
-	scp *.html *.jar *.css deadsea@ostermiller.org:www/ladder
+release: *.html *.jar *.css form.bte levelPage.bte page.bte 
+	@./release.sh $?
+	@touch release
+	
+neaten: *.java
+	@./neaten.sh $?
+	@touch neaten

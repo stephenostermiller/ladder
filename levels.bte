@@ -24,7 +24,7 @@
 <li><b>=</b> - Floor.  You walk on it.
 <li><b>H</b> - Ladder.  You climb it.
 <li><b>|</b> - Wall.  You can't walk through it.  You're not a ghost....yet.
-<li><b>.</b> - Rubber Ball.  It's very bouncey.  This difference is, it bounces you.
+<li><b>.</b> - Rubber Ball.  It's very bouncy.  This difference is, it bounces you.
 <li><b>$</b> - Treasure.  The lad must get here to finish the level.
 <li><b>&</b> - Gold Statue. Money!Money!Money!Money!Money!
 <li><b>^</b> - Fire.  Turns you into extra crispy bacon.

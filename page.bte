@@ -58,7 +58,7 @@ name=licenseLinkText %><%/bte.grp %></li>
 <%bte.tpl name=downloadLinkText %><a href="download.html">Download</a> - Get Ladder and the source code (free).<%/bte.tpl%>
 <%bte.tpl name=instructionsLinkText %><a href="instructions.html">Instructions</a> - How to play.<%/bte.tpl%>
 <%bte.tpl name=historyLinkText %><a href="history.html">History</a> - List of features and bug fixes in each release.<%/bte.tpl%>
-<%bte.tpl name=forumsLinkText %><a href="http://sourceforge.net/forum/forum.php?forum_id=179106">Forums</a> - Unmoderated game disscussion.<%/bte.tpl%>
+<%bte.tpl name=forumsLinkText %><a href="http://sourceforge.net/forum/forum.php?forum_id=179106">Forums</a> - Unmoderated game discussion.<%/bte.tpl%>
 <%bte.tpl name=announcementsLinkText %><a href="http://lists.sourceforge.net/lists/listinfo/laddergame-updates">Announcements</a> - Subscribe to a moderated mailing list used only for announcing new versions.<%/bte.tpl%>
 <%bte.tpl name=sourceLinkText %><a href="http://www.gjt.org/servlets/JCVSlet/list/gjt/com/Ostermiller/Ladder/">Source Code</a> - Browse the source code for the game in your web browser.<%/bte.tpl%>
 <%bte.tpl name=javadocLinkText %><a href="http://www.gjt.org/javadoc/com/Ostermiller/Ladder/package-summary.html">JavaDoc</a> - Documentation for the source code.<%/bte.tpl%>

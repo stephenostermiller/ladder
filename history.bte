@@ -19,7 +19,7 @@
 <li>High score list.</li>
 <li>The order of levels is now like the original: you must play all levels to get a new level.</li>
 <li>Bugs fixed that allowed the lad to go through walls and ceilings under some circumstances.</li>
-<li>Lad death effect retimed.</li>
+<li>Lad death effect re-timed.</li>
 <li>The game indicates that it is paused or that the game is over.</li>
 </ul></li>
 
@@ -27,14 +27,14 @@
 <ul>
 <li>The lad will move up the ladder after a jump if you press the up key during
 the jump, or even before it.</li>
-<li>Better javadoc documentation on the source code.</li>
+<li>Better JavaDoc documentation on the source code.</li>
 <li>New levels: <a href="levels.html#PlinkoPlace">Plinko Place</a> and <a href="levels.html#OneChance">One
 Chance</a>.</li>
 </ul></li>
 
 <li><b><a href="ladder_0_4.jar">Ladder 0.4</a></b> (Executable Jar - 24k) December 1999 - Requires Java 1.2
 <ul>
-<li>Occassional gray flashes in the background are gone.</li>
+<li>Occasional gray flashes in the background are gone.</li>
 <li>Ladder is now in the com.Ostermiller.Ladder package.</li>
 <li>Ladder is now in an executable jar file.</li>
 <li>User preferences are stored in $USER_HOME_DIR/.java/Ladder/LadderUser.ini.</li>

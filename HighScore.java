@@ -22,46 +22,46 @@ package com.Ostermiller.Ladder;
  */
 public class HighScore {
 
-    /**
-     * The actual score associated with this high score.
-     */
-    public long score = 0;
+	/**
+	 * The actual score associated with this high score.
+	 */
+	public long score = 0;
 
-    /**
-     * The level number on which the game ended.
-     */
-    public int level = 0;
+	/**
+	 * The level number on which the game ended.
+	 */
+	public int level = 0;
 
-    /**
-     * The name of the person who acheived this high score.
-     */
-    public String name = "";
+	/**
+	 * The name of the person who achieved this high score.
+	 */
+	public String name = "";
 
-    /**
-     * Create a new high score.
-     */
-    public HighScore(){
-    }
+	/**
+	 * Create a new high score.
+	 */
+	public HighScore(){
+	}
 
-    /**
-     * Create a new high score.
-     *
-     * @param score the actual score associated with this high score.
-     * @param level the level number on which the game ended.
-     * @param name the name of the person who acheived this high score.
-     */
-    public HighScore(long score, int level, String name){
-        this.score = score;
-        this.level = level;
-        this.name = name;
-    }
+	/**
+	 * Create a new high score.
+	 *
+	 * @param score the actual score associated with this high score.
+	 * @param level the level number on which the game ended.
+	 * @param name the name of the person who achieved this high score.
+	 */
+	public HighScore(long score, int level, String name){
+		this.score = score;
+		this.level = level;
+		this.name = name;
+	}
 
-    /**
-     * Format this HighScore for debug printing
-     *
-     * @return a string representation of this HighScore
-     */
-    public String toString(){
-        return (name + " Score:" + score + " Level:" + level);
-    }
+	/**
+	 * Format this HighScore for debug printing
+	 *
+	 * @return a string representation of this HighScore
+	 */
+	public String toString(){
+		return (name + " Score:" + score + " Level:" + level);
+	}
 }
