@@ -30,36 +30,41 @@ import java.net.*;
  * operating system.  It is entirly based in ASCII characters.
  */
 public class Ladder extends JFrame implements  ActionListener, WindowListener, ItemListener{
-    // laddercanvas is the main part of the game
-        /** 
-         * The canvas that displays the main part of the game
-         */
-	private LadderCanvas ladderCanvas;
-	// the menu bar at the top of the screen
     /** 
+     * The canvas that displays the main part of the game
+     */
+	private LadderCanvas ladderCanvas;
+	/** 
      * the menu bar at the top of the screen
      */
     private JMenuBar ladderMenuBar;
-	// menus on the menu bar
-    /** 
+	/** 
+     * menus on the menu bar
      */
     private JMenu fileMenu, editMenu, optionsMenu, difficultyMenu, levelMenu;
-	// menu items in the menus
-        /**          */
+	/**  
+     * menu items in the menus
+     */
 	private JMenuItem openItem, editItem, saveItem, newItem, bgItem, 
         fgItem, exitItem, fontItem;
-    /**      */
+    /**      
+     *
+     */
     private JCheckBoxMenuItem pauseItem;
-        /**          */
-	private JRadioButtonMenuItem easyItem, mediumItem, 
+    /**      
+     *
+     */
+    private JRadioButtonMenuItem easyItem, mediumItem, 
         hardItem, veryHardItem, impossibleItem;
-        /**          */
-	private ButtonGroup difficultyGroup, levelGroup;
-	// for displaying the score and lives left and stuff
-    /**      */
+    /**      
+     *
+     */
+    private ButtonGroup difficultyGroup, levelGroup;
+	/**      
+     * for displaying the score and lives left and stuff
+     */
     private JLabel ladField, levelField, scoreField, bonusTimeField;
-	// the text representation of the current level
-    /** 
+	/** 
      * the text representation of the current level
      */
     private String level;
@@ -67,9 +72,13 @@ public class Ladder extends JFrame implements  ActionListener, WindowListener, I
      * Is the game running, as opposed to over, not started, or paused?
      */
     private boolean running;
-    /**      */
+    /**      
+     *
+     */
     private Properties defaultProps, props;
-    /**      */
+    /**      
+     *
+     */
     private Vector LevelMenuItems;
     /** 
      * Vector of files to load as levels
@@ -79,13 +88,15 @@ public class Ladder extends JFrame implements  ActionListener, WindowListener, I
      * the number of the current level being played
      */
     private int currLevel;
-        /**          */
-	private Color bgColor, fgColor;
+    /**      
+     *
+     */
+    private Color bgColor, fgColor;
 	
-        /** 
-         * Array of choices for font sizes.
-         * 
-         */
+    /** 
+     * Array of choices for font sizes.
+     * 
+     */
 	private final static Integer[] FONT_SIZES = new Integer[16];
     
     /** 
@@ -673,7 +684,8 @@ public class Ladder extends JFrame implements  ActionListener, WindowListener, I
         //System.out.println("Packed on change Level - Repaintt");
     }
 
-    /** get the level after the specified level
+    /** 
+     * get the level after the specified level
      * 
      * @param ind number of the level
      * @return the text of the level
@@ -691,7 +703,8 @@ public class Ladder extends JFrame implements  ActionListener, WindowListener, I
         return(s);
     }
 
-    /** get the text of the next level
+    /** 
+     * get the text of the next level
      * 
      * @return the text of the next level
      */
@@ -720,8 +733,8 @@ public class Ladder extends JFrame implements  ActionListener, WindowListener, I
         return (s);
     }
 
-    /** Start game at the current level.
-     * 
+    /** 
+     * Start game at the current level.
      */
     public void startLevel(){
         pause();
@@ -729,16 +742,16 @@ public class Ladder extends JFrame implements  ActionListener, WindowListener, I
         unpause();
     }
 
-    /** Start the game at the next level.
-     * 
+    /** 
+     * Start the game at the next level.
      */
     public void startGame(){
 		changeLevel(nextLevel(1));
         unpause();
     }
         
-    /** Pause the game.
-     * 
+    /** 
+     * Pause the game.
      */
     private void pause(){
         pauseItem.setState(true);
@@ -747,8 +760,8 @@ public class Ladder extends JFrame implements  ActionListener, WindowListener, I
         }
     }
     
-    /** Unpause the game.
-     * 
+    /** 
+     * Unpause the game.
      */
     private void unpause(){                   
         if (ladderCanvas.ladderCanvasThread == null || !ladderCanvas.ladderCanvasThread.isAlive()){
@@ -757,8 +770,8 @@ public class Ladder extends JFrame implements  ActionListener, WindowListener, I
 		}
     }
 
-    /** Load the properties file.
-     * 
+    /** 
+     * Load the properties file.
      */
     private void loadProperties(){
         defaultProps = new Properties();
@@ -782,7 +795,8 @@ public class Ladder extends JFrame implements  ActionListener, WindowListener, I
         }
     }
 
-    /** Store the properties file.
+    /** 
+     * Store the properties file.
      * 
      */
     private void storeProperties(){
@@ -803,7 +817,8 @@ public class Ladder extends JFrame implements  ActionListener, WindowListener, I
         }
     }
     
-    /** get a level from a file
+    /** 
+     * get a level from a file
      * 
      * @exception java.io.IOException 
      * @param fileName name of the file to load
@@ -847,7 +862,8 @@ public class Ladder extends JFrame implements  ActionListener, WindowListener, I
         return (s2);
     }
     
-    /** quit
+    /** 
+     * quit
      * 
      */
     private void exit(){
@@ -857,11 +873,11 @@ public class Ladder extends JFrame implements  ActionListener, WindowListener, I
         System.exit(0); // close the application
     }
     
-        /** Get the next color.
-         * 
-         * @param c a color
-         * @return color after the one specified
-         */
+    /** Get the next color.
+     * 
+     * @param c a color
+     * @return color after the one specified
+     */
 	public static Color nextColor(Color c){
 		if (c.equals(Color.black)){
 			return(Color.blue);
@@ -892,6 +908,5 @@ public class Ladder extends JFrame implements  ActionListener, WindowListener, I
 		} else {
 			return(Color.black);
 		}
-	}
-	
+	}	
 }

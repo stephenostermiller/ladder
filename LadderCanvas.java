@@ -26,69 +26,179 @@ import java.util.*;
 /** 
  * The LadderCanvas is basically the executable part of the game.  The canvas
  * draws the game on itself.
+ * 
  */
 public class LadderCanvas extends JPanel implements Runnable, KeyListener{
+    /** 
+     * The instance of Ladder which we should report back to.
+     */
     private Ladder caller; // the caller of this
+    /** 
+     * Minimum size
+     */
     private Dimension minSize;
+    /** 
+     * Number of columns
+     */
     private int columns;
+    /** 
+     * Number of rows
+     */
     private int rows;
+    /** 
+     * What should be displayed at some at the current time and on start of level respectively.
+     */
     private StringBuffer screenData, levelData;
+    /** 
+     * A string representing the level being played.
+     */
     private String level;
+    /** 
+     * The lad that is controlled by the player.
+     */
     private Lad lad;
+    /** 
+     * Charactaristics of the font.
+     */
     private int letterWidth, letterHeight, letterAcsent;
+        /** 
+         * Size of the font being used.
+         */
 	private int fontSize;
+    /** 
+     * The font being used.
+     */
     private Font font;
+    /** 
+     * The command the lad should obey on the next frame.
+     */
     public int nextCommand;
+    /** 
+     * If the lad should jump on the next frame.
+     */
     public boolean jumpCommand;
+    /**      */
     private Barrel barrel;
+    /** 
+     * A list of squares that need to be repainted.
+     */
     private Vector repaintList;
+    /** 
+     * A list of all the objects that spit out barrels on this level.
+     */
     private Vector barrelProducers;
+    /** 
+     * Should the entire screen be repainted on the next refresh?
+     */
     private boolean repaintAll;
+    /** 
+     * The color of the background.
+     */
     private Color bgColor;
+    /** 
+     * The color of the foreground.
+     */
     private Color fgColor;
+    /** 
+     */
     public int gameOver;
+    /**      */
     private boolean gameStop;
+    /**      */
     public Thread ladderCanvasThread;
+    /** 
+     * The level of difficulty for the game.
+     */
     private int difficulty;
+    /**      */
     private int cycles;
+    /** 
+     * The score of the game.
+     */
     private long score;
+    /** 
+     * The number of lives left.
+     */
     private int ladsLeft;
+    /**      */
     private int gameSpeed; // pause in ms between frames.
+    /** 
+     * pause in ms between frames.
+     */
     private long nextNewLad;
+        /**          */
 	boolean stopThread;
+        /**          */
 	private boolean go_on = false;
+        /** 
+         * The starting x postition of the lad.
+         */
 	private int ladStartPosX;
+        /** 
+         * The starting y position of the lad.
+         */
 	private int ladStartPosY;
+        /** 
+		 * The time at which the last beep occurred.
+         */
 	private long lastBeep;
 	
+        /**          */
 	private static final boolean STEP_MODE = false;
 
+    /**      */
     public static final int SCORE_RESET = 0;
+    /**      */
     public static final int SCORE_BARREL = 1;
+    /**      */
     public static final int SCORE_STATUE = 2;
+    /**      */
     public static final int SCORE_MONEY = 3;
 
+    /**      */
     public static final int G_O_NOT_OVER = 0;
+    /**      */
     public static final int G_O_BARREL = 1;
+    /**      */
     public static final int G_O_TIME = 2;
+    /**      */
     public static final int G_O_MONEY = 3;
+    /**      */
     public static final int G_O_QUIT = 4;
+    /**      */
     public static final int G_O_SPIKE = 5;
 	
 	// minimum number of barrels per producer at the level
+        /**          */
 	public static final int EASY = 3;
+    /**      */
     public static final int MEDIUM = 5;
+    /**      */
     public static final int HARD = 7;
+    /**      */
     public static final int VERY_HARD = 10;
+    /**      */
     public static final int IMPOSSIBLE = 15;
 	
 	// game speed at the level (milliseconds between frames)
+    /**          */
 	private static final int EASY_SPEED = 130;
+    /**      */
     private static final int MEDIUM_SPEED = 100;
+    /**      */
     private static final int HARD_SPEED = 80;
+    /**      */
     private static final int VERY_HARD_SPEED = 65;
+    /**      */
     private static final int IMPOSSIBLE_SPEED = 55;
 	
+    /** 
+     * Create a ladder canvas.
+     * 
+     * @param level String representation of the level
+     * @param caller The instance of ladder that called this, which we can  
+     *     report back to with scores and such
+     */
     public LadderCanvas(String level, Ladder caller){
 	    lastBeep = 0;
 		ladStartPosX = 1;
@@ -119,6 +229,11 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
 		setOpaque(true);
     }
 	
+    /** 
+     * Set the size of the font used.
+     * 
+     * @param size the size of the font in points
+     */
 	public void setFontSize(int size){
 	    font = new Font("Monospaced", Font.PLAIN, size);
         FontMetrics fontMetrics = this.getFontMetrics(font);
@@ -129,10 +244,19 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
 		fontSize = size;   
 	}
 	
+    /** get the size of the font being used.
+     * 
+     * @return the size of the font in points.
+     */
 	public int getFontSize(){
 	    return fontSize;
 	}
         
+    /** 
+     * Set the background color.
+     * 
+     * @param bg Color to use for the background.
+     */
     public void setBGColor(Color bg){
         bgColor = bg;
         //setBackground(bgColor);
@@ -141,18 +265,33 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
         repaint();
     }
     
+    /** 
+     * Set the foreground color.
+     * 
+     * @param fg Color to use for the foreground.
+     */
     public void setFGColor(Color fg){
         fgColor = fg;
         repaintAll = true;
         repaint();
     }
 
+    /** 
+     * Change the level to the one given and repaint.
+     * 
+     * @param level A string representing the desired level.
+     */
     private void setLevelPaint(String level){
         setLevel(level);
         repaintAll = true;
         repaint();
     }
     
+    /** 
+     * Set the level to the given level without a repaint.
+     * 
+     * @param level A string representing the desired level.
+     */
     public void setLevel(String level){
 	    ladStartPosX = 1;
 		ladStartPosY = 1;
@@ -204,14 +343,29 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
         minSize = new Dimension(letterWidth*(columns - 2), letterHeight*(rows - 2));        
     }
     
+    /** 
+     * get the preferred size
+     * 
+     * @return the preferred size in pixels
+     */
     public Dimension getPreferredSize() {
         return getMinimumSize();
     }
 
+    /** 
+     * gets the minimum size
+     * 
+     * @return the minimum size in pixels
+     */
     public synchronized Dimension getMinimumSize() {
         return minSize;
     }
 
+    /** 
+     * paints the canvas
+     * 
+     * @param g graphics object for this component
+     */
     public void paintComponent(Graphics g){
 	    //if(isOpaque()){
 		//    System.out.println("Painting everything");
@@ -264,10 +418,19 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
 		repaintAll = true;
     }        
     
+    /** 
+     * repaints just the region containing a character on the screen
+     * 
+     * @param xpos the x postion of the character
+     * @param ypos the y position of the character
+     */
     private void repaintCharAt(int xpos, int ypos){
         repaint((xpos-1)*letterWidth, (ypos-1)*letterHeight, letterWidth,letterHeight);
     }
    
+    /** 
+     * start the game moving
+     */
     public void start(){
         if (ladderCanvasThread == null || !ladderCanvasThread.isAlive()){
             ladderCanvasThread = new Thread(this);
@@ -276,11 +439,17 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
         //System.out.println("Started!");
     }
     
+    /** 
+     * stop the game from moving
+     */
     public void stop(){
 		stopThread = true;
         //ladderCanvasThread.stop();  // deprecated
     }
 
+    /** 
+     * reset the game to its initial state, (score, lads, level, (everything) etc.)
+     */
     public void resetGame(){
         //System.out.println("Reseting Game, repainting");
         updateScore(SCORE_RESET);
@@ -293,6 +462,9 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
         repaint();
     }
 
+    /** 
+     * resets the clocks for the game, but not the score, lives left, etc.
+     */
     public void reset(){
         gameStop = false;
         cycles = 2000;
@@ -323,6 +495,11 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
         
     }
     
+    /** 
+     * Set the difficulty for the game
+     * 
+     * @param difficulty level of difficulty
+     */
     public void setDifficulty(int difficulty){
         for (int k=0; k<barrelProducers.size(); k++){
             BarrelProducer BP = (BarrelProducer)barrelProducers.elementAt(k);
@@ -348,6 +525,9 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
     }
         
     
+    /** 
+     * Runs the game, (but not as a thread)
+     */
     public void run(){
 		stopThread = false;
         long beginLoopTime = System.currentTimeMillis();
@@ -530,6 +710,10 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
         }
     }
 
+    /** 
+     * Slowly increments the score as the bonus time is decremented for the end of the
+     * level countdown.
+     */
     private void dollarCountdown(){
         while (cycles > 0){
             caller.setBonusTime(cycles);
@@ -542,6 +726,9 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
         }
     }
 	
+        /** 
+         * sounds a beep.
+         */
 	private void beep(){
 	    if (System.currentTimeMillis() - lastBeep > 150){
 		    getToolkit().beep();
@@ -549,6 +736,9 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
 		}
 	}
 	
+        /** 
+         * kill the lad off in a horrible death of mixed up characters.
+         */
 	private void ladDeath(){
 	    int i;
 		long beginLoopTime = System.currentTimeMillis();
@@ -600,6 +790,11 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
 		}
     }
 
+    /** 
+     * Adjusts the score according to some event.
+     * 
+     * @param scoreind Type of scoring event
+     */
     private void updateScore(int scoreind){
         switch (scoreind){
         case SCORE_STATUE:
@@ -629,6 +824,11 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
 
     }
     
+   /** 
+    * Some key has been pressed, react to it.
+    * 
+    * @param ke The key event corresponding to the key
+    */
    public void keyPressed(KeyEvent ke){
         int keycode = ke.getKeyCode();
         if (keycode == KeyEvent.VK_UP || keycode == KeyEvent.VK_NUMPAD8){
@@ -650,9 +850,19 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
         }
     }
 	
+    /** 
+     * Key released (not really used)
+     * 
+     * @param ke 
+     */
     public void keyReleased(KeyEvent ke){
     }
 	
+    /** 
+     * Key typed (not really used)
+     * 
+     * @param ke 
+     */
     public void keyTyped(KeyEvent ke){
     }
 }

@@ -1,0 +1,240 @@
+<HTML>
+<HEAD>
+<TITLE>Ladder, A Game</TITLE>
+<META name="description" content="Ladder is an ASCII based arcade game similar to Donkey Kong.">
+<META name="keywords" content="ladder, donkey kong, lad, der rock, ASCII, CPM, kaypro, game, open source, java, freeware, GPL, stephen ostermiller">
+</HEAD>
+<BODY  BGCOLOR="#ffffff" TEXT="#000000" LINK="#0000ff" VLINK="#800080" ALINK="#ff0000">
+
+<CENTER><H1>Ladder, A Game</H1></CENTER> 
+
+<CENTER>
+<TABLE  border="0" cellspacing="0" cellpadding="0" bgcolor="#000000">
+<TR>
+<TD >
+<TT>                                     
+<FONT COLOR="#00FF00">
+<PRE>
+                                       V                 $                     
+                                                         H                     
+                H                                        H                     
+       =========H==================================================            
+                H                                                              
+                H                                                              
+                H          H                             H                     
+================H==========H==================   ========H=====================
+                &          H                             H          |       |  
+                                                         H         Easy Street 
+                H                                        H                     
+       =========H==========H=========  =======================                 
+                H                                                              
+                H                                                              
+                H                                        H                     
+======================== ====================== =========H==============       
+                                                         H                     
+                                                         H                     
+*    p                                                   H                    *
+===============================================================================
+</PRE>
+</FONT>
+</TT>
+</TD>
+</TR>
+</TABLE>
+</CENTER>
+<P>
+
+Ladder brings us back to the days of classic computer games.  Yes, there were computer games before there were fancy graphics. <P>
+
+Using only ASCII characters, ladder was an addictive game that was very popular for computers running the CPM operating system.  Seeing the game, you might be very much reminded of "Donkey Kong". Now Ladder has been rewritten in Java and can be played on most of todays computers.<P>
+
+<HR>
+<H3>Features:</H3>
+
+With the new Ladder, written in Java you can:
+<UL>
+	<LI>Play all the <A HREF=levels.html#original>levels of the original game</A>!
+	<LI>Play <A HREF=levels.html#new>new levels</A> included in the game!
+	<LI>Make your own levels! (Then <A HREF="newLevel.html">submit</A> them.)
+	<LI>Jump der rocks all day!
+</UL>
+
+<HR>
+
+<H3>Downloading:</H3>
+
+Ladder version 1.0 is available for download.<P>
+
+<A HREF="Ladder_1_0.jar">Download the executable jar file now.</A><P>
+
+If you want to see under the hood:<P>
+
+<A HREF="LadderSource_1_0.jar">Download the source code now.</A><P>
+
+<HR>
+
+<H3>Running the game:</H3>
+
+Ladder is written in Java.  You will need a <A HREF="http://java.sun.com/ ">java runtime environment</A>.
+Ladder is written in Java 2 so you will need a runtime environment of Java 1.2.1 or later.<P>
+
+Once java is installed, just double click on the jar file to
+start Ladder!<P>
+
+Or, add the jar file to your classpath and run
+<B>java com.Ostermiller.Ladder.Ladder</B><P>
+
+<HR>
+
+<H3>Comments</H3>
+
+See what <A HREF="http://slashdot.org/article.pl?sid=deadsea_ladder">other people have to say</A> about Ladder.<BR>
+<A HREF="comments.html">Leave a comment</A> about Ladder.<BR>
+Send a comment <A HREF="mailto:Ladder@Ostermiller.com?subject=Ladder_Comment">directly to the author</A> by email.<BR>
+<A HREF="newLevel.html">Submit a new level</A> to be included in the next release.<p>
+
+<HR>
+
+<H3>Known bugs:</H3>
+
+<UL>
+	<LI>Bonus time is not done correctly.  You get 2000 for each level.
+	<LI>Finishing all the levels goes back to the first level but the speed does not increase and the bonus time does not decrease.
+</UL> <P>
+ 
+<H3>Upcoming Features:</H3>
+
+<UL>
+	<LI>Remappable keys
+	<LI>Even more levels
+	<LI>High scores
+	<LI>Menu for sound on/off
+	<LI>Different scoring for different difficulty levels
+	<LI>Help menu, display instructions
+	<LI>Ready, set, go!
+	<LI>Cut, copy, and paste in the level editor
+</UL>
+
+<HR>
+
+<H3>Version History:</H3>
+
+<H4>Ladder 1.0</H4>
+<A HREF="Ladder_1_0.jar">Download</A> | <A HREF="LadderSource_1_0.jar">Source Code</A><P>
+<UL>
+	<LI>The lad will move up the ladder after a jump if you press the up key
+	during the jump, or even before it.
+	<LI>Better javadoc documentation on the source code.
+	<LI>New levels: <A HREF="levels.html#PlinkoPlace">Plinko Place</A> and <A HREF="levels.html#OneChance">One Chance</A>.
+</UL><P>
+
+<H4>Ladder 0.4</H4>
+<A HREF="Ladder_0_4.jar">Download</A> | <A HREF="LadderSource_0_4.jar">Source Code</A><P>
+<UL>
+	<LI>Occassional gray flashes in the background are gone.
+	<LI>Ladder is now in the com.Ostermiller.Ladder package.
+	<LI>Ladder is now in an executable jar file.
+	<LI>User preferences are stored in $USER_HOME_DIR/.java/Ladder.
+</UL><P>
+
+<H4>Ladder 0.3a</H4>
+<UL>
+	<LI>Beeps!
+	<LI>Entire new engine for moving the lad around!  The lad now can wait until it can move in a any direction to go that way.
+	<LI>Running the lad into a . makes the lad do more unpredictable things.
+	<LI>Eisappearing floors and gold statues no longer reappear when you lose a life
+	<LI>Keyboard shortcuts on menus.
+	<LI>Adjustable font.
+	<LI>Money countdown when end of level reached.
+	<LI>Lad dies a horrible death of mixed up symbols.
+	<LI>Speed problems fixed.
+	<LI>Color choosers added for picking the background and foreground colors.
+	<LI>The stats at the bottom of the screen are displayed better.
+	<LI>Pausing the game from the menu works correctly again.
+	<LI>The display upgraded to javax.swing rather than java.awt. This has resulted in some major speed enhancements and bug fixes due to double buffering native to swing, however ladder will no longer run under java 1.1.x or less.
+	<LI>Redraw errors fixed. Der rocks should never leave marks behind as they move
+	<LI>Lad moves better.  Can now make a second jump in the middle of a first jump.  Also continues past ladders at the end of a jump now
+</UL>
+
+<H4>Ladder 0.2a</H4>
+<UL>
+	<LI>.ini files to save preferences.
+	<LI>Scoring, time, and number of lads working.
+	<LI>All features of original game included (statues, goal, spikes, dots, etc.).
+	<LI>Included the original levels from the original game.
+	<LI>Background and Foreground color work better.
+	<LI>.ini file support added to save some options when game is quit.
+	<LI>Bugs in how the lad moves around fixed.
+	<LI>The lad should not lose the keyboard focus anymore.
+	<LI>Levels cycle properly.
+	<LI>New game restarts at the first level.
+	<LI>Java 1.2 compliance (deprecation of Thread.stop()) (Still 1.1 compliant!)
+	<LI>Speed change added to level difficulty (as well as more rocks)
+	<LI>New code for reading in levels that is more robust.  (Doesn't care that all lines same length for example.)
+</UL>
+
+<H4>Ladder 0.1a</H4>
+<UL>
+	<LI>Basic game functionality.
+	<LI>Ability to load a level from a text file (And save edited level).
+	<LI>Simple level editor.
+	<LI>Preliminary ability to change the color scheme.
+	<LI>Some level difficulty (more der rocks).
+</UL>
+
+<HR>
+
+<H3>Instructions:</H3>
+
+You are a lad trapped in a maze.  You're mission is to explore the
+dark corridors never before seen by human eyes and find hidden
+treasures and riches.<P>
+
+You control the lad by typing the direction buttons and by jumping by
+typing SPACE.  But beware of the falling rocks called Der rocks.
+You must also find and grasp the treasure (shown as $) BEFORE the
+bonus time runs out.<P>
+
+A new lad will be awarded for every 10,000 points.
+Extra points are awarded for touching the gold
+statues (shown as &).  You will receive the bonus time points
+that are left when you have finished the level.<P>
+
+Remember, there is more than one way to skin a cat.  (Chum)<P>
+
+Good luck lad.<P>
+
+<HR>
+
+<H3>Original Authors:</H3>
+
+Ladder was originally written for the CPM operating system and the game came bundled with Kaypro computers.  It is copyrighted by:<P>
+Yahoo Software<BR>
+10970 Ashton Ave, Suite 312<BR>
+Los Angeles, CA<BR>
+<P>
+
+<HR>
+
+<H3>License</H3>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.<P>
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<A HREF="http://www.gnu.org/copyleft/gpl.html">GNU General Public License</A> for more details.<P>
+
+Ladder<BR>
+Written in Java by Stephen Ostermiller<BR>
+Copyright (C) 1999, 2000  <A HREF="mailto:Ladder@Ostermiller.com">Stephen Ostermiller</A><P>
+<HR>
+<CENTER>
+<P><A HREF="http://conk.com/world/navbar.map"><IMG SRC="http://conk.com/world/navbar.gif" ISMAP BORDER=0 ALT="This Site Hosted By CONKWorld" HEIGHT=100 WIDTH=468></A></P>
+</CENTER>
+</BODY>
+</HTML>
+

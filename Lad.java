@@ -29,15 +29,15 @@ public class Lad extends Creature{
      * 
      */
     private int command;
-        /** 
-         * a command the lad cannot currently execute, but may at some future time.
-         * 
-         */
+    /** 
+     * a command the lad cannot currently execute, but may at some future time.
+     * 
+     */
 	private int futureCommand;
-        /** 
-         * The lad cannot jump now, but may at some future time.
-         * 
-         */
+    /** 
+     * The lad cannot jump now, but may at some future time.
+     * 
+     */
 	private boolean futureJump;
     /** 
      * The lad should jump.
@@ -160,113 +160,113 @@ public class Lad extends Creature{
         this.command = command;
     }
 	
-        /** 
-         * can the lad move up?
-         * 
-         * @return true if the lad can move up, false otherwise
-         */
+    /** 
+     * can the lad move up?
+     * 
+     * @return true if the lad can move up, false otherwise
+     */
 	private boolean canMoveUp(){
 	    // nothing solid can be above us to be able to move up.
 	    return(eight != '=' && eight != '|' && eight != '-'); 
 	}
 	
-        /** 
-         * true if the lad can climb up, false otherwise.
-         * 
-         * @return true if the lad can climb up, false otherwise.
-         */
+    /** 
+     * true if the lad can climb up, false otherwise.
+     * 
+     * @return true if the lad can climb up, false otherwise.
+     */
 	private boolean canClimbUp(){
 	    // must be a ladder above us to be able to climb up
 		// a $ can hide a ladder
 	    return(eight == 'H' || eight == '$');
     }
 	
-        /** 
-         * true if the lad can move down, false otherwise.
-         * 
-         * @return true if the lad can move down, false otherwise.
-         */
+    /** 
+     * true if the lad can move down, false otherwise.
+     * 
+     * @return true if the lad can move down, false otherwise.
+     */
 	private boolean canMoveDown(){
 	    // nothing solid can be below us to be able move down.
 	    return(two != '=' && two != '|' && two != '-');
 	}
 	
-        /** 
-         * true if the lad can move up left, false otherwise.
-         * 
-         * @return true if the lad can move up left, false otherwise.
-         */
+    /** 
+     * true if the lad can move up left, false otherwise.
+     * 
+     * @return true if the lad can move up left, false otherwise.
+     */
 	private boolean canMoveUpLeft(){
 	    // nothing solid can be there to be able move there.
 	    return(seven != '=' && seven != '|' && seven != '-');
 	}
 	
-        /** 
-         * true if the lad can move down left, false otherwise.
-         * 
-         * @return true if the lad can move down left, false otherwise.
-         */
+    /** 
+     * true if the lad can move down left, false otherwise.
+     * 
+     * @return true if the lad can move down left, false otherwise.
+     */
 	private boolean canMoveDownLeft(){
 	    // nothing solid can be there to be able move there.
 	    return(one != '=' && one != '|' && one != '-');
 	}
 	
-        /** 
-         * true if the lad can move up right, false otherwise.
-         * 
-         * @return true if the lad can move up right, false otherwise.
-         */
+    /** 
+     * true if the lad can move up right, false otherwise.
+     * 
+     * @return true if the lad can move up right, false otherwise.
+     */
 	private boolean canMoveUpRight(){
 	    // nothing solid can be there to be able move there.
 	    return(nine != '=' && nine != '|' && nine != '-');
 	}
 	
-        /** 
-         * true if the lad can move down right, false otherwise.
-         * 
-         * @return true if the lad can move down right, false otherwise.
-         */
+    /** 
+     * true if the lad can move down right, false otherwise.
+     * 
+     * @return true if the lad can move down right, false otherwise.
+     */
 	private boolean canMoveDownRight(){
 	    // nothing solid can be there to be able move there.
 	    return(three != '=' && three != '|' && three != '-');
 	}
 	
-        /** 
-         * true if the lad can move right, false otherwise.
-         * 
-         * @return true if the lad can move right, false otherwise.
-         */
+    /** 
+     * true if the lad can move right, false otherwise.
+     * 
+     * @return true if the lad can move right, false otherwise.
+     */
 	private boolean canMoveRight(){
 	    // nothing solid can be there to be able move there.
 	    return(six != '=' && six != '|' && six != '-');
 	}
 	
-        /** 
-         * true if the lad can move left, false otherwise.
-         * 
-         * @return true if the lad can move left, false otherwise.
-         */
+    /** 
+     * true if the lad can move left, false otherwise.
+     * 
+     * @return true if the lad can move left, false otherwise.
+     */
 	private boolean canMoveLeft(){
 	    // nothing solid can be there to be able move there.
 	    return(four != '=' && four != '|' && four != '-');
 	}
 	
-        /** 
-         * true if the lad can stay where it is, false otherwise.
-         * 
-         * @return true if the lad can stay where it is, false otherwise.
-         */
+    /** 
+     * true if the lad can stay where it is, false otherwise.
+     * 
+     * @return true if the lad can stay where it is, false otherwise.
+     */
 	private boolean canStayPut(){
 	    // we have to be standing on something solid,
 		// or be hanging on to something solid
 	    return(two == '=' || two == '|' || two == '-' || five == 'H');
 	}
 	
-        /** 
-         * true if the lad is in the midst of a jump, false otherwise.
-         * 
-         * @return true if the lad is in the midst of a jump, false otherwise.
-         */
+    /** 
+     * true if the lad is in the midst of a jump, false otherwise.
+     * 
+     * @return true if the lad is in the midst of a jump, false otherwise.
+     */
 	private boolean inAJump(){
 	    // if we are in the middle of a jump
 		// we know we are in the middle of a jump if the jump
@@ -277,31 +277,31 @@ public class Lad extends Creature{
 		return(jump > 0 && jump < 6);
 	}
 	
-        /** 
-         * true if the lad just landed a jump, false otherwise.
-         * 
-         * @return true if the lad just landed a jump, false otherwise.
-         */
+    /** 
+     * true if the lad just landed a jump, false otherwise.
+     * 
+     * @return true if the lad just landed a jump, false otherwise.
+     */
 	private boolean JumpJustOver(){
 	    return (jump>5);
 	}
 	
-        /** 
-         * true if the lad has an impending move, false otherwise.
-         * 
-         * @return true if the lad has an impending move, false otherwise.
-         */
+    /** 
+     * true if the lad has an impending move, false otherwise.
+     * 
+     * @return true if the lad has an impending move, false otherwise.
+     */
 	private boolean moveScheduled(){
-	    return(command != Lad.NONE && futureCommand != Lad.NONE && !jumpCommand && !futureJump);
+	    return(command != Lad.NONE || futureCommand != Lad.NONE || jumpCommand || futureJump);
 	}
 	
-	// assume that canStayPut() has already been checked
-	// assume any future jump commands have been moved to jump command
-	// assume there is no command or future command
-	// assume not in the middle of a jump
+	
     /** 
      * tell the lad to move as the lads momentum is currently taking him.
-     * 
+     * assume that canStayPut() has already been checked               
+     * assume any future jump commands have been moved to jump command 
+     * assume there is no command or future command                    
+     * assume not in the middle of a jump 
      */
     private void moveMomentum(){
 	    if (inAJump()){
@@ -347,7 +347,7 @@ public class Lad extends Creature{
 					jumpCommand = false;
 				}
 			} 
-			if (canMoveRight()){   
+			if (canMoveRight()){  
 		        command = Lad.RIGHT;
 			} else {
 			    command = Lad.STOP;
@@ -377,22 +377,55 @@ public class Lad extends Creature{
 		}
 	}
 	
-        /** 
-         * tell the lad to move as if he is continueing with a jump.
-         * 
-         * @return true if it was able to act immediatly on a command or 
-         *     future command
-         */
+    /** 
+     * tell the lad to move as if he is continueing with a jump.
+     * 
+     * @return true if it was able to act immediatly on a command or 
+     *     future command
+     */
 	private boolean moveJump(){
+		// move future commands and future jumps into position if there are none in position
+		if (command == Lad.NONE){
+            command = futureCommand;
+			futureCommand = Lad.NONE;
+        }
+		if (!jumpCommand){
+            jumpCommand = futureJump;
+			futureJump = false;
+        }
+		// Special logic if we are on a ladder
         if (five == 'H'){
-            // end a jump on a ladder.
-            jump = 0;
-            if (!moveScheduled()){
-                command = Lad.STOP;
-            }
-            return(moveNoJump());
+			jump = 0;  // the jump is over, set it for new jump
+			if (jumpCommand){
+				// set it to jump up the ladder
+				command = Lad.STOP;
+				futureCommand = Lad.NONE;
+				jumpCommand = true;
+				futureJump = false;
+				direction = Creature.STATIONARY;
+				futureDirection = Creature.STATIONARY;
+			} else if (moveScheduled()){
+				// Cancel all moves except up and down the ladder moves
+				if (command != Lad.UP && command != Lad.DOWN){
+					command = Lad.STOP;
+				}
+				futureCommand = Lad.NONE;
+				jumpCommand = false;
+				futureJump = false;
+				direction = Creature.STATIONARY;
+				futureDirection = Creature.STATIONARY;
+			} else {
+				// just stop the lad on the ladder
+				command = Lad.STOP;
+				futureCommand = Lad.NONE;
+				jumpCommand = false;
+				futureJump = false;
+				direction = Creature.STATIONARY;
+				futureDirection = Creature.STATIONARY;
+			}
+			return(moveNoJump());            
         } else if (canStayPut() && moveScheduled() && moveNoJump()){ // end jump if we can
-		    jump = 0;
+			jump = 0;
 			return(true);
 		} else if (command == Lad.LEFT){
 		    if (direction == Creature.LEFT){
@@ -417,7 +450,7 @@ public class Lad extends Creature{
 		    jumpCommand = false;
 			futureJump = true;
 		}
-        if (jump == 1){            
+		if (jump == 1){            
             if (direction == Creature.LEFT){
 			    if (canMoveUpLeft()){
 				    command = Lad.UPLEFT;
@@ -428,10 +461,11 @@ public class Lad extends Creature{
 				        command = Lad.STOP;
 					}
 				} else {
-				    command = Lad.FALL;
-					if(futureCommand != Lad.DOWN){
-					    futureCommand = Lad.LEFT;
-                    }
+					//command = Lad.FALL;
+					//if(futureCommand != Lad.DOWN){
+					//    futureCommand = Lad.LEFT;
+                    //}
+                    jump = 5;
 				}				    
             } else if (direction == Creature.RIGHT){
                 if (canMoveUpRight()){
@@ -443,10 +477,11 @@ public class Lad extends Creature{
 				        command = Lad.STOP;
 					}
 				} else {
-				    command = Lad.FALL;
-				    if(futureCommand != Lad.DOWN){
-					    futureCommand = Lad.RIGHT;
-                    }
+				    //command = Lad.FALL;
+				    //if(futureCommand != Lad.DOWN){
+					//    futureCommand = Lad.RIGHT;
+                    //}
+                    jump = 5;
 				}
             } else {
 			    if (canMoveUp()){
@@ -457,8 +492,9 @@ public class Lad extends Creature{
 				    command = Lad.FALL;
 				}
             }
-            jump++;
-        } else if (jump == 2 || jump == 3){
+            
+        } 
+        if (jump == 2 || jump == 3){        	 
             if (direction == Creature.LEFT){
                 if (canMoveLeft()){
 				    command = Lad.LEFT;
@@ -493,9 +529,10 @@ public class Lad extends Creature{
                 command = Lad.STOP; // we can stop here even if we can't hang on.
                 jump = 3; // straight up and down jumps don't last as long
             }
-            jump++;
-        } else if (jump == 4 || jump == 5){
-            if (direction == Creature.LEFT){
+            
+        } 
+        if (jump == 4 || jump == 5){
+        	if (direction == Creature.LEFT){
                 if (canMoveDownLeft()){
 				    command = Lad.DOWNLEFT;
 				} else if (canStayPut()){
@@ -533,19 +570,18 @@ public class Lad extends Creature{
 				} else {
 				    command = Lad.FALL;
 				}	
-            }
-            jump++;
+            }            
 		}
+		jump++;
 		return(true);   
 	}
 	
-	// returns true if it was able to act immediatly on a command or future command
-        /** 
-         * tell the lad to move, as if it is not in a jump.
-         * 
-         * @return true if it was able to act immediatly on a command or 
-         *     future command
-         */
+	/** 
+     * tell the lad to move, as if it is not in a jump.
+     * 
+     * @return true if it was able to act immediatly on a command or 
+     *     future command
+     */
 	private boolean moveNoJump(){
 	    if (command != Lad.NONE){ // any directional changes cancel future jumps and commands
 		    futureJump = false;
@@ -662,12 +698,12 @@ public class Lad extends Creature{
 		return (false);
 	}
 	
-        /** 
-         * Figure out where we should go if we are on a trampoline
-         * 
-         * @return true if it was able to act immediatly on a command or 
-         *     future command
-         */
+    /** 
+     * Figure out where we should go if we are on a trampoline
+     * 
+     * @return true if it was able to act immediatly on a command or 
+     *     future command
+     */
 	private boolean moveOnTrampoline(){
 	    int count, choice;
 		// allow us to stop on the trampoline and and get a command next time.
@@ -813,19 +849,26 @@ public class Lad extends Creature{
 		
 		if (jumpCommand){
 		    jump = 1;
-			jumpCommand = false;
+			jumpCommand = false;	
 			if (command == Lad.LEFT){
 			    command = Lad.UPLEFT;
 			} else if (command == Lad.RIGHT){  
 			    command = Lad.UPRIGHT;
+			} else if (direction == Creature.LEFT){
+				futureCommand = command;
+				command = Lad.UPLEFT;
+			} else if (direction == Creature.RIGHT){
+				futureCommand = command;
+				command = Lad.UPRIGHT;
 			} else {
+				futureCommand = command;
 			    command = Lad.UP;
 			}
 		}
 		
-		if (jump == 6){
+		if (jump == 6){ 
 		    jump = 7;
-		}else if (jump ==7){
+		} else if (jump ==7){
 		    jump = 0;
 		}
 				
