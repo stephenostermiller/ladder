@@ -1,6 +1,7 @@
 /*
  * Part of Ladder, a game.
- * Copyright (C) 1999, 2000 Stephen Ostermiller <Ladder@Ostermiller.com>
+ * Copyright (C) 1999, 2000 Stephen Ostermiller
+ * http://ostermiller.org/contact.pl?regarding=Ladder
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
