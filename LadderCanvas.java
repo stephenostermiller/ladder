@@ -1,6 +1,6 @@
 /*
  * Part of Ladder, a game.
- * Copyright (C) 1999, 2000 Stephen Ostermiller <Ladder@Ostermiller.com>
+ * Copyright (C) 1999-2002 Stephen Ostermiller <Ladder@Ostermiller.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ import java.util.*;
  * draws the game on itself.
  *
  */
-public class LadderCanvas extends JPanel implements Runnable, KeyListener{
+public class LadderCanvas extends JPanel implements Runnable {
     /** 
      * The instance of Ladder which we should report back to.
      */
@@ -228,7 +228,36 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
         fgColor = Color.green;
         repaintList = new Vector();
         barrelProducers = new Vector();
-        this.addKeyListener(this);
+        addKeyListener(new KeyAdapter(){
+           public void keyPressed(KeyEvent ke){
+                int keycode = ke.getKeyCode();
+                if (keycode == KeyEvent.VK_ESCAPE){
+                    LadderCanvas.this.caller.togglePause();
+                } else if (keycode == KeyEvent.VK_UP || keycode == KeyEvent.VK_NUMPAD8){
+                    nextCommand = Lad.UP;
+                } else if (keycode == KeyEvent.VK_DOWN || keycode == KeyEvent.VK_NUMPAD2){
+                    nextCommand = Lad.DOWN;
+                } else if (keycode == KeyEvent.VK_LEFT || keycode == KeyEvent.VK_NUMPAD4){
+                    nextCommand = Lad.LEFT;
+                } else if (keycode == KeyEvent.VK_RIGHT || keycode == KeyEvent.VK_NUMPAD6){
+                    nextCommand = Lad.RIGHT;
+                } else if (keycode == KeyEvent.VK_SPACE){
+                    jumpCommand = true;
+                } else if (keycode == KeyEvent.VK_ESCAPE){
+                    //escape is used to pause the game, lets ignore it here
+                    //it should be caught by main ladder class.
+                } else if (STEP_MODE && keycode == KeyEvent.VK_ENTER){
+        	        go_on = true;
+                } else {
+                    nextCommand = Lad.STOP;
+                }
+            }
+        });
+        addFocusListener(new FocusAdapter(){
+            public void focusLost(FocusEvent e){
+                LadderCanvas.this.requestFocus();
+            }
+        });
         nextCommand = Lad.STOP;
         jumpCommand = false;
         setBackground(bgColor);
@@ -715,6 +744,7 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
             } catch (InterruptedException e){
             }
         }
+        caller.setBonusTime(0);
     }
 	
         /** 
@@ -810,21 +840,5 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
         } else {
             nextCommand = Lad.STOP;
         }
-    }
-	
-    /**
-     * Key released (not really used)
-     *
-     * @param ke
-     */
-    public void keyReleased(KeyEvent ke){
-    }
-
-    /**
-     * Key typed (not really used)
-     *
-     * @param ke
-     */
-    public void keyTyped(KeyEvent ke){
     }
 }

@@ -363,27 +363,6 @@ public class Ladder extends JFrame {
         
 		// initialize the game
         ladderCanvas = new LadderCanvas(level, this);
-		this.addKeyListener(ladderCanvas); // key events need to get passed to the ladder canvas
-        this.addKeyListener(
-			new KeyAdapter(){
-            	/**
-                 * Some key has been pressed, react to it.
-                 *
-                 * @param ke The key event corresponding to the key
-                 */
-            	public void keyPressed(KeyEvent ke){
-                    int keycode = ke.getKeyCode();
-                    if (keycode == KeyEvent.VK_ESCAPE){
-                        // pause and unpause the game when the escape key is pressed.
-                        if(pauseItem.getState()){
-                            unpause();
-						} else {
-                       		pause();
-                        }
-                    }
-                }
-        	}
-        );
 		
 		// lay out this frame using a grid bag layout
         GridBagLayout gridbag = new GridBagLayout();
@@ -509,7 +488,12 @@ public class Ladder extends JFrame {
                     }
                 }
             }
-		);
+		);        
+        addFocusListener(new FocusAdapter(){
+            public void focusGained(FocusEvent e){
+                ladderCanvas.requestFocus();
+            }
+        });
         this.setResizable(true);
         this.setTitle("Ladder");        
         this.pack();
@@ -736,6 +720,17 @@ public class Ladder extends JFrame {
 			ladderCanvas.start();
 			pauseItem.setState(false);
 		}
+    }
+    
+    /**
+     * Pause the game if going, unpause it if paused.
+     */
+    public void togglePause(){
+        if(pauseItem.getState()){
+            unpause();
+		} else {
+            pause();
+        }
     }
 
     /**

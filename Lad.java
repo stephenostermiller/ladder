@@ -1,6 +1,6 @@
 /*
  * Part of Ladder, a game.
- * Copyright (C) 1999, 2000 Stephen Ostermiller <Ladder@Ostermiller.com>
+ * Copyright (C) 1999-2002 Stephen Ostermiller <Ladder@Ostermiller.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -720,7 +720,7 @@ public class Lad extends Creature{
             choice = rand.nextInt(4);
 			if (choice == 0){
 			    moveJump();
-				return(true);
+                return(true);
 			} else if (choice == 1){
 			    if (direction == Creature.LEFT){
 				    direction = Creature.RIGHT;
@@ -728,20 +728,22 @@ public class Lad extends Creature{
 				    direction = Creature.LEFT;
 				}
 				moveJump();
-				return(true);
+                return(true);
 			} else {
 			    jump = 0;
 				moveOnTrampoline();
-				return(true);
+                return(true);
 			}
 		} else {
-		    if (moveScheduled() && moveNoJump()){
-			    return(true); //we found somewhere to move
+            if (moveScheduled() && moveNoJump()){
+                return(true); //we found somewhere to move
 			} else if (direction == Creature.STATIONARY || direction == Creature.DOWN){
 			    // if we are right on top of the thing, jump on it, if we can
 				if (canMoveUp()){
-                    jumpCommand = true;
-					return(true); //we found somewhere to move
+			        jumpCommand = true;
+                    direction = Creature.STATIONARY;
+                    command = Lad.NONE;
+                    return(true); //we found somewhere to move
 				} else {
 				    command = Lad.STOP;
 					return(false); //we were unable to find somewhere to move
@@ -793,6 +795,7 @@ public class Lad extends Creature{
     				if (canMoveUp()){
     				    if (count == choice){
 						    jumpCommand = true;
+                            direction = Creature.STATIONARY;
 							return(true); //we found somewhere to move
 						}						
     				    count++;
@@ -815,7 +818,7 @@ public class Lad extends Creature{
 			}
         }
 		command = Lad.STOP;
-		return(false); //we were unable to find somewhere to move	
+        return(false); //we were unable to find somewhere to move	
 	}
     
     /** 
