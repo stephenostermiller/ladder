@@ -1,7 +1,7 @@
 /*
  * Part of Ladder, a game.
  * Copyright (C) 1999  Stephen Ostermiller <Ladder@Ostermiller.com>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -188,7 +188,7 @@ public class Lad extends Creature{
 	private boolean canClimbUp(){
 	    // must be a ladder above us to be able to climb up
 		// a $ can hide a ladder
-	    return(eight == 'H' || eight == '$');
+	    return((eight == 'H' || eight == '$') && canMoveUp());
     }
 	
     /** 
@@ -320,7 +320,7 @@ public class Lad extends Creature{
 		if (five == '.'){
 		    return; // we can't handle this.
 		}
-	    // we are going one of the four directions
+        // we are going one of the four directions
 	    if (direction == Creature.DOWN){
 		    // we can go down but not jump down
 		    if (canMoveDown() && !JumpJustOver()){
@@ -363,16 +363,17 @@ public class Lad extends Creature{
 			    command = Lad.STOP;
 			}
 		} else if (direction == Creature.UP){
-		    if (canClimbUp()){
-			    if (jumpCommand){
+            if (canClimbUp()){
+		    	if (jumpCommand){
     			    futureJump = true;
     				jumpCommand = false;
 				}
 				command = Lad.UP;
 			} else if (canMoveUp() && jumpCommand){
-			    command = Lad.UP;
+		    	command = Lad.UP;
 			} else {
 			    command = Lad.STOP;
+    			jumpCommand = false;
 		    }
 		} else if (jumpCommand){
 		    if (canMoveUp()){
@@ -388,7 +389,7 @@ public class Lad extends Creature{
 	}
 	
     /** 
-     * tell the lad to move as if he is continueing with a jump.
+     * tell the lad to move as if he is continuing with a jump.
      * 
      * @return true if it was able to act immediatly on a command or 
      *     future command
@@ -406,7 +407,7 @@ public class Lad extends Creature{
 		// Special logic if we are on a ladder
         if (five == 'H'){
 			jump = 0;  // the jump is over, set it for new jump
-			if (jumpCommand){
+			if (jumpCommand && canMoveUp()){
 				// set it to jump up the ladder
 				command = Lad.STOP;
 				futureCommand = Lad.NONE;
@@ -433,7 +434,7 @@ public class Lad extends Creature{
 				direction = Creature.STATIONARY;
 				futureDirection = Creature.STATIONARY;
 			}
-			return(moveNoJump());            
+			return(moveNoJump());
         } else if (canStayPut() && moveScheduled() && moveNoJump()){ // end jump if we can
 			jump = 0;
 			return(true);
@@ -460,7 +461,7 @@ public class Lad extends Creature{
 		    jumpCommand = false;
 			futureJump = true;
 		}
-		if (jump == 1){            
+		if (jump == 1){
             if (direction == Creature.LEFT){
 			    if (canMoveUpLeft()){
 				    command = Lad.UPLEFT;
@@ -471,10 +472,6 @@ public class Lad extends Creature{
 				        command = Lad.STOP;
 					}
 				} else {
-					//command = Lad.FALL;
-					//if(futureCommand != Lad.DOWN){
-					//    futureCommand = Lad.LEFT;
-                    //}
                     jump = 5;
 				}				    
             } else if (direction == Creature.RIGHT){
@@ -487,10 +484,6 @@ public class Lad extends Creature{
 				        command = Lad.STOP;
 					}
 				} else {
-				    //command = Lad.FALL;
-				    //if(futureCommand != Lad.DOWN){
-					//    futureCommand = Lad.RIGHT;
-                    //}
                     jump = 5;
 				}
             } else {
@@ -504,7 +497,7 @@ public class Lad extends Creature{
             }
             
         } 
-        if (jump == 2 || jump == 3){        	 
+        if (jump == 2 || jump == 3){
             if (direction == Creature.LEFT){
                 if (canMoveLeft()){
 				    command = Lad.LEFT;
@@ -667,6 +660,7 @@ public class Lad extends Creature{
 				} else if (canMoveUp()){
 				    command = Lad.UP;
 					futureCommand = Lad.RIGHT;
+                    direction = Lad.NONE; // We hit a wall, so cancel our directional moving.
 					return(true);
 				} else {
 				    futureJump = true;
@@ -689,6 +683,7 @@ public class Lad extends Creature{
 				} else if (canMoveUp()){
 				    command = Lad.UP;
 					futureCommand = Lad.LEFT;
+                    direction = Lad.NONE; // We hit a wall, so cancel our directional moving.
 					return(true);
 				} else {
 				    futureJump = true;
@@ -704,7 +699,7 @@ public class Lad extends Creature{
 				return(false);
 			}
         }
-		moveMomentum();
+        moveMomentum();
 		return (false);
 	}
 	
@@ -852,9 +847,9 @@ public class Lad extends Creature{
 		if (five == '.'){
 		    moveOnTrampoline();
 	    } else if (inAJump()){
-		    moveJump();
+            moveJump();
 		} else {
-		    moveNoJump();
+            moveNoJump();
 		}
 		
 		if (jumpCommand){
@@ -932,4 +927,4 @@ public class Lad extends Creature{
         }
     }
 }
-    
+
