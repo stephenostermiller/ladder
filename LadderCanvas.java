@@ -467,19 +467,25 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
         jumpCommand = false;
         screenLevel = new Level(realLevel);
 
-        barrelProducers.setSize(0);
         lad.reset(ladStartPosX,ladStartPosY,Creature.STATIONARY);
         screenLevel.setCharAt(ladStartPosY-1, ladStartPosX-1, 'p');
         realLevel.setCharAt(ladStartPosY-1, ladStartPosX-1, ' ');
         Dimension p = realLevel.positionOf('V');
-        while (p != null){
-            BarrelProducer brl = new BarrelProducer(p.width+1, p.height+1);
-            brl.setMinBarrels(difficulty);
-            barrelProducers.addElement(brl);
-            
+        int i;
+        for (i=0; i<barrelProducers.size(); i++){
+            ((BarrelProducer)barrelProducers.elementAt(i)).clear();
+        }
+        for (i=0; p != null; i++){
+            if (i < barrelProducers.size()){
+                ((BarrelProducer)barrelProducers.elementAt(i)).reset(p.width+1, p.height+1);
+            } else {
+            	barrelProducers.addElement(new BarrelProducer(p.width+1, p.height+1));
+            }
             p.width++;
             p = realLevel.positionOf('V', p);
         }
+        barrelProducers.setSize(i);
+        System.gc();
     }
     
     /** 
@@ -488,10 +494,6 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
      * @param difficulty level of difficulty
      */
     public void setDifficulty(int difficulty){
-        for (int k=0; k<barrelProducers.size(); k++){
-            BarrelProducer BP = (BarrelProducer)barrelProducers.elementAt(k);
-            BP.setMinBarrels(difficulty);
-        }
         switch (difficulty){
         case EASY:
             gameSpeed = EASY_SPEED;
@@ -583,8 +585,8 @@ public class LadderCanvas extends JPanel implements Runnable, KeyListener{
                     for (int k=0; k<barrelProducers.size(); k++){
                         BarrelProducer BP = (BarrelProducer)barrelProducers.elementAt(k);
                         BP.update();
-                        for (int j=0; j<BP.getBarrels().size(); j++){
-                            Barrel barrel = (Barrel)BP.getBarrels().elementAt(j);
+                        for (int j=0; j<BP.getBarrelCount(); j++){
+                            Barrel barrel = BP.getBarrelAt(j);
                             if (barrel != null){
                                 if(barrel.getYPos() == lad.getYPos() &&  lad.getXPos() == barrel.getXPos()){
                                     gameOver = G_O_BARREL;
