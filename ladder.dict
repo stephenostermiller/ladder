@@ -1,4 +1,4 @@
-personal_ws-1.1 english 404
+personal_ws-1.1 en 408
 drawChars
 TableColumn
 nextDouble
@@ -243,6 +243,7 @@ screenLevel
 getSymbol
 addFocusListener
 Horz
+java
 gc
 InterruptedException
 parseLong
@@ -254,11 +255,13 @@ FileOutputStream
 jre
 canMoveDownLeft
 getY
+Los
 parentComponent
 canMoveRight
 num
 mkdirs
 mouseY
+msie
 futureCommand
 ClassLoader
 classpath
@@ -327,6 +330,7 @@ KeyAdapter
 numLevels
 beginersH
 screenshot
+indexOf
 gameSpeed
 FocusEvent
 beginLoopTime
