@@ -118,7 +118,7 @@ public class Lad extends Creature{
          * Random number generator used by this lad.
          * 
          */
-	private Random rand;
+	private static Random rand = new Random();
 	// the environment around the character
         /**          */
 	private char one, two, three, four, five, six, seven, eight, nine;
@@ -131,6 +131,17 @@ public class Lad extends Creature{
      * @param direction direction in which this lad is headed.
      */
     public Lad(int xpos, int ypos, int direction){
+        reset(xpos, ypos, direction);
+    }
+
+    /**
+     * Set the lad to these initial parameters
+     *
+     * @param xpos x position of this lad
+     * @param ypos y position of this lad
+     * @param direction direction in which this lad is headed.
+     */
+    public void reset(int xpos, int ypos, int direction){
         this.xpos = xpos;
         this.ypos = ypos;
         this.direction = direction;
@@ -140,7 +151,6 @@ public class Lad extends Creature{
 		jumpCommand = false;
 		futureDirection = Creature.STATIONARY;
 		jump = 0;
-		rand = new Random();
     }
     
     /** 
