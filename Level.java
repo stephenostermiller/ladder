@@ -212,6 +212,7 @@ public class Level implements Cloneable {
      * @param file where to write.
      */
     public void store(File file) throws java.io.IOException{
+        if (file.exists()) file.delete();
         store(new FileOutputStream(file));
     }
 
