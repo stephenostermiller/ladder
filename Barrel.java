@@ -1,6 +1,6 @@
 /*
  * Part of Ladder, a game.
- * Copyright (C) 1999  Stephen Ostermiller <Ladder@Ostermiller.com>
+ * Copyright (C) 1999, 2000 Stephen Ostermiller <Ladder@Ostermiller.com>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,7 +11,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * See COPYING.TXT for details.
  */
 
@@ -22,18 +22,34 @@ import java.util.*;
 /** 
  * This class defines a barrel.  Barrels appear as an 'o' on the screen.
  * The roll down the screen and try to crush the lad.
- * 
  */
 public class Barrel extends Creature{
+
     /** 
-     * Random Number Generator for this Barrel
-     * 
+     * Random Number Generator for this Barrel.
      */
-    private Random rnum = new Random();
+    private static Random rnum = new Random();
+
+    /**
+     * Create a new barrel.
+     */
+    public Barrel(){
+        this(0,0);
+    }
+
+    /**
+     * Create a new barrel in the given postion.
+     *
+     * @param xpos the x coordinate of the barrel's position
+     * @param ypos the y coordinate of the barrel's position
+     */
+    public Barrel(int xpos, int ypos){
+        this(xpos, ypos, Creature.STATIONARY);
+    }
 	
-    /** 
+    /**
      * Create a new barrel in the given postion, going the proper direction
-     * 
+     *
      * @param xpos the x coordinate of the barrel's position
      * @param ypos the y coordinate of the barrel's position
      * @param direction the direction in which the barrel is initially moving
@@ -46,23 +62,22 @@ public class Barrel extends Creature{
     }
 
     /** 
-     * The command go  down
-     * 
+     * The command go  down.
      */
     private static final int DOWN = 2;
+
     /** 
-     * The command go left
-     * 
+     * The command go left.
      */
     private static final int LEFT = 4;
+
     /** 
-     * The command go right
-     * 
+     * The command go right.
      */
     private static final int RIGHT = 6;
+
     /** 
-     * The command stop
-     * 
+     * The command stop.
      */
     private static final int STOP = 5;
     
