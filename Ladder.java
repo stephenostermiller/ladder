@@ -38,7 +38,7 @@ public class Ladder extends JFrame {
      * menu items in the menus
      */
 	private JMenuItem openItem, editItem, saveItem, newItem, bgItem,
-        fgItem, exitItem, fontItem;
+        fgItem, exitItem, fontItem, scoresItem;
 
     /**
      * menu itime in the edit menu
@@ -61,6 +61,11 @@ public class Ladder extends JFrame {
      */
     private Level level;
 
+    /**
+     * Array of high scores.
+     */
+    private HighScoreList highScores = new HighScoreList();
+
 	/**
      * Is the game running, as opposed to over, not started, or paused?
      */
@@ -79,7 +84,7 @@ public class Ladder extends JFrame {
     /**
      * the number of the current level being played
      */
-    private int currLevel = -1;
+    private int currLevel = 0;
 
     /**
      * Array of choices for font sizes.
@@ -132,7 +137,6 @@ public class Ladder extends JFrame {
                 } else if (object == newItem){
                     startGame();
                 } else if (object == openItem){
-                    pause();
                     FileDialog fd = new FileDialog(Ladder.this, "Open a Level", FileDialog.LOAD);
                     fd.setFile("*.lvl");
                     fd.setVisible(true);
@@ -154,7 +158,6 @@ public class Ladder extends JFrame {
                         } catch (IOException e){
                             System.err.println(e.getMessage());
                         }
-                    	unpause();
                     }
                 } else if (object == easyItem){
                    ladderCanvas.setDifficulty(LadderCanvas.EASY);
@@ -167,7 +170,6 @@ public class Ladder extends JFrame {
                 } else if (object == impossibleItem){
                    ladderCanvas.setDifficulty(LadderCanvas.IMPOSSIBLE);
                 } else if (object == saveItem){
-                    pause();
                     FileDialog fd = new FileDialog(Ladder.this, "Save a Level", FileDialog.SAVE);
                     fd.setFile("*.lvl");
                     fd.setVisible(true);
@@ -179,6 +181,8 @@ public class Ladder extends JFrame {
                     }
                 } else if (object == editItem){
                    new Editor(level.getLevel(), Ladder.this);
+                } else if (object == scoresItem){
+                    highScores.showHighScoreWindow(Ladder.this);
                 } else if (object == fontItem){
                     Integer i;
                     i = (Integer)JOptionPane.showInputDialog(Ladder.this,
@@ -211,6 +215,9 @@ public class Ladder extends JFrame {
 		newItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0));
         newItem.addActionListener(actList);
         fileMenu.add(newItem);
+        scoresItem = new JMenuItem("High Scores...", 'h');
+        scoresItem.addActionListener(actList);
+        fileMenu.add(scoresItem);
         exitItem = new JMenuItem("Exit", 'x');
 		exitItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, ActionEvent.ALT_MASK));
         exitItem.addActionListener(actList);
@@ -345,11 +352,31 @@ public class Ladder extends JFrame {
         bonusTimeField.setBackground(Color.lightGray);
         bonusTimeField.setForeground(Color.black);
         
-        level = nextLevel(-1); // Load the first level
+        level = nextLevel(0); // Load the first level
         
 		// initialize the game
         ladderCanvas = new LadderCanvas(level, this);
 		this.addKeyListener(ladderCanvas); // key events need to get passed to the ladder canvas
+        this.addKeyListener(
+			new KeyAdapter(){
+            	/**
+                 * Some key has been pressed, react to it.
+                 *
+                 * @param ke The key event corresponding to the key
+                 */
+            	public void keyPressed(KeyEvent ke){
+                    int keycode = ke.getKeyCode();
+                    if (keycode == KeyEvent.VK_ESCAPE){
+                        // pause and unpause the game when the escape key is pressed.
+                        if(pauseItem.getState()){
+                            unpause();
+						} else {
+                       		pause();
+                        }
+                    }
+                }
+        	}
+        );
 		
 		// lay out this frame using a grid bag layout
         GridBagLayout gridbag = new GridBagLayout();
@@ -431,6 +458,15 @@ public class Ladder extends JFrame {
         this.setLocation(x, y);
         this.addWindowListener(
             new WindowAdapter(){
+
+                /**
+                 * true iff ladder was paused by the window being deactivated
+                 * This allows us to only unpause the game on reactivation
+                 * if it was paused because of this and not deliberatly by
+                 * the game player.
+                 */
+                private boolean autopause = false;
+
                 /** window closing
                  *
                  * @param event window closing
@@ -448,7 +484,8 @@ public class Ladder extends JFrame {
                  * @param event window activated
                  */
                 public void windowActivated(java.awt.event.WindowEvent event){
-                    if (!pauseItem.getState()){
+                    if (pauseItem.getState() && autopause){
+                        autopause = false;
                         unpause();
                     }
                 }
@@ -459,7 +496,10 @@ public class Ladder extends JFrame {
                  * @param event window deactivated
                  */
                 public void windowDeactivated(java.awt.event.WindowEvent event){
-                    pause();
+                    if (!pauseItem.getState()){
+                        pause();
+                        autopause = true;
+                    }
                 }
             }
 		);
@@ -484,7 +524,7 @@ public class Ladder extends JFrame {
      * @param level the desired Level.
      */
     public void setLevel(Level level){
-        pause();
+        //pause();
         this.level = level;
         ladderCanvas.setLevel(level);
         this.pack();
@@ -596,24 +636,30 @@ public class Ladder extends JFrame {
      * @return the text of the level
      */
     public Level nextLevel(int ind){
-        if (ind < 0 && ladderCanvas != null){
-            ladderCanvas.resetGame();
-        }
-        Component[] levels = levelMenu.getMenuComponents();
-        currLevel = ind + 1;
-        int levelNum = currLevel;
-        for (int i=0; i<levels.length; levelNum++, i++){
-            try {
-                LevelMenuItem menuItem = (LevelMenuItem)levels[getLevelIndex(levelNum % getNumberLevels(levels.length))];
-                level = menuItem.getLevel();
-                menuItem.setSelected(true);
-                break;
-            } catch (IOException e){
-                System.err.println(e.getMessage());
+        if (ind < 0){
+            currLevel = -1;
+            setLevel(currLevel);
+            return level;
+        } else {
+            if (ind == 0 && ladderCanvas != null){
+                ladderCanvas.resetGame();
             }
+            Component[] levels = levelMenu.getMenuComponents();
+            currLevel = ind + 1;
+            int levelNum = currLevel;
+            for (int i=0; i<levels.length; levelNum++, i++){
+                try {
+                    LevelMenuItem menuItem = (LevelMenuItem)levels[getLevelIndex(levelNum - 1 % getNumberLevels(levels.length))];
+                    level = menuItem.getLevel();
+                    menuItem.setSelected(true);
+                    break;
+                } catch (IOException e){
+                    System.err.println(e.getMessage());
+                }
+            }
+            setLevel(currLevel);
+            return level;
         }
-        setLevel(currLevel);
-        return level;
     }
 
     /**
@@ -674,8 +720,8 @@ public class Ladder extends JFrame {
      * Start the game at the first level.
      */
     public void startGame(){
-		changeLevel(nextLevel(-1));
-        currLevel=0;
+		changeLevel(nextLevel(0));
+        currLevel=1;
         setLevel(currLevel);
 		unpause();
     }
@@ -723,6 +769,7 @@ public class Ladder extends JFrame {
             fis.close();
         } catch (IOException e){
         }
+        highScores.load(props);
     }
 
     /**
@@ -733,6 +780,8 @@ public class Ladder extends JFrame {
         Point p = getLocation();
         props.put("WindowX", ("" + p.x));
         props.put("WindowY", ("" + p.y));
+        // put the high scores list in the properties
+        highScores.store(props);
         try{
 			File propsFile = new File(System.getProperty("user.home"), ".java");
         	propsFile = new File(propsFile, "Ladder");
@@ -873,6 +922,24 @@ public class Ladder extends JFrame {
             level = new Level();
             level.load(fileName);
             return level;
+        }
+    }
+
+    /**
+     * report to GUI that the game is over
+     *
+     * @param score the score at the end of the game
+     */
+    public void gameOver(long score){
+		if (currLevel > 0 && highScores.canBeAdded(score)){
+            String name = JOptionPane.showInputDialog(this,
+                "Congratulation!\nYou got a high score.\nPlease enter your name below.",
+                "High Score", JOptionPane.QUESTION_MESSAGE);
+            if (name == null){
+                name = "";
+            }
+            highScores.add(new HighScore(score, currLevel, name));
+            highScores.showHighScoreWindow(this);
         }
     }
 }
