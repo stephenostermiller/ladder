@@ -2,7 +2,7 @@
 <%bte.tpl name=pageTitle %>Ladder<%/bte.tpl%>
 <%bte.tpl name=description %>A freeware ASCII arcade game similar to Donkey Kong.<%/bte.tpl%>
 <%bte.tpl name=keywords %>ladder, ladder, ladder, game, game, game, der rock, der rock, der rock, lad, lad, lad, kaypro, kaypro, donkey kong, ASCII, CPM, open source, java, freeware, GPL, download, stephen, ostermiller<%/bte.tpl%>
-<%bte.tpl name=homeLinkText %><b>Home</b> - Ladder main page.<%/bte.tpl%>
+<%bte.tpl name=homeLinkText %><b>Home</b><%/bte.tpl%>
 <%bte.tpl name=pageContent %>
 <p align=center>A freeware ASCII arcade game similar to Donkey Kong.</p>
 <table align=center class=level><tr><td><tt>

@@ -2,7 +2,7 @@
 <%bte.tpl name=pageTitle %>Customize Ladder<%/bte.tpl%>
 <%bte.tpl name=description %>Tips and tricks that let you shape the game to your liking.<%/bte.tpl%>
 <%bte.tpl name=keywords %>ladder, ladder, hack, hacking, modify, modification, tip, trick, cheat, customize, customize<%/bte.tpl%>
-<%bte.tpl name=customizeLinkText %><b>Customize</b> - Tips and tricks.<%/bte.tpl%>
+<%bte.tpl name=customizeLinkText %><b>Customization</b><%/bte.tpl%>
 <%bte.tpl name=pageContent %>
 <h3>Creating Levels</h3>
 Ladder comes with a level editor and you can create new levels (<a href="levels.html#creating">instructions</a>).

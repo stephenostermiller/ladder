@@ -2,7 +2,7 @@
 <%bte.tpl name=pageTitle %>Ladder Version History<%/bte.tpl%>
 <%bte.tpl name=description %>Version history and changelog for Java version of the ASCII arcade game.<%/bte.tpl%>
 <%bte.tpl name=keywords %><%/bte.tpl%>
-<%bte.tpl name=historyLinkText %><b>History</b> - List of features and bug fixes in each release.<%/bte.tpl%>
+<%bte.tpl name=historyLinkText %><b>Version History</b><%/bte.tpl%>
 <%bte.tpl name=pageContent %>
 <ul class=contentList>
 <li><b><a href="ladder_1_2.jar">Ladder 1.2</a></b> (Executable Jar - 124k) June 2002 - Requires Java 1.3<br>

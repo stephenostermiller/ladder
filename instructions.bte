@@ -2,7 +2,7 @@
 <%bte.tpl name=pageTitle %>Ladder Instructions<%/bte.tpl%>
 <%bte.tpl name=description %>Instructions for installing and playing Ladder.<%/bte.tpl%>
 <%bte.tpl name=keywords %>instructions, instructions, ladder, game, java, freeware<%/bte.tpl%>
-<%bte.tpl name=instructionsLinkText %><b>Instructions</b> - How to play.<%/bte.tpl%>
+<%bte.tpl name=instructionsLinkText %><b>Instructions</b><%/bte.tpl%>
 <%bte.tpl name=pageContent %>
 <p>You are a lad trapped in a maze. You're mission is to explore the dark
 corridors never before seen by human eyes and find hidden treasures and

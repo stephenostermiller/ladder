@@ -2,7 +2,7 @@
 <%bte.tpl name=pageTitle %>Ladder Levels<%/bte.tpl%>
 <%bte.tpl name=description %>Level writing instructions and submission form for Ladder.<%/bte.tpl%>
 <%bte.tpl name=keywords %>ladder, level, levels, write, create, writing, creating, submission, submit<%/bte.tpl%>
-<%bte.tpl name=levelsLinkText %><b>Levels</b> - Existing levels, and creating and submitting new levels.<%/bte.tpl%>
+<%bte.tpl name=levelsLinkText %><b>Levels</b><%/bte.tpl%>
 <%bte.tpl name=pageContent %>
 
 <h2>Existing Levels</h2>
