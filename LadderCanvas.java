@@ -1,0 +1,658 @@
+/*
+ * Part of Ladder, a game.
+ * Copyright (C) 1999  Stephen Ostermiller <Ladder@Ostermiller.com>
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * See COPYING.TXT for details.
+ */
+
+package com.Ostermiller.Ladder;
+
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import java.lang.*;
+import java.util.*;
+
+/** 
+ * The LadderCanvas is basically the executable part of the game.  The canvas
+ * draws the game on itself.
+ */
+public class LadderCanvas extends JPanel implements Runnable, KeyListener{
+    private Ladder caller; // the caller of this
+    private Dimension minSize;
+    private int columns;
+    private int rows;
+    private StringBuffer screenData, levelData;
+    private String level;
+    private Lad lad;
+    private int letterWidth, letterHeight, letterAcsent;
+	private int fontSize;
+    private Font font;
+    public int nextCommand;
+    public boolean jumpCommand;
+    private Barrel barrel;
+    private Vector repaintList;
+    private Vector barrelProducers;
+    private boolean repaintAll;
+    private Color bgColor;
+    private Color fgColor;
+    public int gameOver;
+    private boolean gameStop;
+    public Thread ladderCanvasThread;
+    private int difficulty;
+    private int cycles;
+    private long score;
+    private int ladsLeft;
+    private int gameSpeed; // pause in ms between frames.
+    private long nextNewLad;
+	boolean stopThread;
+	private boolean go_on = false;
+	private int ladStartPosX;
+	private int ladStartPosY;
+	private long lastBeep;
+	
+	private static final boolean STEP_MODE = false;
+
+    public static final int SCORE_RESET = 0;
+    public static final int SCORE_BARREL = 1;
+    public static final int SCORE_STATUE = 2;
+    public static final int SCORE_MONEY = 3;
+
+    public static final int G_O_NOT_OVER = 0;
+    public static final int G_O_BARREL = 1;
+    public static final int G_O_TIME = 2;
+    public static final int G_O_MONEY = 3;
+    public static final int G_O_QUIT = 4;
+    public static final int G_O_SPIKE = 5;
+	
+	// minimum number of barrels per producer at the level
+	public static final int EASY = 3;
+    public static final int MEDIUM = 5;
+    public static final int HARD = 7;
+    public static final int VERY_HARD = 10;
+    public static final int IMPOSSIBLE = 15;
+	
+	// game speed at the level (milliseconds between frames)
+	private static final int EASY_SPEED = 130;
+    private static final int MEDIUM_SPEED = 100;
+    private static final int HARD_SPEED = 80;
+    private static final int VERY_HARD_SPEED = 65;
+    private static final int IMPOSSIBLE_SPEED = 55;
+	
+    public LadderCanvas(String level, Ladder caller){
+	    lastBeep = 0;
+		ladStartPosX = 1;
+		ladStartPosY = 1;
+        gameStop = false;
+        this.caller = caller;
+        bgColor = Color.black;
+        fgColor = Color.green;
+        repaintList = new Vector();
+        barrelProducers = new Vector();
+        this.addKeyListener(this);
+        nextCommand = Lad.STOP;
+        jumpCommand = false;
+        //columns = 82;
+        //rows = 26;
+        setBackground(bgColor);
+        setFontSize(12);
+        screenData = new StringBuffer();
+        levelData = new StringBuffer();
+		repaintAll = true;
+        setLevelPaint(level);        
+        cycles = 2000;
+        score = 0;
+        ladsLeft = 3;
+        nextNewLad = 10000;
+        caller.setLads(ladsLeft);        
+		setDifficulty(MEDIUM);
+		setOpaque(true);
+    }
+	
+	public void setFontSize(int size){
+	    font = new Font("Monospaced", Font.PLAIN, size);
+        FontMetrics fontMetrics = this.getFontMetrics(font);
+        letterWidth = fontMetrics.charWidth('m');
+        letterHeight = fontMetrics.getHeight();
+        letterAcsent = fontMetrics.getAscent();
+		minSize = new Dimension(letterWidth*(columns - 2), letterHeight*(rows - 2));
+		fontSize = size;   
+	}
+	
+	public int getFontSize(){
+	    return fontSize;
+	}
+        
+    public void setBGColor(Color bg){
+        bgColor = bg;
+        //setBackground(bgColor);
+		caller.setBackground(bgColor);
+        repaintAll = true;
+        repaint();
+    }
+    
+    public void setFGColor(Color fg){
+        fgColor = fg;
+        repaintAll = true;
+        repaint();
+    }
+
+    private void setLevelPaint(String level){
+        setLevel(level);
+        repaintAll = true;
+        repaint();
+    }
+    
+    public void setLevel(String level){
+	    ladStartPosX = 1;
+		ladStartPosY = 1;
+        this.level = level;
+        StringTokenizer levelTok = new StringTokenizer(level, "\n");
+        StringBuffer levelLine = new StringBuffer();
+        screenData.setLength(0);
+        levelData.setLength(0);
+        levelLine.setLength(0);
+        if (levelTok.hasMoreTokens()){
+            levelLine.append(levelTok.nextToken());
+        } else {
+            levelLine.append(" ");// make room for the lad if an empty string is given
+        }
+        columns = levelLine.length() + 2;
+        for (int i=0; i < columns; i++){
+            screenData.append('=');
+            levelData.append('=');
+        }
+        screenData.append('|').append(levelLine).append('|');
+        levelData.append('|').append(levelLine).append('|');
+        int i = 1;
+        while (levelTok.hasMoreTokens()){
+            i++;
+            levelLine.setLength(0);
+            levelLine.append(levelTok.nextToken());
+            // ensure that each line is the same size
+            if (levelLine.length() > columns - 2){
+                levelLine.setLength(columns - 2);
+            }
+            if (levelLine.length() < columns - 2){
+                for (int j = levelLine.length(); j<columns - 2; j++){
+                    levelLine.append(' ');
+                }
+            }
+            screenData.append('|').append(levelLine).append('|');
+            levelData.append('|').append(levelLine).append('|');
+        }
+        rows = i + 2;
+        for (int j=0; j < columns; j++){
+            screenData.append('=');
+            levelData.append('=');
+        }
+		int p = levelData.toString().indexOf('p');
+        if (p > -1){
+            ladStartPosY = (int)Math.floor((double)p/columns);
+            ladStartPosX = p - ladStartPosY * columns;
+        }
+        minSize = new Dimension(letterWidth*(columns - 2), letterHeight*(rows - 2));        
+    }
+    
+    public Dimension getPreferredSize() {
+        return getMinimumSize();
+    }
+
+    public synchronized Dimension getMinimumSize() {
+        return minSize;
+    }
+
+    public void paintComponent(Graphics g){
+	    //if(isOpaque()){
+		//    System.out.println("Painting everything");
+		//}
+        g.setFont(font);
+		g.setColor(fgColor);
+        //if (repaintAll){
+		if (true){
+		    g.clearRect(g.getClipBounds().x, g.getClipBounds().y, g.getClipBounds().width, g.getClipBounds().height);
+            //g.setColor(bgColor);
+			//g.fillRect(g.getClipBounds().x, g.getClipBounds().y, g.getClipBounds().width, g.getClipBounds().height);
+			g.setFont(font);
+            g.setColor(fgColor);
+            //System.out.println(g.getClipBounds().toString());
+            int a = (int)Math.floor((double)g.getClipBounds().y/letterHeight);
+            int b = (int)Math.ceil((double)(g.getClipBounds().y + g.getClipBounds().height + letterHeight - letterAcsent)/letterHeight + 1);
+            int c = (int)Math.floor((double)g.getClipBounds().x/letterWidth);
+            int d = (int)Math.ceil((double)(g.getClipBounds().x + g.getClipBounds().width + letterWidth)/letterWidth);
+            //System.out.println("Vert: " + (a+1) + " to " + (b) + " Horz: " + (c+1) + " to " + (d)); 
+            for (int i=a+1; i<b && i<rows - 1; i++){
+                for(int j=c+1; j<d && j<columns - 1; j++){
+                    //g.setColor(bgColor);
+					//g.fillRect((j-1)*letterWidth, (i-1)*letterHeight, letterWidth, letterHeight);
+                    //g.setColor(fgColor);
+					char[] ch = new char[1];
+                    ch[0] = screenData.charAt(i*columns + j);
+                    g.drawChars(ch,0,1,(j-1)*letterWidth,(i-1)*letterHeight+letterAcsent);
+                }
+            }
+        } else {
+            int i, j;
+			for(int k=repaintList.size()-1; k>=0; k--){			    
+                j = ((Dimension)repaintList.elementAt(k)).width;
+                i = ((Dimension)repaintList.elementAt(k)).height;
+				// only redraw this character if it is in the clip rectangle.
+				// otherwise we would have no effect and the element would be removed and 
+				// never repainted.
+				if(g.getClipBounds().contains((j-1)*letterWidth, (i-1)*letterHeight)){
+                    //g.setColor(bgColor);
+					//g.fillRect((j-1)*letterWidth, (i-1)*letterHeight, letterWidth,letterHeight);
+                    g.clearRect((j-1)*letterWidth, (i-1)*letterHeight, letterWidth,letterHeight);
+					g.setColor(fgColor);
+					char[] ch = new char[1];
+                    ch[0] = screenData.charAt(i*columns + j);
+                    g.drawChars(ch,0,1,(j-1)*letterWidth,(i-1)*letterHeight+letterAcsent);
+    				repaintList.removeElementAt(k);
+				}
+            }
+        }
+		repaintAll = true;
+    }        
+    
+    private void repaintCharAt(int xpos, int ypos){
+        repaint((xpos-1)*letterWidth, (ypos-1)*letterHeight, letterWidth,letterHeight);
+    }
+   
+    public void start(){
+        if (ladderCanvasThread == null || !ladderCanvasThread.isAlive()){
+            ladderCanvasThread = new Thread(this);
+        }
+        ladderCanvasThread.start();
+        //System.out.println("Started!");
+    }
+    
+    public void stop(){
+		stopThread = true;
+        //ladderCanvasThread.stop();  // deprecated
+    }
+
+    public void resetGame(){
+        //System.out.println("Reseting Game, repainting");
+        updateScore(SCORE_RESET);
+        ladsLeft = 3;
+        nextNewLad = 10000;
+        caller.setLads(ladsLeft);
+		setLevelPaint(level);
+        reset();
+        repaintAll = true;
+        repaint();
+    }
+
+    public void reset(){
+        gameStop = false;
+        cycles = 2000;
+        gameOver = G_O_NOT_OVER;
+        nextCommand = Lad.STOP;
+        jumpCommand = false;
+        //setLevelPaint(level);
+		screenData.setLength(0);
+		screenData.append(levelData.toString());
+        barrelProducers.setSize(0);
+        Dimension pos = new Dimension(1,1);
+        String ld = levelData.toString();
+        lad = new Lad(ladStartPosX,ladStartPosY,Creature.STATIONARY);
+		screenData.setCharAt(ladStartPosY*columns + ladStartPosX, 'p');
+        levelData.setCharAt(ladStartPosY*columns + ladStartPosX,' ');
+        int p = ld.indexOf('V');
+        pos.height = (int)Math.floor((double)p/columns);
+        pos.width = p - pos.height * columns;
+        while (p != -1){
+            BarrelProducer brl = new BarrelProducer(pos.width, pos.height);
+            brl.setMinBarrels(difficulty);
+            barrelProducers.addElement(brl);
+            
+            p = ld.indexOf('V',p+1);
+            pos.height = (int)Math.floor((double)p/columns);
+            pos.width = p - pos.height * columns;
+        }
+        
+    }
+    
+    public void setDifficulty(int difficulty){
+        for (int k=0; k<barrelProducers.size(); k++){
+            BarrelProducer BP = (BarrelProducer)barrelProducers.elementAt(k);
+            BP.setMinBarrels(difficulty);
+        }
+        switch (difficulty){
+        case EASY:
+            gameSpeed = EASY_SPEED;
+        break;
+        case MEDIUM:
+            gameSpeed = MEDIUM_SPEED;
+        break;
+        case HARD:
+            gameSpeed = HARD_SPEED;
+        break;
+        case VERY_HARD:
+            gameSpeed = VERY_HARD_SPEED;
+        break;
+        case IMPOSSIBLE:
+            gameSpeed = IMPOSSIBLE_SPEED;
+        break;
+        }
+    }
+        
+    
+    public void run(){
+		stopThread = false;
+        long beginLoopTime = System.currentTimeMillis();
+        long endLoopTime;
+        int sleepTime;
+		while (!gameStop && !stopThread){
+            try{
+    			while (gameOver == G_O_NOT_OVER && !stopThread){ // While the game is not over
+                    cycles--;  // time count down
+                    caller.setBonusTime(cycles);
+                    //System.out.print(" " + cycles);
+                    if (cycles <= 0){ // Game over due to out of time
+                        gameOver = G_O_TIME;
+                        throw (new GameOverException());
+     				}
+                    // move the lad
+                    screenData.setCharAt(lad.getYPos()*columns + lad.getXPos(),levelData.charAt(lad.getYPos()*columns + lad.getXPos()));
+                    repaintList.addElement(new Dimension(lad.getXPos(), lad.getYPos()));
+                    int oldx = lad.getXPos();
+                    int oldy = lad.getYPos();
+                    //repaintCharAt(lad.getXPos(), lad.getYPos());
+                    lad.setCommand(nextCommand);
+                    nextCommand = Lad.NONE;
+                    if (jumpCommand){
+                        lad.setJump();
+                    }
+                    jumpCommand = false;
+                    // tell the lad about its surroundings so that it knows how it can move
+                    lad.update(levelData.charAt((lad.getYPos() + 1)*columns + (lad.getXPos() - 1)),
+                        levelData.charAt((lad.getYPos() + 1)*columns + (lad.getXPos())),
+                        levelData.charAt((lad.getYPos() + 1)*columns + (lad.getXPos() + 1)),
+                        levelData.charAt((lad.getYPos())*columns + (lad.getXPos() - 1)),
+                        levelData.charAt((lad.getYPos())*columns + (lad.getXPos())),
+                        levelData.charAt((lad.getYPos())*columns + (lad.getXPos() + 1)),
+                        levelData.charAt((lad.getYPos() - 1)*columns + (lad.getXPos() - 1)),
+                        levelData.charAt((lad.getYPos() - 1)*columns + (lad.getXPos())),
+                        levelData.charAt((lad.getYPos() - 1)*columns + (lad.getXPos() + 1)));
+                    // redraw the lad
+                    screenData.setCharAt(lad.getYPos()*columns + lad.getXPos(),lad.getSymbol());
+                    repaintList.addElement(new Dimension(lad.getXPos(), lad.getYPos()));
+                    if(levelData.charAt(lad.getYPos()*columns + lad.getXPos()) == '$'){
+                        gameOver = G_O_MONEY; // Found the goal, game over
+						repaint();
+						throw (new GameOverException());
+                        
+                    }
+                    if(levelData.charAt(lad.getYPos()*columns + lad.getXPos()) == '^'){
+                        gameOver = G_O_SPIKE; // Found the goal, game over
+                        throw (new GameOverException());
+					}
+                    if(levelData.charAt(lad.getYPos()*columns + lad.getXPos()) == '&'){
+                        // found a statue, adjust the score, remove the statue
+                        updateScore(SCORE_STATUE);
+                        levelData.setCharAt(lad.getYPos()*columns + lad.getXPos(), ' ');
+                    }
+                    // get rid of dissapearing flooring
+                    if ((lad.getXPos() != oldx && lad.getYPos() >= oldy) && levelData.charAt((oldy + 1)*columns + oldx) == '-'){
+                        // get rid of flooring only if the lad moved over it without jumping.
+                        // so don't remove if he stayed in the same place or if his y pos has gone up.
+                        screenData.setCharAt((oldy + 1)*columns + oldx, ' ');
+                        levelData.setCharAt((oldy + 1)*columns + oldx, ' ');
+                        repaintList.addElement(new Dimension(oldx, oldy + 1));
+                        //repaintCharAt(oldx, oldy + 1);
+                    }
+                    // update and repaint all the barrels
+                    for (int k=0; k<barrelProducers.size(); k++){
+                        BarrelProducer BP = (BarrelProducer)barrelProducers.elementAt(k);
+                        BP.update();
+                        for (int j=0; j<BP.getBarrels().size(); j++){
+                            Barrel barrel = (Barrel)BP.getBarrels().elementAt(j);
+                            if (barrel != null){
+                                if(barrel.getYPos() == lad.getYPos() &&  lad.getXPos() == barrel.getXPos()){
+                                    gameOver = G_O_BARREL;
+                                    throw (new GameOverException());
+								} 
+                                // score for jumping barrels
+                                if (levelData.charAt((lad.getYPos())*columns + (lad.getXPos())) != 'H'){ // no score if on ladder
+                                    if(barrel.getYPos() - 1 == lad.getYPos() &&  lad.getXPos()  == barrel.getXPos()){
+                                        updateScore(SCORE_BARREL);
+                                    } else if(barrel.getYPos() - 2 == lad.getYPos() &&  lad.getXPos()  == barrel.getXPos() &&
+                                        levelData.charAt((lad.getYPos() + 1)*columns + (lad.getXPos())) != '=' &&
+                                        levelData.charAt((lad.getYPos() + 1)*columns + (lad.getXPos())) != '|' &&
+                                        levelData.charAt((lad.getYPos() + 1)*columns + (lad.getXPos())) != '-'){
+                                        updateScore(SCORE_BARREL);
+                                    } 
+                                }
+                                screenData.setCharAt(barrel.getYPos()*columns + barrel.getXPos(),levelData.charAt(barrel.getYPos()*columns + barrel.getXPos()));
+                                repaintList.addElement(new Dimension(barrel.getXPos(), barrel.getYPos()));
+                                //repaintCharAt(barrel.getXPos(), barrel.getYPos());
+                                barrel.update(levelData.charAt((barrel.getYPos() + 1)*columns + (barrel.getXPos() - 1)),
+                                    levelData.charAt((barrel.getYPos() + 1)*columns + (barrel.getXPos())),
+                                    levelData.charAt((barrel.getYPos() + 1)*columns + (barrel.getXPos() + 1)),
+                                    levelData.charAt((barrel.getYPos())*columns + (barrel.getXPos() - 1)),
+                                    levelData.charAt((barrel.getYPos())*columns + (barrel.getXPos())),
+                                    levelData.charAt((barrel.getYPos())*columns + (barrel.getXPos() + 1)),
+                                    levelData.charAt((barrel.getYPos() - 1)*columns + (barrel.getXPos() - 1)),
+                                    levelData.charAt((barrel.getYPos() - 1)*columns + (barrel.getXPos())),
+                                    levelData.charAt((barrel.getYPos() - 1)*columns + (barrel.getXPos() + 1)));
+                                screenData.setCharAt(barrel.getYPos()*columns + barrel.getXPos(),barrel.getSymbol());
+                                repaintList.addElement(new Dimension(barrel.getXPos(), barrel.getYPos()));
+                                //repaintCharAt(barrel.getXPos(), barrel.getYPos());
+                                if(barrel.getYPos() == lad.getYPos() &&  lad.getXPos() == barrel.getXPos()){
+                                    gameOver = G_O_BARREL;
+                                    throw (new GameOverException());
+								}
+                                // score for jumping barrels
+                                if (lad.getDirection() != Creature.UP && lad.getDirection() != Creature.DOWN && // no score this time if the lad is moving up or down to avoid double counting of score
+								    levelData.charAt((lad.getYPos())*columns + (lad.getXPos())) != 'H'){ // no score if on ladder
+                                    if(barrel.getYPos() - 1 == lad.getYPos() &&  lad.getXPos()  == barrel.getXPos()){
+                                        updateScore(SCORE_BARREL);
+                                    } else if(barrel.getYPos() - 2 == lad.getYPos() &&  lad.getXPos()  == barrel.getXPos() &&
+                                        levelData.charAt((lad.getYPos() + 1)*columns + (lad.getXPos())) != '=' &&
+                                        levelData.charAt((lad.getYPos() + 1)*columns + (lad.getXPos())) != '|' &&
+                                        levelData.charAt((lad.getYPos() + 1)*columns + (lad.getXPos())) != '-'){
+                                        updateScore(SCORE_BARREL);
+                                    } 
+                                }
+                                if (levelData.charAt(barrel.getYPos()*columns + barrel.getXPos()) == '*'){
+                                    screenData.setCharAt(barrel.getYPos()*columns + barrel.getXPos(),levelData.charAt(barrel.getYPos()*columns + barrel.getXPos()));
+                                    repaintList.addElement(new Dimension(barrel.getXPos(), barrel.getYPos()));
+                                    //repaintCharAt(barrel.getXPos(), barrel.getYPos());
+                                    BP.recycleBarrel(barrel);
+                                }
+                            }
+                        }
+                    }
+    				repaintAll = false;
+    				repaint();
+    				
+    				endLoopTime = System.currentTimeMillis();
+                    sleepTime = (int)(gameSpeed - (endLoopTime - beginLoopTime));
+                    if (sleepTime > 0){
+    					try{
+    						Thread.sleep(sleepTime);
+    					} catch (InterruptedException e){
+    					}
+                    }
+    				if (STEP_MODE){
+    				    while (!go_on){
+        					try{
+        						Thread.sleep(100);
+        					} catch (InterruptedException e){
+        					}
+    					}
+    					go_on = false;
+    				}
+                    beginLoopTime = System.currentTimeMillis();
+                }
+            } catch (GameOverException e){
+			}
+            // End game here
+        
+            switch (gameOver){
+            case G_O_BARREL: case G_O_TIME: case G_O_SPIKE:
+                //System.out.println("Killed " + gameOver);
+				ladDeath();
+                if (ladsLeft > 0){
+                    ladsLeft--;
+                    caller.setLads(ladsLeft);
+                    //System.out.println("Restarting Level");
+                    reset();
+                    gameStop = false;
+                } else {
+                    gameStop = true;
+                }
+            break;
+            case G_O_MONEY:
+			    dollarCountdown();
+                caller.changeLevel();
+                reset();
+                gameStop = false;
+            break;
+			case G_O_NOT_OVER: // the game is not over.  Thread is stopped.
+				gameStop = false;
+			break;
+            default:
+                gameStop = true;
+            break;        
+            }  
+        }
+    }
+
+    private void dollarCountdown(){
+        while (cycles > 0){
+            caller.setBonusTime(cycles);
+            updateScore(SCORE_MONEY);                    
+            cycles -= 10;
+			try{
+                Thread.sleep(1);
+            } catch (InterruptedException e){
+            }
+        }
+    }
+	
+	private void beep(){
+	    if (System.currentTimeMillis() - lastBeep > 150){
+		    getToolkit().beep();
+			lastBeep = System.currentTimeMillis();
+		}
+	}
+	
+	private void ladDeath(){
+	    int i;
+		long beginLoopTime = System.currentTimeMillis();
+        long endLoopTime;
+        int sleepTime;
+        for (i=0; i<10; i++){
+		    beep();
+		    switch(i){
+			    case 0:
+				    screenData.setCharAt( lad.getYPos()*columns + lad.getXPos(), '!');
+				break;
+				case 1:
+				    screenData.setCharAt( lad.getYPos()*columns + lad.getXPos(), '@');
+				break;
+				case 2:
+				    screenData.setCharAt( lad.getYPos()*columns + lad.getXPos(), '#');
+				break;
+				case 3:
+				    screenData.setCharAt( lad.getYPos()*columns + lad.getXPos(), '/');
+				break;
+				case 4:
+				    screenData.setCharAt( lad.getYPos()*columns + lad.getXPos(), '+');
+				break;
+				case 5:
+				    screenData.setCharAt( lad.getYPos()*columns + lad.getXPos(), '%');
+				break;
+				case 6:
+				    screenData.setCharAt( lad.getYPos()*columns + lad.getXPos(), '?');
+				break;
+				case 7:
+				    screenData.setCharAt( lad.getYPos()*columns + lad.getXPos(), '\\');
+				break;
+				case 8:
+				    screenData.setCharAt( lad.getYPos()*columns + lad.getXPos(), '*');
+				break;
+				case 9:
+				    screenData.setCharAt( lad.getYPos()*columns + lad.getXPos(), 'b');
+				break;
+			}
+			repaint();       
+    		endLoopTime = System.currentTimeMillis();
+            sleepTime = (int)(gameSpeed - (endLoopTime - beginLoopTime));
+            if (sleepTime > 0){
+                try{
+                    Thread.sleep(sleepTime);
+                } catch (InterruptedException e){
+                }
+            }
+		}
+    }
+
+    private void updateScore(int scoreind){
+        switch (scoreind){
+        case SCORE_STATUE:
+            score += cycles;
+			beep();
+        break;
+        case SCORE_RESET:
+            score = 0;
+        break;
+        case SCORE_BARREL:
+            score += 200;
+			beep();
+        break;
+        case SCORE_MONEY:
+            score += 10; 
+			beep();          
+        break;
+        }
+        // give a new lad if over 10,000 points
+        if (score > nextNewLad){
+            ladsLeft++;
+            caller.setLads(ladsLeft);
+            nextNewLad += 10000;
+        }
+        caller.setScore(score);
+        //System.out.println(score);
+
+    }
+    
+   public void keyPressed(KeyEvent ke){
+        int keycode = ke.getKeyCode();
+        if (keycode == KeyEvent.VK_UP || keycode == KeyEvent.VK_NUMPAD8){
+            nextCommand = Lad.UP;
+        } else if (keycode == KeyEvent.VK_DOWN || keycode == KeyEvent.VK_NUMPAD2){
+            nextCommand = Lad.DOWN;
+        } else if (keycode == KeyEvent.VK_LEFT || keycode == KeyEvent.VK_NUMPAD4){
+            nextCommand = Lad.LEFT;
+        } else if (keycode == KeyEvent.VK_RIGHT || keycode == KeyEvent.VK_NUMPAD6){
+            nextCommand = Lad.RIGHT;
+        } else if (keycode == KeyEvent.VK_SPACE){
+            jumpCommand = true;
+        } else {
+            if (STEP_MODE && keycode == KeyEvent.VK_ENTER){
+                go_on = true;               
+            } else {
+                nextCommand = Lad.STOP;
+            }
+        }
+    }
+	
+    public void keyReleased(KeyEvent ke){
+    }
+	
+    public void keyTyped(KeyEvent ke){
+    }
+}
