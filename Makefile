@@ -10,7 +10,7 @@ CVS=cvs
 .SUFFIXES: .bte .html
 
 .PHONY: all
-all: junkclean spell neaten compile web javadoc build release
+all: junkclean spell neaten compile web javadoc build
 
 
 spell: *.bte *.java
@@ -72,13 +72,13 @@ clean: buildclean javadocclean webclean
 	@echo Make: Removing generated class files.
 	@rm -f *.class spell javadoc release neaten
 
-ladder.jar: Makefile *.bte *.java *.class *.sh *.lvl *.mf *.ini *.dict *.css package.html
+ladder.jar: Makefile *.bte *.java *.class *.sh *.lvl *.mf *.ini *.dict *.css
 	@echo Make: Building jar file.
 	@rm -f *~
 	@rm -f ladder.jar
 	@rm -rf com/
 	@mkdir -p com/Ostermiller/Ladder
-	@cp Makefile *.bte *.java *.class *.sh *.lvl *.mf *.ini *.dict *.css package.html com/Ostermiller/Ladder/
+	@cp Makefile *.bte *.java *.class *.sh *.lvl *.mf *.ini *.dict *.css com/Ostermiller/Ladder/
 	@jar cmfv Ladder.mf ladder.jar com/ > /dev/null
 	@rm -rf com/
 
@@ -89,9 +89,7 @@ javadoc: *.java
 	@echo Make: Generating JavaDoc.
 	@rm -rf doc/
 	@mkdir doc
-	@mv package.html temp
 	@$(JAVADOC) -quiet -d doc/ com.Ostermiller.Ladder > /dev/null
-	@mv temp package.html
 	@touch javadoc
 
 .PHONY: htmlclean
@@ -144,6 +142,6 @@ update: clean
 commit: clean
 	$(CVS) commit
 	
-release: *.html *.jar *.css form.bte levelPage.bte page.bte 
+release: *.html ladder.jar *.css form.bte levelPage.bte page.bte 
 	@./release.sh $?
 	@touch release
