@@ -17,6 +17,10 @@ spell: *.bte *.java
 	@echo Make: Running spell check.
 	@./spell.sh $?
 	@touch spell
+
+neaten: *.java
+	@./neaten.sh $?
+	@touch neaten
 	
 .PHONY : compile
 compile: classes
@@ -51,7 +55,7 @@ classes: $(JAVAFILES:.java=.class)
 .PHONY: junkclean
 junkclean:
 	@echo Make: Removing Ladder detritus.
-	@rm -rf *~ ~* core *.bak com/ docs/ spell javadoc
+	@rm -rf *~ ~* core *.bak com/ docs/
 
 .PHONY: buildclean
 buildclean: junkclean
@@ -66,15 +70,15 @@ javadocclean: junkclean
 .PHONY: clean
 clean: buildclean javadocclean webclean
 	@echo Make: Removing generated class files.
-	@rm -f *.class
+	@rm -f *.class spell javadoc release neaten
 
-ladder.jar: *.bte *.java *.class *.sh *.lvl *.mf *.ini *.dict *.css package.html Makefile	
-	@echo Make: Building jar file
+ladder.jar: Makefile *.bte *.java *.class *.sh *.lvl *.mf *.ini *.dict *.css package.html
+	@echo Make: Building jar file.
 	@rm -f *~
 	@rm -f ladder.jar
 	@rm -rf com/
 	@mkdir -p com/Ostermiller/Ladder
-	@cp *.bte *.java *.class *.sh *.lvl *.mf *.ini *.dict *.css package.html Makefile com/Ostermiller/Ladder/
+	@cp Makefile *.bte *.java *.class *.sh *.lvl *.mf *.ini *.dict *.css package.html com/Ostermiller/Ladder/
 	@jar cmfv Ladder.mf ladder.jar com/ > /dev/null
 	@rm -rf com/
 
@@ -82,12 +86,13 @@ ladder.jar: *.bte *.java *.class *.sh *.lvl *.mf *.ini *.dict *.css package.html
 build: ladder.jar
 
 javadoc: *.java
-	rm -rf doc/
-	mkdir doc
-	mv package.html temp
-	$(JAVADOC) -quiet -d doc/ com.Ostermiller.Ladder > /dev/null
-	mv temp package.html
-	touch javadoc
+	@echo Make: Generating JavaDoc.
+	@rm -rf doc/
+	@mkdir doc
+	@mv package.html temp
+	@$(JAVADOC) -quiet -d doc/ com.Ostermiller.Ladder > /dev/null
+	@mv temp package.html
+	@touch javadoc
 
 .PHONY: htmlclean
 htmlclean:
@@ -138,11 +143,7 @@ update: clean
 .PHONY: commit
 commit: clean
 	$(CVS) commit
-
+	
 release: *.html *.jar *.css form.bte levelPage.bte page.bte 
 	@./release.sh $?
 	@touch release
-	
-neaten: *.java
-	@./neaten.sh $?
-	@touch neaten
