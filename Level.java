@@ -1,6 +1,6 @@
 /*
  * Part of Ladder, a game.
- * Copyright (C) 1999, 2000 Stephen Ostermiller <Ladder@Ostermiller.com>
+ * Copyright (C) 1999-2002 Stephen Ostermiller <Ladder@Ostermiller.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -167,7 +167,7 @@ public class Level implements Cloneable {
  	}
 
     /**
-     * Has this level changed since it was last loaded or saved?
+     * Checks to see if this level changed since it was last loaded or saved.
      * Methods that load, save, set, or get the level will
      * reset this value.
      *

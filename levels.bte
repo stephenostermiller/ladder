@@ -14,7 +14,7 @@
 
 <p>Ladder comes with all the original levels and several new ones.</p>
 
-<h2>Creating Levels</h2>
+<h2><a href="creating">Creating Levels</a></h2>
 
 <p>You can create your own levels to play in Ladder.   You can create levels in your favorite text editor or in the level editor included with the game.  Here are the characters that you can put in your level:</p>
 <ul id=elementDescriptions class=contentList>	
@@ -30,6 +30,8 @@
 <li><b>^</b> - Fire.  Turns you into extra crispy bacon.
 <li><b>-</b> - Disposable Floor. Well, you can walk on it once.
 </ul>
+
+<p>You can <a href="customize.html#addlevel">add your level</a> to the game play.</p>
 
 <h2><a href="http://gccprinters.com/servlets/FormGen/ladder.html">Submit a level</a></h2>
 

@@ -27,6 +27,8 @@ name=levelsLinkText %><%/bte.grp %><%bte.grp onNoResolve=ok %>
 <li><%bte.grp onDefault=ok %><%bte.inc 
 name=differencesLinkText %><%/bte.grp %></li>
 <li><%bte.grp onDefault=ok %><%bte.inc 
+name=customizeLinkText %><%/bte.grp %></li>
+<li><%bte.grp onDefault=ok %><%bte.inc 
 name=historyLinkText %><%/bte.grp %></li>
 <li><%bte.grp onDefault=ok %><%bte.inc 
 name=forumsLinkText %><%/bte.grp %></li>
@@ -63,4 +65,5 @@ name=licenseLinkText %><%/bte.grp %></li>
 <%bte.tpl name=bugsLinkText %><a href="http://sourceforge.net/tracker/?group_id=53718&atid=471349">Bugs</a> - View existing bugs and submit new ones.<%/bte.tpl%>
 <%bte.tpl name=featuresLinkText %><a href="http://sourceforge.net/tracker/?func=browse&group_id=53718&atid=471352">Feature Requests</a> - View features that others want, or ask for your own.<%/bte.tpl%>
 <%bte.tpl name=licenseLinkText %><a href="license.html">License</a> - Ladder is freely available under the GNU General Public License.<%/bte.tpl%>
+<%bte.tpl name=customizeLinkText %><a href="customize.html">Customize</a> - Tips and tricks.<%/bte.tpl%>
 <%/bte.doc%>
