@@ -70,13 +70,13 @@ With the new Ladder, written in Java you can:
 
 <P><a href="http://java.sun.com/j2se/" target="_new">Download</a> and install the Java2 Runtime Environment (JRE v1.3 or later) from java.sun.com if you do not already have it installed.</P>
 
-<P><a href="Ladder.jar">Download</a> the latest version of Ladder (Executable Jar - 86k)</p>
+<P><a href="ladder.jar">Download</a> the latest version of Ladder (Executable Jar - 86k)</p>
 
 <p>All you need to do is double click the jar file to start Ladder!</p>
 
 <p>Some systems may not support executable jar files correctly.  If double clicking on the jar file does not work, try the following command lines:<br>
-<b>java&nbsp;-jar&nbsp;Ladder.jar</b><br>
-<b>java&nbsp;-classpath&nbsp;Ladder.jar&nbsp;com.Ostermiller.Ladder.Ladder</b></p>
+<b>java&nbsp;-jar&nbsp;ladder.jar</b><br>
+<b>java&nbsp;-classpath&nbsp;ladder.jar&nbsp;com.Ostermiller.Ladder.Ladder</b></p>
 
 <hr>
 
@@ -89,14 +89,50 @@ code</a>, or look at the <a href="http://www.gjt.org/javadoc/com/Ostermiller/Lad
 
 <h3>Comments</h3>
 
-Send comments <a href="mailto:Ladder@Ostermiller.com?subject=Ladder_Comment">directly
+<p>Send comments <a href="mailto:Ladder@Ostermiller.com?subject=Ladder_Comment">directly
 to the author</a> by email.
 <br><a href="newLevel.html">Submit a new level</a> to be included in the
-next release.
-<p>
+next release.</p>
+
 <hr>
-<h3>
-Known bugs:</h3>
+
+<h3>What's Different</h3>
+
+<p>This version of Ladder is very similar to the original but there are a few differences.   My goal is to keep the original spirit and game play while making improvements.</p>
+
+<p>Most of the controls for the lad are the same.  The arrow keys still move the lad around, the space bar still make him jump, and any other key will stop him.  Today's computers handle repeat key stokes differently than CPM systems did.  If you hold down the a key there is usually a delay before the second key event is generated.  This means that holding down the space bar to keep jumping probably will not work quite like it should.  Holding down the space bar will cause the lad will jump once, then stop jumping for a second before continuing.  To execute two jumps in a row, the space bar needs to be tapped twice.</p>
+
+<p>The original ladder kept a rather long buffer of keystrokes.  If you held down a key for long enough, eventually your computer would start beeping at you when this buffer filled up.  Furthermore, it would take a few seconds to process all of the keystrokes is the buffer while you couldn't tell the lad to do anything else.   If you held down the space bar you would continue to jump for a while even after you released it.  I found this to be annoying so in this version of ladder only one keystroke is buffered for later use.  Subsequent keystrokes will replace the keystroke in the buffer rather than overflowing the buffer and causing beeps.</p>
+
+<p>If the lad is moving to the left or right, pressing the up arrow key will cause the lad to climb the next arrow key that it encounters.  This feature of the original game was not consistent with other forms of motion.  If you were falling and pressed left or right, you would still stop when you hit the ground.  If you were moving left or right and pressed down, the lad would immediately  stop rather than waiting to go down the next ladder that encountered.  Similarly, when going up ladders if left or right were pressed and the lad was next to a wall, the lad would stop.  If you were climbing a ladder and pressed left or right a moment to soon when you were at the level of the next platform, the lad would get stuck.  In this version, if the lad cannot perform an action at the given time,  he doesn't do anything with the command until such a time as he perform the action.   Some people have written me that they used the down arrow key to stop in the original, they will have to find some other key to use for stopping.</p>
+
+<p>If the lad jumps and hits his head he no longer falls straight down and stops as he would have in the original.  The lad now continues in the direction that he was headed, but his jump is shortened.   This makes it possible to jump barrels even when there is a low ceiling.</p>
+
+<p>Floorboards that disappear when the lad walks on them still work like they used to with one exception.  If the lad walks across a disappearing floor the floor will disappear.  If he jumps across it the floor will remain intact.  In the original, if the lad stopped on a piece of disappearing floorboard, there would be no way to get off of it without it disappearing, even by jumping.  In this version the lad can jump off a disappearing floorboard and it will remain intact. </p>
+<p></p>
+
+<hr>
+
+<h3>Creating Levels</h3>
+
+<p>You can create your own levels to play in Ladder.   You can create levels in your favorite text editor or in the level editor included with the game.  Here are the characters that you can put in your level:</p>
+<ul>	
+<li><b>p</b> The place where the lad starts.
+<li><b>V</b> Der Dispenser.  Der Rocks roll out of it to squash you flat.
+<li><b>*</b> Der Eaters.  They eat the Der Rocks but oddly do not harm you in the slightest
+<li><b>=</b> Floor.  You walk on it.
+<li><b>H</b> Ladder.  You climb it.
+<li><b>|</b> Wall.  You can't walk through it.  You're not a ghost....yet.
+<li><b>.</b> Rubber Ball.  It's very bouncey.  This difference is, it bounces you.
+<li><b>$</b> Treasure.  The lad must get here to finish the level.
+<li><b>&</b> Gold Statue. Money!Money!Money!Money!Money!
+<li><b>^</b> Fire.  Turns you into extra crispy bacon.
+<li><b>-</b> Disposable Floor. Well, you can walk on it once.
+</ul>
+<p>If you need ideas for levels, just take a look at the <a href="levels.html">levels that already exist</a>.  Once you have made a level, <a href="newLevel.html">send it this way</a>.</p>
+<hr>
+
+<h3>Known bugs:</h3>
 
 <ul>
 <li>Bonus time is not done correctly. You get 2000 for each level.</li>
@@ -119,7 +155,7 @@ not increase and the bonus time does not decrease.</li>
 <hr>
 <h3>Version History:</h3>
 <ul>
-<li><b><a href="Ladder_1_1.jar">Ladder 1.1</a></b> (Executable Jar - 86k) December 2000 - Requires Java 1.3<br>
+<li><b><a href="ladder_1_1.jar">Ladder 1.1</a></b> (Executable Jar - 86k) December 2000 - Requires Java 1.3<br>
 <ul>
 <li>Major code refactoring that results in improved speed and lower memory usage.</li>
 <li>High score list.</li>
@@ -129,7 +165,7 @@ not increase and the bonus time does not decrease.</li>
 <li>The game indicates that it is paused or that the game is over.</li>
 </ul></li>
 
-<li><b><a href="Ladder_1_0.jar">Ladder 1.0</a></b> (Executable Jar - 68k) February 2000 - Requires Java 1.2
+<li><b><a href="ladder_1_0.jar">Ladder 1.0</a></b> (Executable Jar - 68k) February 2000 - Requires Java 1.2
 <ul>
 <li>The lad will move up the ladder after a jump if you press the up key during
 the jump, or even before it.</li>
@@ -138,7 +174,7 @@ the jump, or even before it.</li>
 Chance</a>.</li>
 </ul></li>
 
-<li><b><a href="Ladder_0_4.jar">Ladder 0.4</a></b> (Executable Jar - 24k) December 1999 - Requires Java 1.2
+<li><b><a href="ladder_0_4.jar">Ladder 0.4</a></b> (Executable Jar - 24k) December 1999 - Requires Java 1.2
 <ul>
 <li>Occassional gray flashes in the background are gone.</li>
 <li>Ladder is now in the com.Ostermiller.Ladder package.</li>
