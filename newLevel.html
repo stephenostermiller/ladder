@@ -1,61 +1,99 @@
-<HTML>
-<HEAD>
-<TITLE>Ladder, A Game</TITLE>
-<META name="description" content="Level submission form for Ladder">
-<META name="keywords" content="ladder, level, levels, submit, ASCII, stephen ostermiller">
-</HEAD>
-<BODY  BGCOLOR="#ffffff" TEXT="#000000" LINK="#0000ff" VLINK="#800080" ALINK="#ff0000">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<meta name="generator" content="HTML Tidy, see www.w3.org">
+<title>Ladder, A Game</title>
+<meta name="description" content="Level submission form for Ladder">
+<meta name="keywords" content="ladder, level, levels, submit, ASCII, stephen ostermiller">
+<script type='text/javascript'>
+<!--
+var emailexp = /^[a-z_0-9\.\-]+@[a-z_0-9\.]+\.[a-z]{2,3}$/i
+var levelexp1 = /[H\|\=\_]/
+var levelexp2 = /p/
+var levelexp3 = /[\$]/
 
-<h2>Submit a level</h2> 
+function checkform(form) {
 
-So you have a new level for ladder that you think everybody would enjoy?
-Just copy and paste it here and send it off.  If you leave your name and
-email address, we'll give you credit for it.<P>
+    // Check the name field
+    if (form.name.value.length == 0) {
+        alert('You must enter your name.');
+        form.from.focus();
+        return false;
+    }
 
-You might want to check out the <A HREF="levels.html">levels that are already included in Ladder</A> if you are looking for ideas for your own level.<P>
+    // Check the email field
+    if (form.from.value.length == 0) {
+        alert('You must enter your email address.');
+        form.from.focus();
+        return false;
+    }
+    if (!emailexp.test(form.from.value)) {
+        alert('Your email address does not appear to be valid.');
+        form.from.focus();
+        return false;
+    }
+    
+    // Check the title field
+    if (form.Title.value.length == 0) {
+        alert('Please enter a title for your level.');
+        form.Title.focus();
+        return false;
+    }
+        
+    // Check that the level is valid
+    if (!levelexp1.test(form.Level.value)) {
+        alert('Your level does not have any platforms!');
+        form.Level.focus();
+        return false;
+    }
+    if (!levelexp2.test(form.Level.value)) {
+        alert('You did not include a place for the lad to start in your level.');
+        form.Level.focus();
+        return false;
+    }
+    if (!levelexp3.test(form.Level.value)) {
+        alert('There is no place to finish the level.');
+        form.Level.focus();
+        return false;
+    }
+    return true;
+}
+//-->
+</script>
+</head>
+<body bgcolor="#ffffff" text="#000000" link="#0000ff" vlink="#800080" alink="#ff0000">
+<h2>Submit a level</h2>
 
-<HR>
+So you have a new level for ladder that you think everybody would enjoy? Just copy and paste it
+here and send it off. If you leave your name and email address, we'll give you credit for it. 
 
-<form method="post" target="_top" 
-action="http://cgi52.Freedback.com/mail.pl"> 
+<p> You might want to check out the <a href="levels.html">levels that are already included in
+Ladder</a> if you are looking for ideas for your own level.</p>
+
+<hr>
+<form method="post" onsubmit="return checkform(this)" action="http://cgi52.Freedback.com/mail.pl">
+<input type="hidden" name="to" value="Ladder@Ostermiller.com"> <input type="hidden" name="subject"
+value="New Level!"> <input type="hidden" name="form" value="http://world.conk.com/world/ladder">
+<input type="hidden" name="admin" value="Ladder@Ostermiller.com"> <input type="hidden" name= 
+"audience" value="general"> <input type="hidden" name="language" value="en"> 
+
+<p>Your name:<br>
+<input name="name"></p>
+
+<p>Your email address:<br>
+<input name="from"></p>
+
+<p>Title of your Level:<br>
+<input type="text" name="Title" size="50" maxlength="50"></p>
+
+<p>Level: (Copy and paste your level here.)<br>
+<textarea name="Level" rows="10" cols="80" wrap="off"></textarea></p>
+
+<input type="submit" value="Submit"></form>
+
+<hr>
+Return to <a href="">Ladder</a> homepage.
+</body>
+</html>
 
 
-<input type="hidden" name="to" 
-value="Ladder@Ostermiller.com"> 
-
-<input type="hidden" name="subject" 
-value="New Level!"> 
-
-<input type="hidden" name="form" 
-value="http://world.conk.com/world/ladder"> 
-
-<input type="hidden" name="admin" 
-value="Ladder@Ostermiller.com"> 
-
-<input type="hidden" name="audience" 
-value="general"> 
-
-<input type="hidden" name="language" 
-value="en"> 
-
-Your name: (Optional)<BR>
-<input name="name" size=40><br> 
-
-Your email address: (Optional)<BR>
-(e.g.: <em>you@aol.com</em>) <BR>
-<input name="from" size=30><p> 
-
-Title of your Level:<BR>
-<input TYPE="text" name="Title" SIZE=50 MAXLENGTH=50><br> 
-
-Level: (Copy and paste your level here.)<BR>
-<textarea name="Level" rows=10 cols=50></textarea><br> 
-
-<input type=submit value="Submit"> 
-
-<HR>
-
-Return to <A HREF="">Ladder</A> homepage.
-
-<BODY>
-</HTML>
