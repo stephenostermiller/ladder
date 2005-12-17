@@ -1,7 +1,7 @@
 JFLAGS=-classpath ../../..
 JAVA=java $(JFLAGS)
 JAVAC=javac $(JFLAGS)
-JAVADOC=javadoc
+JAVADOC=javadoc $(JFLAGS)
 BTE=$(JAVA) $(JFLAGS) com.Ostermiller.bte.Compiler
 CVS=cvs
 
