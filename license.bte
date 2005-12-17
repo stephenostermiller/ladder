@@ -1,7 +1,7 @@
 <%bte.doc super="page.bte"%>
 <%bte.tpl name=pageTitle %>Ladder License<%/bte.tpl%>
-<%bte.tpl name=description %>Ladder is licensed under the GNU General Public License.<%/bte.tpl%>
-<%bte.tpl name=keywords %>ladder, license, gpl, gnu, general, public, license<%/bte.tpl%>
+<%bte.tpl name=description %>Ladder is free - licensed under the GNU General Public License<%/bte.tpl%>
+<%bte.tpl name=keywords %>ladder license, gpl license for ladder, license for ladder<%/bte.tpl%>
 <%bte.tpl name=licenseLinkText %><b>License</b><%/bte.tpl%>
 <%bte.tpl name=pageContent %>
 <p>This program is free software; you can redistribute it and/or modify it

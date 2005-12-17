@@ -1,7 +1,7 @@
 <%bte.doc super="levelPage.bte"%>
 <%bte.tpl name=pageTitle %>Ladder Levels<%/bte.tpl%>
-<%bte.tpl name=description %>The playable levels from Ladder II.<%/bte.tpl%>
-<%bte.tpl name=keywords %>ladder, level, levels, board, boards, II, 2, two<%/bte.tpl%>
+<%bte.tpl name=description %>The playable levels from Ladder II<%/bte.tpl%>
+<%bte.tpl name=keywords %>ladder 2 levels, levels for ladder two<%/bte.tpl%>
 <%bte.tpl name=ladder2levelsLinkText %><b>Ladder 2 Levels</b><%/bte.tpl%>
 <%bte.tpl name=pageContent %>
 

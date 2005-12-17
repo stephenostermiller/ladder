@@ -1,17 +1,12 @@
 <%bte.doc super="downloadPage.bte"%>
 <%bte.tpl name=pageTitle %>Ladder Alternate Downloads<%/bte.tpl%>
 <%bte.tpl name=description %>Alternate download sites for an ASCII based arcade game similar to Donkey Kong.<%/bte.tpl%>
-<%bte.tpl name=keywords %>ladder, download, alternate<%/bte.tpl%>
+<%bte.tpl name=keywords %>alternate ladder download sites, other ladder download sites<%/bte.tpl%>
 <%bte.tpl name=alternateLinkText %><b>Alternate Sites</b><%/bte.tpl%>
 <%bte.tpl name=pageContent %>
-<p>Several sites have been kind enough to distribute this ASCII based game that is like Donkey Kong.</a>
+<p>Other sites have been kind enough to distribute this ASCII based game that is like Donkey Kong.</a>
 
 <ul class=contentList>
-<li><a href="./">Main Download Site</a> - Will always have the most recent version.</li>
-<li><a href="http://www.jokeofalltrades.com/ladder.phtml">Joke of All Trades</a> - From 
-Michael D. Hoke who played as a kid.</li>
-<li><a href="http://www.jcvs.org/jcvslet/JCVSlet/list/gjt/java/com/Ostermiller/Ladder">Giant Java Tree</a> - The source code is checked into the CVS repository and can be checked out, browsed, or downloaded.</li>
-<li><a href="http://www.os2world.com/games/html/ladder.html">OS2 World</a> - Has a zip file and a screenshot.</li>
 <li><a href="http://sourceforge.net/project/showfiles.php?group_id=53718">Source Forge</a> - All downloads including past versions.</li>
 </ul>
 <%/bte.tpl%>

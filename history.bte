@@ -1,7 +1,7 @@
 <%bte.doc super="page.bte"%>
 <%bte.tpl name=pageTitle %>Ladder Version History<%/bte.tpl%>
 <%bte.tpl name=description %>Version history and changelog for Java version of the ASCII arcade game.<%/bte.tpl%>
-<%bte.tpl name=keywords %><%/bte.tpl%>
+<%bte.tpl name=keywords %>ladder history, history of ladder<%/bte.tpl%>
 <%bte.tpl name=historyLinkText %><b>Version History</b><%/bte.tpl%>
 <%bte.tpl name=pageContent %>
 <ul class=contentList>
@@ -19,7 +19,7 @@
 <li>High score list.</li>
 <li>The order of levels is now like the original: you must play all levels to get a new level.</li>
 <li>Bugs fixed that allowed the lad to go through walls and ceilings under some circumstances.</li>
-<li>Lad death effect re-timed.</li>
+<li>Lad death effect retimed.</li>
 <li>The game indicates that it is paused or that the game is over.</li>
 </ul></li>
 
@@ -27,7 +27,7 @@
 <ul>
 <li>The lad will move up the ladder after a jump if you press the up key during
 the jump, or even before it.</li>
-<li>Better JavaDoc documentation on the source code.</li>
+<li>Better javadoc documentation on the source code.</li>
 <li>New levels: <a href="levels.html#PlinkoPlace">Plinko Place</a> and <a href="levels.html#OneChance">One
 Chance</a>.</li>
 </ul></li>

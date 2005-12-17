@@ -1,7 +1,7 @@
 <%bte.doc super="levelPage.bte"%>
 <%bte.tpl name=pageTitle %>Ladder Levels<%/bte.tpl%>
-<%bte.tpl name=description %>Level writing instructions and submission form for Ladder.<%/bte.tpl%>
-<%bte.tpl name=keywords %>ladder, level, levels, write, create, writing, creating, submission, submit<%/bte.tpl%>
+<%bte.tpl name=description %>Level writing instructions and submission form for Ladder<%/bte.tpl%>
+<%bte.tpl name=keywords %>ladder levels, levels for ladder<%/bte.tpl%>
 <%bte.tpl name=levelsLinkText %><b>Levels</b><%/bte.tpl%>
 <%bte.tpl name=pageContent %>
 
@@ -14,7 +14,7 @@
 
 <p>Ladder comes with all the original levels and several new ones.</p>
 
-<h2><a href="creating">Creating Levels</a></h2>
+<h2><a href="customize.html">Creating Levels</a></h2>
 
 <p>You can create your own levels to play in Ladder.   You can create levels in your favorite text editor or in the level editor included with the game.  Here are the characters that you can put in your level:</p>
 <ul id=elementDescriptions class=contentList>	

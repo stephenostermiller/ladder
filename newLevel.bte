@@ -1,7 +1,7 @@
 <%bte.doc super="levelPage.bte"%>
 <%bte.tpl name=pageTitle %>New Ladder Levels<%/bte.tpl%>
 <%bte.tpl name=description %>The playable levels that are created for this version of Ladder and included with the download..<%/bte.tpl%>
-<%bte.tpl name=keywords %>ladder, level, levels, board, boards<%/bte.tpl%>
+<%bte.tpl name=keywords %>new ladder levels, new ladder boards<%/bte.tpl%>
 <%bte.tpl name=newLevelLinkText %><b>New Levels</b><%/bte.tpl%>
 <%bte.tpl name=pageContent %>
 

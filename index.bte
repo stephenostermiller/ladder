@@ -1,10 +1,9 @@
 <%bte.doc super="page.bte"%>
 <%bte.tpl name=pageTitle %>Ladder<%/bte.tpl%>
-<%bte.tpl name=description %>A freeware ASCII arcade game similar to Donkey Kong.<%/bte.tpl%>
-<%bte.tpl name=keywords %>ladder, ladder, ladder, game, game, game, der rock, der rock, der rock, lad, lad, lad, kaypro, kaypro, donkey kong, ASCII, CPM, open source, java, freeware, GPL, download, stephen, ostermiller<%/bte.tpl%>
+<%bte.tpl name=description %>A freeware ASCII arcade game similar to Donkey Kong<%/bte.tpl%>
+<%bte.tpl name=keywords %>ladder, game of ladder, der rock, lad, kaypro game, ASCII game, CPM game, open source game, java game, freeware game, GPL game<%/bte.tpl%>
 <%bte.tpl name=homeLinkText %><b>Home</b><%/bte.tpl%>
 <%bte.tpl name=pageContent %>
-<p align=center>A freeware ASCII arcade game similar to Donkey Kong.</p>
 <table align=center class=level><tr><td><tt>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<BR>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;H&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<BR>

@@ -1,81 +1,9 @@
-<%bte.doc output=false super="levelPage.bte" %>
-<%bte.tpl name=pageTitle %><%bte.inc name=AAAPageTitle %><%/bte.tpl%>
-<%bte.tpl name=description %>Submit a level for Ladder, the ASCII arcade game similar to Donkey Kong.<%/bte.tpl%>
-<%bte.tpl name=keywords %>ladder, level, submit, submission, levels<%/bte.tpl%>
+<%bte.doc super="levelPage.bte"%>
+<%bte.tpl name=pageTitle %>$title<%/bte.tpl%>
+<%bte.tpl name=description %>Submit a level for the game of Ladder<%/bte.tpl%>
+<%bte.tpl name=keywords %>submit ladder level<%/bte.tpl%>
 <%bte.tpl name=submitLinkText %><b>Submit</b><%/bte.tpl%>
-<%bte.tpl name=headContent %>
-<style type="text/css">
-body { background-color:white; color:black; }
-.text { width:5in; }
-.req { color:red}
-.desc { text-align:left; vertical-align:top; }
-.elem { text-align:left; vertical-align:top; }
-</style>
-<script language=javascript type="text/javascript"><!--
-function checkForm(){
-var major = parseInt(navigator.appVersion);
-var agent = navigator.userAgent.toLowerCase();
-if (agent.indexOf('mozilla')==-1 || major>4 || (major==4 && agent.indexOf('msie')!=-1)){
-if (!document.theform.name.value.match(new RegExp('<%bte.inc name=nameAAAValidEscaped %>', 'g'))){
-alert('<%bte.inc name=nameAAAError %>');
-document.theform.name.select();
-document.theform.name.focus();
-return false;
-}
-if (!document.theform.from.value.match(new RegExp('<%bte.inc name=fromAAAValidEscaped %>', 'g'))){
-alert('<%bte.inc name=fromAAAError %>');
-document.theform.from.select();
-document.theform.from.focus();
-return false;
-}
-if (!document.theform.Title.value.match(new RegExp('<%bte.inc name=TitleAAAValidEscaped %>', 'g'))){
-alert('<%bte.inc name=TitleAAAError %>');
-document.theform.Title.select();
-document.theform.Title.focus();
-return false;
-}
-if (!document.theform.Level.value.match(new RegExp('<%bte.inc name=LevelAAAValidEscaped %>', 'g'))){
-alert('<%bte.inc name=LevelAAAError %>');
-document.theform.Level.select();
-document.theform.Level.focus();
-return false;
-}
-return true;
-} else {
-return true;
-}
-}
-//--></script>
-<%/bte.tpl%>
-<%bte.tpl name=pageContent %>
-<%bte.grp onNoResolve=ok%><p class=req><%bte.inc name=AAAerror %></p><%/bte.grp%>
-<form name=theform action="<%bte.inc name='AAAFormAction'%>" onSubmit="return checkForm()"><table width="100%" border=0>
-<tr><td class=desc>
-<%bte.grp onNoResolve=ok %><span class=req>*</span> <%bte.inc name=nameAAARequired %><%/bte.grp%><%bte.inc name=nameAAADescription %><br>
-</td></tr><tr><td class=elem>
-<input type=text class=text name=name<%bte.grp onNoResolve=ok%> value="<%bte.inc name=nameAAAValue %>"<%/bte.grp%>>
-</td></tr>
-<tr><td class=desc>
-<%bte.grp onNoResolve=ok %><span class=req>*</span> <%bte.inc name=fromAAARequired %><%/bte.grp%><%bte.inc name=fromAAADescription %><br>
-</td></tr><tr><td class=elem>
-<input type=text class=text name=from<%bte.grp onNoResolve=ok%> value="<%bte.inc name=fromAAAValue %>"<%/bte.grp%>>
-</td></tr>
-<tr><td class=desc>
-<%bte.grp onNoResolve=ok %><span class=req>*</span> <%bte.inc name=TitleAAARequired %><%/bte.grp%><%bte.inc name=TitleAAADescription %><br>
-</td></tr><tr><td class=elem>
-<input type=text class=text name=Title<%bte.grp onNoResolve=ok%> value="<%bte.inc name=TitleAAAValue %>"<%/bte.grp%>>
-</td></tr>
-<tr><td class=desc>
-<%bte.grp onNoResolve=ok %><span class=req>*</span> <%bte.inc name=LevelAAARequired %><%/bte.grp%><%bte.inc name=LevelAAADescription %><br>
-</td></tr><tr><td class=elem>
-<textarea rows="15" wrap="off" class=text name=Level><%bte.grp onNoResolve=ok%><%bte.inc name=LevelAAAValue %><%/bte.grp%></textarea>
-</td></tr>
-<tr><td class=desc>
-</td></tr><tr><td class=elem>
-<input type=submit value=Submit>
-</td></tr>
-</table>
-</form>
-<p><small><span class=req>*</span> denotes a required field.</small></p>
-<%/bte.tpl%>
+<%bte.tpl name=headContent %>$css
+$javascript<%/bte.tpl%>
+<%bte.tpl name=pageContent %>$content<%/bte.tpl%>
 <%/bte.doc%>

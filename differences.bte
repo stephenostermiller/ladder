@@ -1,7 +1,7 @@
 <%bte.doc super="page.bte"%>
 <%bte.tpl name=pageTitle %>Java Ladder vs CP/M Ladder<%/bte.tpl%>
 <%bte.tpl name=description %>Differences between this version of Ladder and the original CP/M version.<%/bte.tpl%>
-<%bte.tpl name=keywords %>ladder, ladder, cp/m, cpm, java, differences, new, different, controls, beep, beeps, sound<%/bte.tpl%>
+<%bte.tpl name=keywords %>ladder differences, how ladder has changed<%/bte.tpl%>
 <%bte.tpl name=differencesLinkText %><b>Differences from Original</b><%/bte.tpl%>
 <%bte.tpl name=pageContent %>
 <p>This version of Ladder is very similar to the original but there are a few differences.   My goal is to keep the original spirit and game play while making improvements.</p>

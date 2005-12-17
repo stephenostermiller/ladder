@@ -4,7 +4,6 @@
 <head><title><%bte.inc name=pageTitle %></title><%bte.grp onNoResolve=warning %>
 <meta name="description" content="<%bte.inc name=description %>"><%/bte.grp %><%bte.grp onNoResolve=warning %>
 <meta name="keywords" content="<%bte.inc name=keywords %>"><%/bte.grp %>
-<base href="http://ostermiller.org/ladder/">
 <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 <link rel="stylesheet" media="screen" title="Web View" href="style.css" type="text/css">
 <link rel="stylesheet" media="print" href="printable.css" type="text/css">
@@ -12,8 +11,20 @@
 <%bte.grp onNoResolve=ok %><%bte.inc name=headContent %><%/bte.grp %>
 </head>
 <body>
-<table align=left hspace=10 width=200 class=sidebar><tr><td>
-<ul class=sidebar>
+
+<div id=head>
+<div style="float:left;padding-right:1cm;">
+<h1><a name="content"><%bte.inc name=pageTitle %></a></h1>
+</div>
+<div>
+<%bte.inc name=description %>
+</div>
+</div>
+
+<div id=content><%bte.inc name=pageContent %></div>
+
+<div id=menu>
+<ul>
 <li><%bte.grp onDefault=ok %><%bte.inc 
 name=homeLinkText %><%/bte.grp %></li>
 <li><%bte.grp onDefault=ok %><%bte.inc 
@@ -31,39 +42,50 @@ name=customizeLinkText %><%/bte.grp %></li>
 <li><%bte.grp onDefault=ok %><%bte.inc 
 name=historyLinkText %><%/bte.grp %></li>
 <li><%bte.grp onDefault=ok %><%bte.inc 
-name=forumsLinkText %><%/bte.grp %></li>
-<li><%bte.grp onDefault=ok %><%bte.inc 
-name=announcementsLinkText %><%/bte.grp %></li>
-<li><%bte.grp onDefault=ok %><%bte.inc 
-name=sourceLinkText %><%/bte.grp %></li>
-<li><%bte.grp onDefault=ok %><%bte.inc 
-name=javadocLinkText %><%/bte.grp %></li>
-<li><%bte.grp onDefault=ok %><%bte.inc 
-name=bugsLinkText %><%/bte.grp %></li>
-<li><%bte.grp onDefault=ok %><%bte.inc 
-name=featuresLinkText %><%/bte.grp %></li>
+name=externalLinkText %><%/bte.grp %></li>
 <li><%bte.grp onDefault=ok %><%bte.inc 
 name=licenseLinkText %><%/bte.grp %></li>
 </ul>
-</td></tr></table>
-<h1 align=center><a name="content"><%bte.inc name=pageTitle %></a></h1>
-<div class=content><%bte.inc name=pageContent %></div>
-<br clear=all>
-<div class=copyright><p>Copyright &copy; <a href="http://ostermiller.org/contact.pl?regarding=Ladder" class=mail>Stephen Ostermiller</a> 1999-2002</p></div>
+</div>
+
+<div id=foot>
+<p>Copyright &copy; <a href="http://ostermiller.org/contact.pl?regarding=Ladder" class=mail>Stephen Ostermiller</a> 1999-2005</p>
+<p style="text-align:right;font-size:smaller"><a href="http://ostermiller.org/">ostermiller.org</a> (<a href="http://ostermiller.org/siteindex.html">site index</a>)</p>
+</div>
+
+<div id=stuff>
+<%bte.grp onDefault=ok %><%bte.inc name=googleskyscraper %><%/bte.grp %>
+</div>
+
 </body>
 </html><%/bte.tpl%>
-<%bte.tpl name=homeLinkText %><a href="./">Home</a><%/bte.tpl%>
+<%bte.tpl name=homeLinkText %><a href="./">Ladder</a><%/bte.tpl%>
 <%bte.tpl name=levelsLinkText %><a href="levels.html">Levels</a><%/bte.tpl%>
 <%bte.tpl name=differencesLinkText %><a href="differences.html">Differences from Original</a><%/bte.tpl%>
 <%bte.tpl name=downloadLinkText %><a href="download.html">Download</a><%/bte.tpl%>
 <%bte.tpl name=instructionsLinkText %><a href="instructions.html">Instructions</a><%/bte.tpl%>
 <%bte.tpl name=historyLinkText %><a href="history.html">Version History</a><%/bte.tpl%>
-<%bte.tpl name=forumsLinkText %><a href="http://sourceforge.net/forum/forum.php?forum_id=179106">Forums</a><%/bte.tpl%>
-<%bte.tpl name=announcementsLinkText %><a href="http://lists.sourceforge.net/lists/listinfo/laddergame-updates">Subscribe to Announcements</a><%/bte.tpl%>
-<%bte.tpl name=sourceLinkText %><a href="http://www.gjt.org/servlets/JCVSlet/list/gjt/com/Ostermiller/Ladder/">Source Code</a><%/bte.tpl%>
-<%bte.tpl name=javadocLinkText %><a href="http://www.gjt.org/javadoc/com/Ostermiller/Ladder/package-summary.html">JavaDoc</a><%/bte.tpl%>
-<%bte.tpl name=bugsLinkText %><a href="http://sourceforge.net/tracker/?group_id=53718&atid=471349">Bugs</a><%/bte.tpl%>
-<%bte.tpl name=featuresLinkText %><a href="http://sourceforge.net/tracker/?func=browse&group_id=53718&atid=471352">Feature Requests</a><%/bte.tpl%>
 <%bte.tpl name=licenseLinkText %><a href="license.html">License</a><%/bte.tpl%>
 <%bte.tpl name=customizeLinkText %><a href="customize.html">Customization</a><%/bte.tpl%>
+<%bte.tpl name=externalLinkText %><a href="external.html">Bugs/JavaDoc/Source</a><%/bte.tpl%>
+
+
+<%bte.tpl name=googleskyscraper %>
+<script type="text/javascript"><!--
+google_ad_client = "pub-2385172974335864";
+google_ad_width = 120;
+google_ad_height = 600;
+google_ad_format = "120x600_as";
+google_ad_type = "text";
+google_ad_channel ="";
+google_color_border = "000000";
+google_color_bg = "000000";
+google_color_link = "00FF00";
+google_color_url = "00FF00";
+google_color_text = "00FF00";
+//--></script>
+<script type="text/javascript"
+  src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<%/bte.tpl%>
 <%/bte.doc%>
