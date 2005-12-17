@@ -1,6 +1,6 @@
 /*
  * Part of Ladder, a game.
- * Copyright (C) 1999-2002 Stephen Ostermiller
+ * Copyright (C) 1999-2005 Stephen Ostermiller
  * http://ostermiller.org/contact.pl?regarding=Ladder
  *
  * This program is free software; you can redistribute it and/or modify
@@ -262,6 +262,8 @@ public class LadderCanvas extends JPanel implements Runnable {
 		nextCommand = Lad.STOP;
 		jumpCommand = false;
 		setBackground(bgColor);
+		caller.setBackground(bgColor);
+		caller.getContentPane().setBackground(bgColor);
 		setFontSize(12);
 		realLevel = new Level(level);
 		screenLevel = new Level(realLevel);
@@ -306,8 +308,9 @@ public class LadderCanvas extends JPanel implements Runnable {
 	 */
 	public void setBGColor(Color bg){
 		bgColor = bg;
-		//setBackground(bgColor);
+		setBackground(bgColor);
 		caller.setBackground(bgColor);
+		caller.getContentPane().setBackground(bgColor);
 		repaintAll = true;
 		repaint();
 	}
@@ -413,11 +416,10 @@ public class LadderCanvas extends JPanel implements Runnable {
 	 * @param g graphics object for this component
 	 */
 	public void paintComponent(Graphics g){
+		g.setColor(bgColor);
+		g.fillRect(g.getClipBounds().x, g.getClipBounds().y, g.getClipBounds().width, g.getClipBounds().height);
 		g.setFont(font);
 		g.setColor(fgColor);
-		g.clearRect(g.getClipBounds().x, g.getClipBounds().y, g.getClipBounds().width, g.getClipBounds().height);
-		//g.setFont(font);
-		//g.setColor(fgColor);
 		int rowStart = (int)Math.floor((double)g.getClipBounds().y/letterHeight);
 		int rowEnd = (int)Math.ceil((double)(g.getClipBounds().y + g.getClipBounds().height + letterHeight - letterAcsent)/letterHeight + 1);
 		int columnStart = (int)Math.floor((double)g.getClipBounds().x/letterWidth);
