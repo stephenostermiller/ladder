@@ -1,6 +1,6 @@
 /*
  * Part of Ladder, a game.
- * Copyright (C) 1999, 2000 Stephen Ostermiller
+ * Copyright (C) 1999-2005 Stephen Ostermiller
  * http://ostermiller.org/contact.pl?regarding=Ladder
  *
  * This program is free software; you can redistribute it and/or modify
@@ -246,36 +246,32 @@ public class EditorCanvas extends JPanel implements KeyListener, MouseListener{
 	 */
 	public void paintComponent(Graphics g){
 		//System.out.println("painting Editor");
-		//g.setFont(font);
-		//g.setColor(fgColor);
-		//if (true){
-			g.setFont(font);
-			g.setColor(fgColor);
-			//System.out.println(g.getClipBounds().toString());
-			int a = (int)Math.floor((double)g.getClipBounds().y/letterHeight);
-			int b = (int)Math.ceil((double)(g.getClipBounds().y + g.getClipBounds().height + letterHeight - letterAcsent)/letterHeight + 1);
-			int c = (int)Math.floor((double)g.getClipBounds().x/letterWidth);
-			int d = (int)Math.ceil((double)(g.getClipBounds().x + g.getClipBounds().width + letterWidth)/letterWidth);
-			//System.out.println("Vert: " + (a+1) + " to " + (b) + " Horz: " + (c+1) + " to " + (d));
-			for (int i=a; i<b && i<rows; i++){
-				 for(int j=c; j<d && j<columns; j++){
-				if (inSelection(j, i)){
-					g.setColor(fgColor);
-				} else {
-					 g.setColor(bgColor);
-				}
-				g.fillRect((j)*letterWidth, (i)*letterHeight, letterWidth, letterHeight);
-				if (inSelection(j, i)){
-					g.setColor(bgColor);
-				} else {
-					 g.setColor(fgColor);
-				}
-				 char[] ch = new char[1];
-						ch[0] = levelData.charAt(i*columns + j);
-						g.drawChars(ch,0,1,(j)*letterWidth,(i)*letterHeight+letterAcsent);
-				 }
+		g.setFont(font);
+		g.setColor(fgColor);
+		//System.out.println(g.getClipBounds().toString());
+		int a = (int)Math.floor((double)g.getClipBounds().y/letterHeight);
+		int b = (int)Math.ceil((double)(g.getClipBounds().y + g.getClipBounds().height + letterHeight - letterAcsent)/letterHeight + 1);
+		int c = (int)Math.floor((double)g.getClipBounds().x/letterWidth);
+		int d = (int)Math.ceil((double)(g.getClipBounds().x + g.getClipBounds().width + letterWidth)/letterWidth);
+		//System.out.println("Vertical: " + (a+1) + " to " + (b) + " Horizontal: " + (c+1) + " to " + (d));
+		for (int i=a; i<b && i<rows; i++){
+			 for(int j=c; j<d && j<columns; j++){
+			if (inSelection(j, i)){
+				g.setColor(fgColor);
+			} else {
+				 g.setColor(bgColor);
 			}
-		//}
+			g.fillRect((j)*letterWidth, (i)*letterHeight, letterWidth, letterHeight);
+			if (inSelection(j, i)){
+				g.setColor(bgColor);
+			} else {
+				 g.setColor(fgColor);
+			}
+			 char[] ch = new char[1];
+					ch[0] = levelData.charAt(i*columns + j);
+					g.drawChars(ch,0,1,(j)*letterWidth,(i)*letterHeight+letterAcsent);
+			 }
+		}
 		repaintAll = true;
 	}
 
