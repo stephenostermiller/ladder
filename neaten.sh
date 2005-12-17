@@ -24,5 +24,8 @@ do
         tablist="$tablist $file"  
     fi    
 done
-java -classpath ../../.. com.Ostermiller.util.Tabs -gtv $tablist
+if [ "$tablist" != "" ]
+then
+	java -classpath ../../.. com.Ostermiller.util.Tabs -tv -w 4 $tablist
+fi
 
