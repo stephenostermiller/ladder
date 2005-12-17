@@ -134,6 +134,9 @@ web: html
 .PHONY: webclean
 webclean: htmlclean
 
+.PHONY: *.class
+*.class:
+
 .PHONY: update
 update: clean
 	$(CVS) update
