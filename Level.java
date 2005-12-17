@@ -1,6 +1,6 @@
 /*
  * Part of Ladder, a game.
- * Copyright (C) 1999-2002 Stephen Ostermiller
+ * Copyright (C) 1999-2005 Stephen Ostermiller
  * http://ostermiller.org/contact.pl?regarding=Ladder
  *
  * This program is free software; you can redistribute it and/or modify
@@ -103,7 +103,7 @@ public class Level implements Cloneable {
 	 * zero at the left of the screen.
 	 *
 	 * @param row the vertical coordinate of the character that should be retrieved.
-	 * @param column the starting horizontal coordinate of the characters that should be retrieved.
+	 * @param columnStart the starting horizontal coordinate of the characters that should be retrieved.
 	 * @return array of characters from the given point.
 	 */
 	public final char[] getCharsAt(int row, int columnStart, int length){
