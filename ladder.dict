@@ -1,10 +1,11 @@
-personal_ws-1.1 en 408
+personal_ws-1.1 en 409
 drawChars
 TableColumn
 nextDouble
 CVS
 moveJump
 setFont
+HHHHHHHHHHHHH
 getSystemResource
 itime
 ItemListener
@@ -60,6 +61,7 @@ jumpCommand
 UserName
 setLevel
 showHighScoreWindow
+HHHHHHHHHHHHHH
 LevelMenuItem
 elementAt
 newItem
@@ -121,6 +123,7 @@ setMinBarrels
 setLevelPaint
 stopThread
 JMenuBar
+ClassNotFoundException
 EditorCanvas
 editorcanvas
 levelString
@@ -174,7 +177,6 @@ repaintCharAt
 startGame
 getRowCount
 canBeAdded
-NumberFormatException
 MyFirst
 allBarrels
 WindowY
@@ -192,6 +194,7 @@ currentTimeMillis
 WindowAdapter
 setBonusTime
 fgItem
+NumberFormatException
 setState
 ipadx
 nbsp
@@ -211,7 +214,6 @@ getLocation
 getX
 ladderMenuBar
 moveNoJump
-HHHHHHHHHHHHHH
 defaultProps
 theArea
 getKeyChar
@@ -245,7 +247,6 @@ addFocusListener
 Horz
 java
 gc
-InterruptedException
 parseLong
 resaved
 CP
@@ -281,17 +282,16 @@ instanceof
 req
 HighScoreList
 getLevel
-GridBagConstraints
 ladsLeft
 mmmmmmmm
 tok
 getKeyCode
 lastAdded
-ClassNotFoundException
 JMenuItem
 KeyListener
 WindowListener
 getMenuComponents
+InterruptedException
 letterHeight
 VK
 getColumnName
@@ -319,6 +319,7 @@ changeSelection
 nextToken
 setFontSize
 bgColor
+GridBagConstraints
 charWidth
 nextInt
 nextLevel
@@ -365,7 +366,6 @@ countTokens
 nextNewLad
 setConstraints
 nPlease
-HHHHHHHHHHHHH
 requestFocus
 OutputStream
 HHH
@@ -386,7 +386,6 @@ fontSize
 canMoveDownRight
 ostermiller
 getDirection
-HHHHHHHHHHHH
 args
 focusGained
 setFGColor
@@ -399,7 +398,9 @@ positionOf
 moveScheduled
 HHHHHHHHHHH
 optionsMenu
+lastIndexOf
 InputStream
+HHHHHHHHHHHH
 DOWNLEFT
 unpause
 addWindowListener
