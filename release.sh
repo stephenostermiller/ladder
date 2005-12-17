@@ -1,8 +1,7 @@
 #!/bin/bash
 
-size=`ls -lah ladder.jar`
-size=${size:38:4}
-if [ -z "`grep $size download.html`" ]
+size=`ls -lah ladder.jar | grep -oE '[0-9]+[KkMm]'`
+if [ -z "`grep "$size" download.html`" ]
 then
     echo "ladder.jar size is $size but download.html does not show that."
     exit 1
@@ -15,6 +14,6 @@ FILES=${FILES/javadoc/}
 FILES=${FILES/compile/} 
 if [ "$FILES" ]
 then
-	echo Make: Uploading to web site: $FILES
-	scp -r $FILES deadsea@ostermiller.org:www/ladder
+	echo Make: copying to web directory: $FILES
+	cp -r $FILES ~/ostermiller.org/www/ladder
 fi
