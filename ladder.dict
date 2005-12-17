@@ -1,4 +1,4 @@
-personal_ws-1.1 en 414
+personal_ws-1.1 en 416
 drawChars
 TableColumn
 nextDouble
@@ -331,6 +331,7 @@ nextLevel
 GameOverException
 HighScoreTable
 rowEnd
+setFile
 stephen
 KeyAdapter
 numLevels
@@ -371,6 +372,7 @@ countTokens
 nextNewLad
 setConstraints
 nPlease
+forName
 requestFocus
 OutputStream
 HHH
