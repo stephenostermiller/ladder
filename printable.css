@@ -2,10 +2,7 @@ body {
   color:black;
   background-color:white;  
 }
-ul#elementDescriptions {
-  list-style:none;
-}
-table.sidebar {
+#menu, #stuff {
   display:none;
 }
 table.level {
