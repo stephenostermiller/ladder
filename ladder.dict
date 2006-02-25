@@ -74,8 +74,8 @@ canMoveUpLeft
 setVisible
 setMnemonic
 levelGroup
-easyItem
 editItem
+easyItem
 loadProperties
 UPLEFT
 JCheckBoxMenuItem
@@ -268,8 +268,8 @@ mkdirs
 mouseY
 msie
 futureCommand
-ClassLoader
 classpath
+ClassLoader
 gridx
 canMoveDown
 retValue

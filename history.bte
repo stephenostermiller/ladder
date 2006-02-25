@@ -34,7 +34,7 @@
 <li>The lad will move up the ladder after a jump if you press the up key during
 the jump, or even before it.</li>
 <li>Better javadoc documentation on the source code.</li>
-<li>New levels: <a href="levels.html#PlinkoPlace">Plinko Place</a> and <a href="levels.html#OneChance">One
+<li>New levels: <a href="newLevel.html#PlinkoPlace">Plinko Place</a> and <a href="newLevel.html#OneChance">One
 Chance</a>.</li>
 </ul></li>
 

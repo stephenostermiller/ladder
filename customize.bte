@@ -5,7 +5,7 @@
 <%bte.tpl name=customizeLinkText %><b>Customization</b><%/bte.tpl%>
 <%bte.tpl name=pageContent %>
 <h3>Creating Levels</h3>
-Ladder comes with a level editor and you can create new levels (<a href="levels.html#creating">instructions</a>).
+Ladder comes with a level editor and you can create new levels (<a href="levels.html">instructions</a>).
 
 <h3>LadderUser.ini</h3>
 Ladder creates a user configuration file called<br>
