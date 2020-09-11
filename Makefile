@@ -2,7 +2,7 @@ JFLAGS=-classpath ../../..
 JAVA=java $(JFLAGS)
 JAVAC=javac $(JFLAGS)
 JAVADOC=javadoc $(JFLAGS)
-BTE=$(JAVA) $(JFLAGS) com.Ostermiller.bte.Compiler
+BTE=bte
 CVS=cvs
 
 .SUFFIXES:
@@ -21,7 +21,7 @@ spell: *.bte *.java
 neaten: *.java
 	@./neaten.sh $?
 	@touch neaten
-	
+
 .PHONY : compile
 compile: classes
 
@@ -29,7 +29,7 @@ JAVAFILES=$(wildcard *.java)
 .PHONY: classes
 classes: $(JAVAFILES:.java=.class)
 	@# Write a bash script that will compile the files in the todo list
-	@echo "#!/bin/bash" > tempCommand	
+	@echo "#!/bin/bash" > tempCommand
 	@# If the todo list doesn't exist, don't compile anything
 	@echo "if [ -e tempChangedJavaFileList ]" >> tempCommand
 	@echo "then" >> tempCommand
@@ -61,7 +61,7 @@ junkclean:
 buildclean: junkclean
 	@echo Make: Removing ladder.jar.
 	@rm -f ladder.jar
-        
+
 .PHONY: javadocclean
 javadocclean: junkclean
 	@echo Make: Removing generated JavaDoc.
@@ -102,7 +102,7 @@ BTEFILES=$(wildcard *.bte)
 .PHONY: html
 html: $(BTEFILES:.bte=.html)
 	@# Write a bash script that will compile the files in the todo list
-	@echo "#!/bin/bash" > tempCommand	
+	@echo "#!/bin/bash" > tempCommand
 	@# If the todo list doesn't exist, don't compile anything
 	@echo "if [ -e tempChangedBTEFileList ]" >> tempCommand
 	@echo "then" >> tempCommand
@@ -127,7 +127,7 @@ html: $(BTEFILES:.bte=.html)
 .bte.html:
 	@#for each changed java file, add it to the todo list.
 	@echo "$<" >> tempChangedBTEFileList
-	
+
 .PHONY: web
 web: html
 
@@ -140,11 +140,11 @@ webclean: htmlclean
 .PHONY: update
 update: clean
 	$(CVS) update
-        
+
 .PHONY: commit
 commit: clean
 	$(CVS) commit
-	
-release: *.html ladder.jar *.css form.bte levelPage.bte page.bte 
+
+release: *.html ladder.jar *.css form.bte levelPage.bte page.bte
 	@./release.sh $?
 	@touch release

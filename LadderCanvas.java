@@ -34,10 +34,6 @@ public class LadderCanvas extends JPanel implements Runnable {
 	 * The instance of Ladder which we should report back to.
 	 */
 	private Ladder caller; // the caller of this
-	/**
-	 * Minimum size
-	 */
-	private Dimension minSize;
 
 	private Level screenLevel = new Level();
 
@@ -74,11 +70,11 @@ public class LadderCanvas extends JPanel implements Runnable {
 	/**
 	 * A list of squares that need to be repainted.
 	 */
-	private Vector repaintList;
+	private Vector<Dimension> repaintList;
 	/**
 	 * A list of all the objects that spit out barrels on this level.
 	 */
-	private Vector barrelProducers;
+	private Vector<BarrelProducer> barrelProducers;
 	/**
 	 * Should the entire screen be repainted on the next refresh?
 	 */
@@ -227,8 +223,8 @@ public class LadderCanvas extends JPanel implements Runnable {
 		this.caller = caller;
 		bgColor = Color.black;
 		fgColor = Color.green;
-		repaintList = new Vector();
-		barrelProducers = new Vector();
+		repaintList = new Vector<Dimension>();
+		barrelProducers = new Vector<BarrelProducer>();
 		addKeyListener(new KeyAdapter(){
 			 public void keyPressed(KeyEvent ke){
 				int keycode = ke.getKeyCode();
@@ -284,12 +280,11 @@ public class LadderCanvas extends JPanel implements Runnable {
 	 * @param size the size of the font in points
 	 */
 	public void setFontSize(int size){
-		font = new Font("Monospaced", Font.PLAIN, size);
+		setFont(font = new Font("Monospaced", Font.PLAIN, size));
 		FontMetrics fontMetrics = this.getFontMetrics(font);
 		letterWidth = fontMetrics.charWidth('m');
 		letterHeight = fontMetrics.getHeight();
 		letterAcsent = fontMetrics.getAscent();
-		minSize = new Dimension(letterWidth*(realLevel.getColumnCount()), letterHeight*(realLevel.getRowCount()));
 		fontSize = size;
 	}
 
@@ -389,7 +384,6 @@ public class LadderCanvas extends JPanel implements Runnable {
 			ladStartPosY = p.height+1;
 			ladStartPosX = p.width+1;
 		}
-		minSize = new Dimension(letterWidth*(realLevel.getColumnCount()), letterHeight*(realLevel.getRowCount()));
 	}
 
 	/**
@@ -407,7 +401,7 @@ public class LadderCanvas extends JPanel implements Runnable {
 	 * @return the minimum size in pixels
 	 */
 	public synchronized Dimension getMinimumSize() {
-		return minSize;
+		return new Dimension(letterWidth*(realLevel.getColumnCount()), letterHeight*(realLevel.getRowCount()));
 	}
 
 	/**
@@ -417,16 +411,19 @@ public class LadderCanvas extends JPanel implements Runnable {
 	 */
 	public void paintComponent(Graphics g){
 		g.setColor(bgColor);
-		g.fillRect(g.getClipBounds().x, g.getClipBounds().y, g.getClipBounds().width, g.getClipBounds().height);
-		g.setFont(font);
+		Rectangle bounds = g.getClipBounds();
+		g.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
 		g.setColor(fgColor);
-		int rowStart = (int)Math.floor((double)g.getClipBounds().y/letterHeight);
-		int rowEnd = (int)Math.ceil((double)(g.getClipBounds().y + g.getClipBounds().height + letterHeight - letterAcsent)/letterHeight + 1);
-		int columnStart = (int)Math.floor((double)g.getClipBounds().x/letterWidth);
-		int columnEnd = (int)Math.ceil((double)(g.getClipBounds().x + g.getClipBounds().width + letterWidth)/letterWidth);
-		for (int i=rowStart+1; i<rowEnd && i<realLevel.getRowCount() + 1; i++){
-			 g.drawChars(screenLevel.getCharsAt(i-1, columnStart, columnEnd-columnStart-1), 0, columnEnd-columnStart-1,
-				(columnStart)*letterWidth,(i-1)*letterHeight+letterAcsent);
+
+		int rowStart = bounds.y / letterHeight;
+		int rowEnd = (bounds.y + bounds.height + letterHeight) / letterHeight;
+		int columnStart = bounds.x / letterWidth;
+		int columnEnd = (bounds.x + bounds.width + letterWidth) / letterWidth;
+
+		for (int i = rowStart; i < rowEnd && i < realLevel.getRowCount(); i++){
+			g.drawChars(screenLevel.getCharsAt(i, columnStart, columnEnd - columnStart - 1),
+				0, columnEnd-columnStart-1,
+				(columnStart)*letterWidth, i * letterHeight + letterAcsent);
 		}
 		if (gameStop){
 			g.setColor(Color.red);
@@ -478,7 +475,7 @@ public class LadderCanvas extends JPanel implements Runnable {
 	 * reset the game to its initial state, (score, lads, (everything))
 	 */
 	public void resetGame(){
-		//System.out.println("Reseting Game, repainting");
+		//System.out.println("Resetting Game, repainting");
 		updateScore(SCORE_RESET);
 		ladsLeft = 3;
 		nextNewLad = 10000;

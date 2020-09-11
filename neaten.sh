@@ -21,11 +21,11 @@ do
     fi
     if [ $generated -eq '0' ]
     then
-        tablist="$tablist $file"  
-    fi    
+        tablist="$tablist $file"
+    fi
 done
 if [ "$tablist" != "" ]
 then
-	java -classpath ../../.. com.Ostermiller.util.Tabs -tv -w 4 $tablist
+	tabfix -tv -w 4 $tablist
 fi
 

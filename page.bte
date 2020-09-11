@@ -25,31 +25,31 @@
 
 <div id=menu>
 <ul>
-<li><%bte.grp onDefault=ok %><%bte.inc 
+<li><%bte.grp onDefault=ok %><%bte.inc
 name=homeLinkText %><%/bte.grp %></li>
-<li><%bte.grp onDefault=ok %><%bte.inc 
+<li><%bte.grp onDefault=ok %><%bte.inc
 name=downloadLinkText %><%/bte.grp %><%bte.grp onNoResolve=ok %>
 <%bte.inc name=downloadLinks %><%/bte.grp %></li>
-<li><%bte.grp onDefault=ok %><%bte.inc 
+<li><%bte.grp onDefault=ok %><%bte.inc
 name=instructionsLinkText %><%/bte.grp %></li>
-<li><%bte.grp onDefault=ok %><%bte.inc 
+<li><%bte.grp onDefault=ok %><%bte.inc
 name=levelsLinkText %><%/bte.grp %><%bte.grp onNoResolve=ok %>
 <%bte.inc name=levelLinks %><%/bte.grp %></li>
-<li><%bte.grp onDefault=ok %><%bte.inc 
+<li><%bte.grp onDefault=ok %><%bte.inc
 name=differencesLinkText %><%/bte.grp %></li>
-<li><%bte.grp onDefault=ok %><%bte.inc 
+<li><%bte.grp onDefault=ok %><%bte.inc
 name=customizeLinkText %><%/bte.grp %></li>
-<li><%bte.grp onDefault=ok %><%bte.inc 
+<li><%bte.grp onDefault=ok %><%bte.inc
 name=historyLinkText %><%/bte.grp %></li>
-<li><%bte.grp onDefault=ok %><%bte.inc 
+<li><%bte.grp onDefault=ok %><%bte.inc
 name=externalLinkText %><%/bte.grp %></li>
-<li><%bte.grp onDefault=ok %><%bte.inc 
+<li><%bte.grp onDefault=ok %><%bte.inc
 name=licenseLinkText %><%/bte.grp %></li>
 </ul>
 </div>
 
 <div id=foot>
-<p>Copyright &copy; <a href="http://ostermiller.org/contact.pl?regarding=Ladder" class=mail>Stephen Ostermiller</a> 1999-2006</p>
+<p>Copyright &copy; <a href="http://ostermiller.org/contact.pl?regarding=Ladder" class=mail>Stephen Ostermiller</a> 1999-2020</p>
 <p style="text-align:right;font-size:smaller"><a href="http://ostermiller.org/">ostermiller.org</a> (<a href="http://ostermiller.org/siteindex.html">site index</a>)</p>
 </div>
 

@@ -8,12 +8,12 @@ then
 fi
 
 FILES=$@
-FILES=${FILES/package.html/} 
-FILES=${FILES/web/} 
-FILES=${FILES/javadoc/} 
-FILES=${FILES/compile/} 
+FILES=${FILES/package.html/}
+FILES=${FILES/web/}
+FILES=${FILES/javadoc/}
+FILES=${FILES/compile/}
 if [ "$FILES" ]
 then
 	echo Make: copying to web directory: $FILES
-	cp -r $FILES ~/ostermiller.org/www/ladder
+	cp -r $FILES ~/sites/ostermiller.org/www/ladder
 fi
