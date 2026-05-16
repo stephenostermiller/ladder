@@ -126,7 +126,7 @@ public class EditorCanvas extends JPanel implements KeyListener, MouseListener{
 	 * @return the size of the current fond
 	 */
 	public int getFontSize(){
-		 return fontSize;
+		return fontSize;
 	}
 
 	/**
@@ -255,22 +255,22 @@ public class EditorCanvas extends JPanel implements KeyListener, MouseListener{
 		int d = (int)Math.ceil((double)(g.getClipBounds().x + g.getClipBounds().width + letterWidth)/letterWidth);
 		//System.out.println("Vertical: " + (a+1) + " to " + (b) + " Horizontal: " + (c+1) + " to " + (d));
 		for (int i=a; i<b && i<rows; i++){
-			 for(int j=c; j<d && j<columns; j++){
+			for(int j=c; j<d && j<columns; j++){
 			if (inSelection(j, i)){
 				g.setColor(fgColor);
 			} else {
-				 g.setColor(bgColor);
+				g.setColor(bgColor);
 			}
 			g.fillRect((j)*letterWidth, (i)*letterHeight, letterWidth, letterHeight);
 			if (inSelection(j, i)){
 				g.setColor(bgColor);
 			} else {
-				 g.setColor(fgColor);
+				g.setColor(fgColor);
 			}
-			 char[] ch = new char[1];
+			char[] ch = new char[1];
 					ch[0] = levelData.charAt(i*columns + j);
 					g.drawChars(ch,0,1,(j)*letterWidth,(i)*letterHeight+letterAcsent);
-			 }
+			}
 		}
 		repaintAll = true;
 	}
@@ -365,12 +365,12 @@ public class EditorCanvas extends JPanel implements KeyListener, MouseListener{
 		break;
 		case KeyEvent.VK_UP:
 		case KeyEvent.VK_KP_UP:
-			 if (cursorY > 0){
-				 repaintRegion(cursorX, cursorY, cursorEndX, cursorEndY);
-				 cursorY--;
-				 cursorEndX = cursorX;
-				 cursorEndY = cursorY;
-				 repaintCharAt(cursorX, cursorY);
+			if (cursorY > 0){
+				repaintRegion(cursorX, cursorY, cursorEndX, cursorEndY);
+				cursorY--;
+				cursorEndX = cursorX;
+				cursorEndY = cursorY;
+				repaintCharAt(cursorX, cursorY);
 			}
 		break;
 		case KeyEvent.VK_BACK_SPACE:

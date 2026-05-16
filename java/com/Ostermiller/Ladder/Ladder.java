@@ -176,15 +176,15 @@ public class Ladder extends JFrame {
 						}
 					}
 				} else if (object == easyItem){
-					 ladderCanvas.setDifficulty(LadderCanvas.EASY);
+					ladderCanvas.setDifficulty(LadderCanvas.EASY);
 				} else if (object == mediumItem){
-					 ladderCanvas.setDifficulty(LadderCanvas.MEDIUM);
+					ladderCanvas.setDifficulty(LadderCanvas.MEDIUM);
 				} else if (object == hardItem){
-					 ladderCanvas.setDifficulty(LadderCanvas.HARD);
+					ladderCanvas.setDifficulty(LadderCanvas.HARD);
 				} else if (object == veryHardItem){
-					 ladderCanvas.setDifficulty(LadderCanvas.VERY_HARD);
+					ladderCanvas.setDifficulty(LadderCanvas.VERY_HARD);
 				} else if (object == impossibleItem){
-					 ladderCanvas.setDifficulty(LadderCanvas.IMPOSSIBLE);
+					ladderCanvas.setDifficulty(LadderCanvas.IMPOSSIBLE);
 				} else if (object == saveItem){
 					FileDialog fd = new FileDialog(Ladder.this, "Save a Level", FileDialog.SAVE);
 					fd.setFile("*.lvl");
@@ -197,7 +197,7 @@ public class Ladder extends JFrame {
 						}
 					}
 				} else if (object == editItem){
-					 new Editor(level.getLevel(), Ladder.this);
+					new Editor(level.getLevel(), Ladder.this);
 				} else if (object == scoresItem){
 					highScores.showHighScoreWindow(Ladder.this);
 				} else if (object == fontItem){
@@ -869,7 +869,7 @@ public class Ladder extends JFrame {
 			super(text, icon, selected);
 		}
 
-		 /**
+		/**
 		 * Filename from which the level should be loaded
 		 */
 		private String fileName;

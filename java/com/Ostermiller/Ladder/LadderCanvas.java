@@ -22,7 +22,6 @@ package com.Ostermiller.Ladder;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import java.lang.*;
 import java.util.*;
 
 /**
@@ -227,7 +226,7 @@ public class LadderCanvas extends JPanel implements Runnable {
 		repaintList = new Vector<Dimension>();
 		barrelProducers = new Vector<BarrelProducer>();
 		addKeyListener(new KeyAdapter(){
-			 public void keyPressed(KeyEvent ke){
+			public void keyPressed(KeyEvent ke){
 				int keycode = ke.getKeyCode();
 				if (keycode == KeyEvent.VK_ESCAPE){
 					LadderCanvas.this.caller.togglePause();
@@ -561,10 +560,10 @@ public class LadderCanvas extends JPanel implements Runnable {
 					if (cycles <= 0){ // Game over due to out of time
 						gameOver = G_O_TIME;
 						throw (new GameOverException());
-					 }
+					}
 					// move the lad
 					screenLevel.setCharAt(lad.getYPos()-1, lad.getXPos()-1, realLevel.charAt(lad.getYPos()-1, lad.getXPos()-1));
-					 repaintList.addElement(new Dimension(lad.getXPos() - 1, lad.getYPos() - 1));
+					repaintList.addElement(new Dimension(lad.getXPos() - 1, lad.getYPos() - 1));
 					int oldx = lad.getXPos();
 					int oldy = lad.getYPos();
 					lad.setCommand(nextCommand);

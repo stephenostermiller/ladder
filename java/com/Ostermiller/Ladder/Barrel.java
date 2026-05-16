@@ -167,4 +167,3 @@ public class Barrel extends Creature{
 		}
 	}
 }
-

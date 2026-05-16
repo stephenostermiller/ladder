@@ -11,7 +11,7 @@ ladder.jar: script/jar-build.sh build/classes java/Ladder.mf $(wildcard java/com
 run-java: ladder.jar
 	@java -jar ladder.jar
 
-www: script/www-build.sh ladder.jar $(wildcard site/*)
+www: script/www-build.sh ladder.jar $(wildcard site/*) $(wildcard releases/*)
 	@./script/www-build.sh
 
 .PHONY: clean

@@ -1,0 +1,27 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+    -   id: trailing-whitespace # Remove trailing whitespace
+    -   id: end-of-file-fixer # Ensure files end with a newline
+    -   id: check-added-large-files # Prevent committing large files
+    -   id: detect-private-key # Prevent committing secrets/keys
+    -   id: mixed-line-ending # Ensure consistent line endings
+    -   id: check-case-conflict # Important for Java's case-sensitive class names
+    -   id: check-executables-have-shebangs # For your shell scripts (spell.sh, neaten.sh)
+    -   id: check-yaml # Validate YAML files
+-   repo: https://github.com/editorconfig-checker/editorconfig-checker.python
+    rev: '3.6.1'
+    hooks:
+    -   id: editorconfig-checker # Validate files against .editorconfig
+        alias: ec
+-   repo: local
+    hooks:
+    -   id: build-check # Ensure build passes before committing
+        name: Build check
+        entry: make
+        language: system
+        pass_filenames: false
+        stages: [commit]

@@ -17,7 +17,7 @@
 <h2><a href="customize.html">Creating Levels</a></h2>
 
 <p>You can create your own levels to play in Ladder.   You can create levels in your favorite text editor or in the level editor included with the game.  Here are the characters that you can put in your level:</p>
-<ul id=elementDescriptions class=contentList>	
+<ul id=elementDescriptions class=contentList>
 <li><b>p</b> - The place where the lad starts.
 <li><b>V</b> - Der Dispenser.  Der Rocks roll out of it to squash you flat.
 <li><b>*</b> - Der Eaters.  They eat the Der Rocks but oddly do not harm you in the slightest

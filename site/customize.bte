@@ -9,7 +9,7 @@ Ladder comes with a level editor and you can create new levels (<a href="levels.
 
 <h3>LadderUser.ini</h3>
 Ladder creates a user configuration file called<br>
-<i>&lt;UserHome&gt;</i>/.java/Ladder/LadderUser.ini. 
+<i>&lt;UserHome&gt;</i>/.java/Ladder/LadderUser.ini.
 <i>&lt;UserHome&gt;</i> is your home directory, often c:\Windows on Win9x systems, and c:\Documents&nbsp;and&nbsp;Settings\<i>&lt;UserName&gt;</i> on other Windows computers.  You can hack Ladder by adding content to this file.  Values that are in this file override the values in the <a href="http://www.gjt.org/servlets/JCVSlet/log/gjt/com/Ostermiller/Ladder/Ladder.ini/0">default configuration file</a>.
 <h4><a name="addlevel">Add your levels to the game play and menus</a></h4>
 Levels are taken from values that look like<br>

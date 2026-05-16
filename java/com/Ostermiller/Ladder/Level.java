@@ -166,7 +166,7 @@ public class Level implements Cloneable {
 		} catch (IOException e){
 			System.err.println(e.getMessage());
 		}
-	 }
+	}
 
 	/**
 	 * Checks to see if this level changed since it was last loaded or saved.
@@ -250,7 +250,7 @@ public class Level implements Cloneable {
 			InputStream stream = url.openStream();
 			load(stream);
 		} else {
-			 load(new File(fileName));
+			load(new File(fileName));
 		}
 	}
 

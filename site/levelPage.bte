@@ -1,12 +1,12 @@
 <%bte.doc output="false" super="page.bte"%>
 <%bte.tpl name=levelLinks %><ul class=sidebar>
-<li><%bte.grp onDefault=ok %><%bte.inc 
+<li><%bte.grp onDefault=ok %><%bte.inc
 name=ladder1levelsLinkText %><%/bte.grp %></li>
-<li><%bte.grp onDefault=ok %><%bte.inc 
+<li><%bte.grp onDefault=ok %><%bte.inc
 name=ladder2levelsLinkText %><%/bte.grp %></li>
-<li><%bte.grp onDefault=ok %><%bte.inc 
+<li><%bte.grp onDefault=ok %><%bte.inc
 name=newLevelLinkText %><%/bte.grp %></li>
-<li><%bte.grp onDefault=ok %><%bte.inc 
+<li><%bte.grp onDefault=ok %><%bte.inc
 name=submitLinkText %><%/bte.grp %></li>
 </ul><%/bte.tpl%>
 

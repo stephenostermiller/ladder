@@ -34,8 +34,8 @@ were written without any fancy graphics.  Heck, they were written without any gr
 popular for computers running the CPM operating system. Seeing the game,
 you might be very much reminded of "Donkey Kong".</p>
 
-<p>Now Ladder has been rewritten in Java and can be played on most of today's computers.  
-This version includes all the original levels and several new ones. 
+<p>Now Ladder has been rewritten in Java and can be played on most of today's computers.
+This version includes all the original levels and several new ones.
 It also comes with a level editor so that you can make your own.</p>
 <%/bte.tpl%>
 <%/bte.doc%>

@@ -1,8 +1,8 @@
 <%bte.doc output="false" super="page.bte"%>
 <%bte.tpl name=downloadLinks %><ul class=sidebar>
-<li><%bte.grp onDefault=ok %><%bte.inc 
+<li><%bte.grp onDefault=ok %><%bte.inc
 name=jarLinkText %><%/bte.grp %></li>
-<li><%bte.grp onDefault=ok %><%bte.inc 
+<li><%bte.grp onDefault=ok %><%bte.inc
 name=alternateLinkText %><%/bte.grp %></li>
 </ul><%/bte.tpl%>
 
