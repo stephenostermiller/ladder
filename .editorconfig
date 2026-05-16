@@ -4,39 +4,16 @@ root = true
 [*]
 end_of_line = lf
 insert_final_newline = true
+indent_style = tab
+indent_size = 4
 charset = utf-8
 
-# Java files - tab indentation
-[*.java]
-indent_style = tab
-indent_size = 4
-
-# Shell scripts
-[*.sh]
-indent_style = tab
-indent_size = 4
-
-# Makefile - requires tabs
-[Makefile]
-indent_style = tab
-
-# CSS files
-[*.css]
+[*.{css,htm,html,bte,ini,dict,properties,json}]
 indent_style = tab
 indent_size = 2
 
-# HTML/BTE templates
-[*.{html,bte}]
-indent_style = tab
-indent_size = 2
-
-# Configuration files
-[*.{ini,dict,properties}]
-indent_style = tab
-indent_size = 2
-
-# YAML/JSON
-[*.{yaml,yml,json}]
+# YAML
+[*.{yaml,yml}]
 indent_style = space
 indent_size = 2
 

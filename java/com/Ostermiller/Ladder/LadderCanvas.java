@@ -25,24 +25,21 @@ import javax.swing.*;
 import java.util.*;
 
 /**
- * The LadderCanvas is basically the executable part of the game.  The canvas
- * draws the game on itself.
- *
+ * The LadderCanvas is the UI and threading layer for the game.  The canvas
+ * draws the game on itself and drives the game loop. Core game logic lives
+ * in GameEngine.
  */
 public class LadderCanvas extends JPanel implements Runnable {
 	/**
 	 * The instance of Ladder which we should report back to.
 	 */
-	private Ladder caller; // the caller of this
-
-	private Level screenLevel = new Level();
-
-	private Level realLevel = new Level();
+	private Ladder caller;
 
 	/**
-	 * The lad that is controlled by the player.
+	 * The core game logic engine.
 	 */
-	private Lad lad;
+	private GameEngine engine;
+
 	/**
 	 * Charactaristics of the font.
 	 */
@@ -64,17 +61,9 @@ public class LadderCanvas extends JPanel implements Runnable {
 	 */
 	public boolean jumpCommand;
 	/**
-	 *
-	 */
-	private Barrel barrel;
-	/**
 	 * A list of squares that need to be repainted.
 	 */
 	private Vector<Dimension> repaintList;
-	/**
-	 * A list of all the objects that spit out barrels on this level.
-	 */
-	private Vector<BarrelProducer> barrelProducers;
 	/**
 	 * Should the entire screen be repainted on the next refresh?
 	 */
@@ -90,10 +79,6 @@ public class LadderCanvas extends JPanel implements Runnable {
 	/**
 	 *
 	 */
-	public int gameOver;
-	/**
-	 *
-	 */
 	private boolean gameStop;
 	/**
 	 *
@@ -104,25 +89,9 @@ public class LadderCanvas extends JPanel implements Runnable {
 	 */
 	private int difficulty;
 	/**
-	 *
-	 */
-	private int cycles;
-	/**
-	 * The score of the game.
-	 */
-	private long score;
-	/**
-	 * The number of lives left.
-	 */
-	private int ladsLeft;
-	/**
 	 * pause in ms between frames.
 	 */
 	private int gameSpeed;
-	/**
-	 *
-	 */
-	private long nextNewLad;
 	/**
 	 *
 	 */
@@ -131,14 +100,6 @@ public class LadderCanvas extends JPanel implements Runnable {
 	 *
 	 */
 	private boolean go_on = false;
-	/**
-	 * The starting x position of the lad.
-	 */
-	private int ladStartPosX;
-	/**
-	 * The starting y position of the lad.
-	 */
-	private int ladStartPosY;
 	/**
 	 * The time at which the last beep occurred.
 	 */
@@ -160,17 +121,17 @@ public class LadderCanvas extends JPanel implements Runnable {
 	public static final int SCORE_MONEY = 3;
 
 	/**      */
-	public static final int G_O_NOT_OVER = 0;
+	public static final int G_O_NOT_OVER = GameEngine.G_O_NOT_OVER;
 	/**      */
-	public static final int G_O_BARREL = 1;
+	public static final int G_O_BARREL = GameEngine.G_O_BARREL;
 	/**      */
-	public static final int G_O_TIME = 2;
+	public static final int G_O_TIME = GameEngine.G_O_TIME;
 	/**      */
-	public static final int G_O_MONEY = 3;
+	public static final int G_O_MONEY = GameEngine.G_O_MONEY;
 	/**      */
-	public static final int G_O_QUIT = 4;
+	public static final int G_O_QUIT = GameEngine.G_O_QUIT;
 	/**      */
-	public static final int G_O_SPIKE = 5;
+	public static final int G_O_SPIKE = GameEngine.G_O_SPIKE;
 
 	// minimum number of barrels per producer at the level
 	/**      */
@@ -204,7 +165,7 @@ public class LadderCanvas extends JPanel implements Runnable {
 	 *     report back to with scores and such
 	 */
 	public LadderCanvas(String level, Ladder caller){
-		this (new Level(level), caller);
+		this(new Level(level), caller);
 	}
 
 	/**
@@ -216,15 +177,12 @@ public class LadderCanvas extends JPanel implements Runnable {
 	 */
 	public LadderCanvas(Level level, Ladder caller){
 		lastBeep = 0;
-		ladStartPosX = 1;
-		ladStartPosY = 1;
-		lad = new Lad(ladStartPosX,ladStartPosY,Creature.STATIONARY);
 		gameStop = false;
 		this.caller = caller;
 		bgColor = Color.black;
 		fgColor = Color.green;
 		repaintList = new Vector<Dimension>();
-		barrelProducers = new Vector<BarrelProducer>();
+
 		addKeyListener(new KeyAdapter(){
 			public void keyPressed(KeyEvent ke){
 				int keycode = ke.getKeyCode();
@@ -240,9 +198,6 @@ public class LadderCanvas extends JPanel implements Runnable {
 					nextCommand = Lad.RIGHT;
 				} else if (keycode == KeyEvent.VK_SPACE){
 					jumpCommand = true;
-				} else if (keycode == KeyEvent.VK_ESCAPE){
-					//escape is used to pause the game, lets ignore it here
-					//it should be caught by main ladder class.
 				} else if (STEP_MODE && keycode == KeyEvent.VK_ENTER){
 					go_on = true;
 				} else {
@@ -261,15 +216,23 @@ public class LadderCanvas extends JPanel implements Runnable {
 		caller.setBackground(bgColor);
 		caller.getContentPane().setBackground(bgColor);
 		setFontSize(12);
-		realLevel = new Level(level);
-		screenLevel = new Level(realLevel);
+
+		engine = new GameEngine(level, new GameEngine.Callback() {
+			public void onScoreChanged(long score) {
+				LadderCanvas.this.caller.setScore(score);
+			}
+			public void onLadsChanged(int lads) {
+				LadderCanvas.this.caller.setLads(lads);
+			}
+			public void onBonusTimeChanged(int time) {
+				LadderCanvas.this.caller.setBonusTime(time);
+			}
+			public void onBeep() {
+				LadderCanvas.this.beep();
+			}
+		});
+
 		repaintAll = true;
-		setLevelPaint(level);
-		cycles = 2000;
-		score = 0;
-		ladsLeft = 3;
-		nextNewLad = 10000;
-		caller.setLads(ladsLeft);
 		setDifficulty(MEDIUM);
 		setOpaque(true);
 	}
@@ -344,46 +307,14 @@ public class LadderCanvas extends JPanel implements Runnable {
 	 *
 	 * @param level A string representing the desired level.
 	 */
-	private void setLevelPaint(String level){
-		setLevel(new Level(level));
-	}
-
-	/**
-	 * Change the level to the one given and repaint.
-	 *
-	 * @param level A string representing the desired level.
-	 */
-	private void setLevelPaint(Level level){
-		setLevel(level);
-		repaintAll = true;
-		repaint();
-	}
-
-	/**
-	 * Set the level to the given level without a repaint.
-	 *
-	 * @param level A string representing the desired level.
-	 */
 	public void setLevel(String level){
 		setLevel(new Level(level));
 	}
 
 	public void setLevel(Level level){
-		ladStartPosX = 1;
-		ladStartPosY = 1;
-
-		realLevel = new Level(level);
-		screenLevel = new Level(level);
-
-		Dimension p = realLevel.positionOf('p');
-		if (p == null){
-			ladStartPosY = 1;
-			ladStartPosX = 1;
-
-		} else {
-			ladStartPosY = p.height+1;
-			ladStartPosX = p.width+1;
-		}
+		engine.setLevel(level);
+		repaintAll = true;
+		repaint();
 	}
 
 	/**
@@ -401,7 +332,9 @@ public class LadderCanvas extends JPanel implements Runnable {
 	 * @return the minimum size in pixels
 	 */
 	public synchronized Dimension getMinimumSize() {
-		return new Dimension(letterWidth*(realLevel.getColumnCount()), letterHeight*(realLevel.getRowCount()));
+		return new Dimension(
+			letterWidth * engine.realLevel.getColumnCount(),
+			letterHeight * engine.realLevel.getRowCount());
 	}
 
 	/**
@@ -420,8 +353,8 @@ public class LadderCanvas extends JPanel implements Runnable {
 		int columnStart = bounds.x / letterWidth;
 		int columnEnd = (bounds.x + bounds.width + letterWidth) / letterWidth;
 
-		for (int i = rowStart; i < rowEnd && i < realLevel.getRowCount(); i++){
-			g.drawChars(screenLevel.getCharsAt(i, columnStart, columnEnd - columnStart - 1),
+		for (int i = rowStart; i < rowEnd && i < engine.realLevel.getRowCount(); i++){
+			g.drawChars(engine.screenLevel.getCharsAt(i, columnStart, columnEnd - columnStart - 1),
 				0, columnEnd-columnStart-1,
 				(columnStart)*letterWidth, i * letterHeight + letterAcsent);
 		}
@@ -430,13 +363,13 @@ public class LadderCanvas extends JPanel implements Runnable {
 			g.setFont(new Font("SansSerif", Font.BOLD, font.getSize() * 2));
 			String p = "GAME OVER";
 			g.drawString(p, (getWidth() - g.getFontMetrics().stringWidth(p)) / 2,
-				(getHeight()	) / 2);
+				(getHeight()) / 2);
 		} else if (stopThread){
 			g.setColor(Color.red);
 			g.setFont(new Font("SansSerif", Font.BOLD, font.getSize() * 2));
 			String p = "PAUSED";
 			g.drawString(p, (getWidth() - g.getFontMetrics().stringWidth(p)) / 2,
-				(getHeight()	) / 2);
+				(getHeight()) / 2);
 		}
 		repaintAll = true;
 	}
@@ -466,7 +399,6 @@ public class LadderCanvas extends JPanel implements Runnable {
 	 * stop the game from moving
 	 */
 	public void stop(){
-		// set a flag that will make the run method exit.
 		stopThread = true;
 		repaint();
 	}
@@ -475,12 +407,7 @@ public class LadderCanvas extends JPanel implements Runnable {
 	 * reset the game to its initial state, (score, lads, (everything))
 	 */
 	public void resetGame(){
-		//System.out.println("Resetting Game, repainting");
-		updateScore(SCORE_RESET);
-		ladsLeft = 3;
-		nextNewLad = 10000;
-		caller.setLads(ladsLeft);
-		reset();
+		engine.resetGame();
 		repaintAll = true;
 		repaint();
 	}
@@ -490,31 +417,7 @@ public class LadderCanvas extends JPanel implements Runnable {
 	 */
 	public void reset(){
 		gameStop = false;
-		cycles = 2000;
-		gameOver = G_O_NOT_OVER;
-		nextCommand = Lad.STOP;
-		jumpCommand = false;
-		screenLevel = new Level(realLevel);
-
-		lad.reset(ladStartPosX,ladStartPosY,Creature.STATIONARY);
-		screenLevel.setCharAt(ladStartPosY-1, ladStartPosX-1, 'p');
-		realLevel.setCharAt(ladStartPosY-1, ladStartPosX-1, ' ');
-		Dimension p = realLevel.positionOf('V');
-		int i;
-		for (i=0; i<barrelProducers.size(); i++){
-			((BarrelProducer)barrelProducers.elementAt(i)).clear();
-		}
-		for (i=0; p != null; i++){
-			if (i < barrelProducers.size()){
-				((BarrelProducer)barrelProducers.elementAt(i)).reset(p.width+1, p.height+1);
-			} else {
-				barrelProducers.addElement(new BarrelProducer(p.width+1, p.height+1));
-			}
-			p.width++;
-			p = realLevel.positionOf('V', p);
-		}
-		barrelProducers.setSize(i);
-		System.gc();
+		engine.reset();
 	}
 
 	/**
@@ -542,9 +445,8 @@ public class LadderCanvas extends JPanel implements Runnable {
 		}
 	}
 
-
 	/**
-	 * Runs the game, (but not as a thread)
+	 * Runs the game loop.
 	 */
 	public void run(){
 		stopThread = false;
@@ -553,125 +455,18 @@ public class LadderCanvas extends JPanel implements Runnable {
 		int sleepTime;
 		while (!gameStop && !stopThread){
 			try{
-				while (gameOver == G_O_NOT_OVER && !stopThread){ // While the game is not over
-					cycles--;  // time count down
-					caller.setBonusTime(cycles);
-					//System.out.print(" " + cycles);
-					if (cycles <= 0){ // Game over due to out of time
-						gameOver = G_O_TIME;
-						throw (new GameOverException());
-					}
-					// move the lad
-					screenLevel.setCharAt(lad.getYPos()-1, lad.getXPos()-1, realLevel.charAt(lad.getYPos()-1, lad.getXPos()-1));
-					repaintList.addElement(new Dimension(lad.getXPos() - 1, lad.getYPos() - 1));
-					int oldx = lad.getXPos();
-					int oldy = lad.getYPos();
-					lad.setCommand(nextCommand);
+				while (engine.gameOver == G_O_NOT_OVER && !stopThread){
+					int gameOver = engine.tick(nextCommand, jumpCommand);
 					nextCommand = Lad.NONE;
-					if (jumpCommand){
-						lad.setJump();
-					}
 					jumpCommand = false;
-					// tell the lad about its surroundings so that it knows how it can move
-					lad.update(
-						realLevel.charAt(lad.getYPos() - 1 + 1 , lad.getXPos() - 1 - 1),
-						realLevel.charAt(lad.getYPos() - 1 + 1 , lad.getXPos() - 1),
-						realLevel.charAt(lad.getYPos() - 1 + 1 , lad.getXPos() - 1 + 1),
-						realLevel.charAt(lad.getYPos() - 1 , lad.getXPos() - 1 - 1),
-						realLevel.charAt(lad.getYPos() - 1 , lad.getXPos() - 1),
-						realLevel.charAt(lad.getYPos() - 1 , lad.getXPos() - 1 + 1),
-						realLevel.charAt(lad.getYPos() - 1 - 1 , lad.getXPos() - 1 - 1),
-						realLevel.charAt(lad.getYPos() - 1 - 1 , lad.getXPos() - 1),
-						realLevel.charAt(lad.getYPos() - 1 - 1 , lad.getXPos() - 1 + 1));
-					// redraw the lad
-					screenLevel.setCharAt(lad.getYPos()-1, lad.getXPos()-1, lad.getSymbol());
-					repaintList.addElement(new Dimension(lad.getXPos(), lad.getYPos()));
-					if(realLevel.charAt(lad.getYPos() -1, lad.getXPos() - 1) == '$'){
-						gameOver = G_O_MONEY; // Found the goal, game over
-						repaint();
-						throw (new GameOverException());
 
+					if (gameOver == G_O_MONEY){
+						repaint();
 					}
-					if(realLevel.charAt(lad.getYPos() - 1, lad.getXPos() - 1) == '^'){
-						gameOver = G_O_SPIKE; // Found the goal, game over
+					if (gameOver != G_O_NOT_OVER){
 						throw (new GameOverException());
 					}
-					if(realLevel.charAt(lad.getYPos() - 1, lad.getXPos() - 1) == '&'){
-						// found a statue, adjust the score, remove the statue
-						updateScore(SCORE_STATUE);
-						realLevel.setCharAt(lad.getYPos()-1, lad.getXPos()-1, ' ');
-					}
-					// get rid of disappearing flooring
-					if ((lad.getXPos() != oldx && lad.getYPos() >= oldy) && realLevel.charAt(oldy - 1 + 1, oldx - 1) == '-'){
-						// get rid of flooring only if the lad moved over it without jumping.
-						// so don't remove if he stayed in the same place or if his y pos has gone up.
-						screenLevel.setCharAt(oldy, oldx-1, ' ');
-						realLevel.setCharAt(oldy, oldx-1, ' ');
-						repaintList.addElement(new Dimension(oldx, oldy + 1));
-						//repaintCharAt(oldx, oldy + 1);
-					}
-					// update and repaint all the barrels
-					for (int k=0; k<barrelProducers.size(); k++){
-						BarrelProducer BP = (BarrelProducer)barrelProducers.elementAt(k);
-						BP.update();
-						for (int j=0; j<BP.getBarrelCount(); j++){
-							Barrel barrel = BP.getBarrelAt(j);
-							if (barrel != null){
-								if(barrel.getYPos() == lad.getYPos() &&  lad.getXPos() == barrel.getXPos()){
-									gameOver = G_O_BARREL;
-									throw (new GameOverException());
-								}
-								// score for jumping barrels
-								if (realLevel.charAt(lad.getYPos() - 1, lad.getXPos() - 1) != 'H'){ // no score if on ladder
-									if(barrel.getYPos() - 1 == lad.getYPos() &&  lad.getXPos()  == barrel.getXPos()){
-										updateScore(SCORE_BARREL);
-									} else if(barrel.getYPos() - 2 == lad.getYPos() &&  lad.getXPos()  == barrel.getXPos() &&
-										realLevel.charAt((lad.getYPos() - 1 + 1), lad.getXPos() - 1) != '=' &&
-										realLevel.charAt((lad.getYPos() - 1 + 1), lad.getXPos() - 1) != '|' &&
-										realLevel.charAt((lad.getYPos() - 1 + 1), lad.getXPos() - 1) != '-'){
-										updateScore(SCORE_BARREL);
-									}
-								}
-								screenLevel.setCharAt(barrel.getYPos() - 1, barrel.getXPos() - 1 ,
-									realLevel.charAt(barrel.getYPos() - 1, barrel.getXPos() - 1));
-								repaintList.addElement(new Dimension(barrel.getXPos(), barrel.getYPos()));
-								barrel.update(
-									realLevel.charAt(barrel.getYPos() - 1 + 1 , barrel.getXPos() - 1 - 1),
-									realLevel.charAt(barrel.getYPos() - 1 + 1 , barrel.getXPos() - 1),
-									realLevel.charAt(barrel.getYPos() - 1 + 1 , barrel.getXPos() - 1 + 1),
-									realLevel.charAt(barrel.getYPos() - 1 , barrel.getXPos() - 1 - 1),
-									realLevel.charAt(barrel.getYPos() - 1 , barrel.getXPos() - 1),
-									realLevel.charAt(barrel.getYPos() - 1 , barrel.getXPos() - 1 + 1),
-									realLevel.charAt(barrel.getYPos() - 1 - 1 , barrel.getXPos() - 1 - 1),
-									realLevel.charAt(barrel.getYPos() - 1 - 1 , barrel.getXPos() - 1),
-									realLevel.charAt(barrel.getYPos() - 1 - 1 , barrel.getXPos() - 1 + 1));
-								screenLevel.setCharAt(barrel.getYPos() - 1, barrel.getXPos() - 1, barrel.getSymbol());
-								repaintList.addElement(new Dimension(barrel.getXPos(), barrel.getYPos()));
-								if(barrel.getYPos() == lad.getYPos() &&  lad.getXPos() == barrel.getXPos()){
-									gameOver = G_O_BARREL;
-									throw (new GameOverException());
-								}
-								// score for jumping barrels
-								if (lad.getDirection() != Creature.UP && lad.getDirection() != Creature.DOWN && // no score this time if the lad is moving up or down to avoid double counting of score
-									realLevel.charAt(lad.getYPos() - 1, lad.getXPos() - 1) != 'H'){ // no score if on ladder
-									if(barrel.getYPos() - 1 == lad.getYPos() &&  lad.getXPos()  == barrel.getXPos()){
-										updateScore(SCORE_BARREL);
-									} else if(barrel.getYPos() - 2 == lad.getYPos() &&  lad.getXPos()  == barrel.getXPos() &&
-										realLevel.charAt(lad.getYPos() - 1 + 1, lad.getXPos() - 1) != '=' &&
-										realLevel.charAt(lad.getYPos() - 1 + 1, lad.getXPos() - 1) != '|' &&
-										realLevel.charAt(lad.getYPos() - 1 + 1, lad.getXPos() - 1) != '-'){
-										updateScore(SCORE_BARREL);
-									}
-								}
-								if (realLevel.charAt(barrel.getYPos() - 1, barrel.getXPos() - 1) == '*'){
-									screenLevel.setCharAt(barrel.getYPos()-1, barrel.getXPos()-1,
-										realLevel.charAt(barrel.getYPos() - 1, barrel.getXPos() - 1));
-									repaintList.addElement(new Dimension(barrel.getXPos(), barrel.getYPos()));
-									BP.recycleBarrel(barrel);
-								}
-							}
-						}
-					}
+
 					repaintAll = false;
 					repaint();
 
@@ -696,30 +491,26 @@ public class LadderCanvas extends JPanel implements Runnable {
 				}
 			} catch (GameOverException e){
 			}
-			// End game here
 
-			switch (gameOver){
+			switch (engine.gameOver){
 			case G_O_BARREL: case G_O_TIME: case G_O_SPIKE:
 				ladDeath();
-				if (ladsLeft > 0){
-					ladsLeft--;
-					caller.setLads(ladsLeft);
-					//System.out.println("Restarting Level");
-					reset();
+				if (engine.getLadsLeft() > 0){
+					engine.reset();
 					gameStop = false;
 				} else {
 					gameStop = true;
-					caller.gameOver(score);
+					caller.gameOver(engine.getScore());
 					repaint();
 				}
 			break;
 			case G_O_MONEY:
 				dollarCountdown();
 				caller.changeLevel();
-				reset();
+				engine.reset();
 				gameStop = false;
 			break;
-			case G_O_NOT_OVER: // the game is not over.  Thread is stopped.
+			case G_O_NOT_OVER:
 				gameStop = false;
 			break;
 			default:
@@ -735,10 +526,10 @@ public class LadderCanvas extends JPanel implements Runnable {
 	 * level countdown.
 	 */
 	private void dollarCountdown(){
-		while (cycles > 0){
-			caller.setBonusTime(cycles);
-			updateScore(SCORE_MONEY);
-			cycles -= 10;
+		while (engine.cycles > 0){
+			caller.setBonusTime(engine.cycles);
+			engine.scoreMoney();
+			engine.cycles -= 10;
 			try{
 				Thread.sleep(10);
 			} catch (InterruptedException e){
@@ -768,7 +559,7 @@ public class LadderCanvas extends JPanel implements Runnable {
 		for (i=0; i<symbols.length; i++){
 			beginLoopTime = System.currentTimeMillis();
 			beep();
-			screenLevel.setCharAt(lad.getYPos()-1, lad.getXPos()-1, symbols[i]);
+			engine.screenLevel.setCharAt(engine.getLadY()-1, engine.getLadX()-1, symbols[i]);
 			repaint();
 			endLoopTime = System.currentTimeMillis();
 			sleepTime = (int)(gameSpeed - (endLoopTime - beginLoopTime));
@@ -779,39 +570,6 @@ public class LadderCanvas extends JPanel implements Runnable {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Adjusts the score according to some event.
-	 *
-	 * @param scoreind Type of scoring even
-	 */
-	private void updateScore(int scoreind){
-		switch (scoreind){
-		case SCORE_STATUE:
-			score += cycles;
-			beep();
-		break;
-		case SCORE_RESET:
-			score = 0;
-		break;
-		case SCORE_BARREL:
-			score += 200;
-			beep();
-		break;
-		case SCORE_MONEY:
-			score += 10;
-			beep();
-		break;
-		}
-		// give a new lad if over 10,000 points
-		if (score > nextNewLad){
-			ladsLeft++;
-			caller.setLads(ladsLeft);
-			nextNewLad += 10000;
-		}
-		caller.setScore(score);
-		//System.out.println(score);
 	}
 
 	/**
