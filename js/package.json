@@ -1,0 +1,11 @@
+{
+	"name": "ladder-js",
+	"version": "1.0.0",
+	"description": "Ladder Game - JavaScript implementation",
+	"scripts": {
+		"test": "vitest"
+	},
+	"devDependencies": {
+		"vitest": "^2.0.0"
+	}
+}

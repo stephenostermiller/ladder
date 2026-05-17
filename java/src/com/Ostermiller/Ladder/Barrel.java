@@ -196,6 +196,16 @@ public class Barrel extends Creature{
 	public void update(char one, char two, char three, char four, char five, char six,
 		char seven, char eight, char nine){
 		int go = Barrel.STOP;
+
+		// If sticky direction hits a wall, cancel it so barrel queries random
+		if (direction == Creature.LEFT && (four == '=' || four == '-' || four == '|')) {
+			direction = Creature.STATIONARY;
+		} else if (direction == Creature.RIGHT && (six == '=' || six == '-' || six == '|')) {
+			direction = Creature.STATIONARY;
+		} else if (direction == Creature.DOWN && (two == '=' || two == '-' || two == '|')) {
+			direction = Creature.STATIONARY;
+		}
+
 		if (two == 'H' && five == 'H' && direction == Creature.DOWN){
 			go = Barrel.DOWN;
 		} else if (five == 'H' && two == 'H'){

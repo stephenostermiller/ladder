@@ -21,6 +21,13 @@ run-java: build/java/ladder.jar
 test: build/java/test-classes
 	@./script/test-run.sh
 
+build/js/node_modules: script/js-install.sh js/package.json js/package-lock.json
+	@./script/js-install.sh
+
+.PHONY: js-test
+js-test: build/js/node_modules
+	@cd js && npm test
+
 build/www: script/www-build.sh build/java/ladder.jar $(wildcard site/*) $(wildcard releases/*) $(wildcard src/js/*) $(wildcard levels/*)
 	@./script/www-build.sh
 

@@ -201,6 +201,7 @@ public class BarrelProducer{
 		if (allBarrels.size() > 0){
 			b = (Barrel)allBarrels.elementAt(allBarrels.size()-1);
 			allBarrels.removeElementAt(allBarrels.size()-1);
+			b.resetState();
 			b.resetRandom(barrelRandom);
 		} else {
 			b = new Barrel(barrelRandom);

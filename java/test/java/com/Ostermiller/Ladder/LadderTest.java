@@ -599,88 +599,140 @@ public class LadderTest {
 
 	@Test
 	public void barrelsFindLadder() {
+		CyclingBarrelRandom barrelRand = new CyclingBarrelRandom();
 		GameSimulation sim = new GameSimulation(
-			"|VH*\n" +
+			" *HV\n" +
 			"==H=\n" +
 			"p*H*\n",
-			new DeterministicBarrelProducerRandom(8),
-			new CyclingBarrelRandom()
+			new DeterministicBarrelProducerRandom(20),
+			barrelRand
 		);
+		assertEquals(0, barrelRand.leftRightCount);
+		assertEquals(0, barrelRand.leftRightDownCount);
+		// Step 1: A barrel is produced at the site of the barrel producer
 		sim.step().assertScreen(
-			"|oH*\n" +
+			" *Ho\n" +
 			"==H=\n" +
 			"g*H*\n"
 		);
+		assertEquals(0, barrelRand.leftRightCount);
+		// Step 2: the barrel queries the deterministic nextInt(left/right) which says to stay put
 		sim.step().assertScreen(
-			"|oH*\n" +
+			" *Ho\n" +
 			"==H=\n" +
 			"g*H*\n"
 		);
+		assertEquals(1, barrelRand.leftRightCount);
+		// Step 3: the barrel queries the deterministic nextInt(left/right) which says to move left
 		sim.step().assertScreen(
-			"|oH*\n" +
+			" *oV\n" +
 			"==H=\n" +
 			"g*H*\n"
 		);
+		assertEquals(2, barrelRand.leftRightCount);
+		// Step 4: the barrel queries the deterministic nextInt(left/right/down) which says to stay put
 		sim.step().assertScreen(
-			"|Vo*\n" +
+			" *oV\n" +
 			"==H=\n" +
 			"g*H*\n"
 		);
+		assertEquals(1, barrelRand.leftRightDownCount);
+		// Step 5: the barrel queries the deterministic nextInt(left/right/down) which says to move left
 		sim.step().assertScreen(
-			"|Vo*\n" +
+			" oHV\n" +
 			"==H=\n" +
 			"g*H*\n"
 		);
+		assertEquals(2, barrelRand.leftRightDownCount);
+		// Step 6: the old barrel is removed
 		sim.step().assertScreen(
-			"|oH*\n" +
+			" *HV\n" +
 			"==H=\n" +
 			"g*H*\n"
 		);
-		sim.step().assertScreen(
-			"|Vo*\n" +
+		// Step 7: a new barrel is produced at the site of the barrel producer
+		sim.step(Lad.NONE, 15).assertScreen(
+			" *Ho\n" +
 			"==H=\n" +
 			"g*H*\n"
 		);
+		// Step 8: the barrel queries the deterministic nextInt(left/right) which says to move right, but it can't
 		sim.step().assertScreen(
-			"|VHo\n" +
+			" *Ho\n" +
 			"==H=\n" +
 			"g*H*\n"
 		);
+		assertEquals(3, barrelRand.leftRightCount);
+		// Step 9: the barrel queries the deterministic nextInt(left/right) which says to stay put
 		sim.step().assertScreen(
-			"|oH*\n" +
+			" *Ho\n" +
 			"==H=\n" +
 			"g*H*\n"
 		);
+		assertEquals(4, barrelRand.leftRightCount);
+		// Step 10: the barrel queries the deterministic nextInt(left/right) which says to move left
 		sim.step().assertScreen(
-			"|Vo*\n" +
+			" *oV\n" +
 			"==H=\n" +
 			"g*H*\n"
 		);
+		assertEquals(5, barrelRand.leftRightCount);
+		// Step 11: the barrel queries the deterministic nextInt(left/right/down) which says to move right
 		sim.step().assertScreen(
-			"|VH*\n" +
+			" *Ho\n" +
+			"==H=\n" +
+			"g*H*\n"
+		);
+		assertEquals(3, barrelRand.leftRightDownCount);
+		// Step 12: the barrel queries the deterministic nextInt(left/right) which says to move right, but it can't
+		sim.step().assertScreen(
+			" *Ho\n" +
+			"==H=\n" +
+			"g*H*\n"
+		);
+		assertEquals(6, barrelRand.leftRightCount);
+		// Step 13: the barrel queries the deterministic nextInt(left/right) which says to stay put
+		sim.step().assertScreen(
+			" *Ho\n" +
+			"==H=\n" +
+			"g*H*\n"
+		);
+		assertEquals(7, barrelRand.leftRightCount);
+		// Step 14: the barrel queries the deterministic nextInt(left/right) which says move left
+		sim.step().assertScreen(
+			" *oV\n" +
+			"==H=\n" +
+			"g*H*\n"
+		);
+		assertEquals(8, barrelRand.leftRightCount);
+		// Step 15: the barrel queries the deterministic nextInt(left/right/down) which says to move down
+		sim.step().assertScreen(
+			" *HV\n" +
 			"==o=\n" +
 			"g*H*\n"
 		);
+		assertEquals(4, barrelRand.leftRightDownCount);
+		// Step 16: the barrel continues down the ladder
 		sim.step().assertScreen(
-			"|VH*\n" +
+			" *HV\n" +
 			"==H=\n" +
 			"g*o*\n"
 		);
+		// Step 17: the barrel queries the deterministic nextInt(left/right) which says move right
 		sim.step().assertScreen(
-			"|VH*\n" +
+			" *HV\n" +
 			"==H=\n" +
-			"g*o*\n"
+			"g*Ho\n"
 		);
+		assertEquals(9, barrelRand.leftRightCount);
+		// Step 18: the barrel gets removed
 		sim.step().assertScreen(
-			"|VH*\n" +
-			"==H=\n" +
-			"goH*\n"
-		);
-		sim.step().assertScreen(
-			"|VH*\n" +
+			" *HV\n" +
 			"==H=\n" +
 			"g*H*\n"
 		);
+		assertEquals(9, barrelRand.leftRightCount);
+		assertEquals(4, barrelRand.leftRightDownCount);
 	}
 
 	@Test
