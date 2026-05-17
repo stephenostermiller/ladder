@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-	<classpathentry kind="src" path="java"/>
-	<classpathentry kind="src" output="build/test-classes" path="test/java"/>
-	<classpathentry kind="lib" path="build/classes"/>
-	<classpathentry kind="lib" path="build/lib"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="output" path="build/classes"/>
-</classpath>

@@ -22,7 +22,6 @@ import java.awt.event.*;
 import java.util.*;
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.event.*;
 
 /**
  * The text component of the Ladder Editor

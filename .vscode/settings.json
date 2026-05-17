@@ -1,5 +1,6 @@
 {
 	"java.project.sourcePaths": ["java", "test/java"],
 	"java.project.outputPath": "build/classes",
-	"java.project.referencedLibraries": ["build/lib/*"]
+	"java.configuration.updateBuildConfiguration": "automatic",
+	"java.import.maven.enabled": true,
 }

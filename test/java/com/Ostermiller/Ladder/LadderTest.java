@@ -211,6 +211,58 @@ public class LadderTest {
 	}
 
 	@Test
+	public void jumpRightSimultaneous() {
+		GameSimulation sim = new GameSimulation(
+			"        \n" +
+			"        \n" +
+			"p       \n" +
+			"========\n"
+		);
+		sim.jump(Lad.RIGHT).assertScreen(
+			"        \n" +
+			" p      \n" +
+			"        \n" +
+			"========\n"
+		);
+		sim.step().assertScreen(
+			"  p     \n" +
+			"        \n" +
+			"        \n" +
+			"========\n"
+		);
+		sim.step().assertScreen(
+			"   p    \n" +
+			"        \n" +
+			"        \n" +
+			"========\n"
+		);
+		sim.step().assertScreen(
+			"    p   \n" +
+			"        \n" +
+			"        \n" +
+			"========\n"
+		);
+		sim.step().assertScreen(
+			"        \n" +
+			"     p  \n" +
+			"        \n" +
+			"========\n"
+		);
+		sim.step().assertScreen(
+			"        \n" +
+			"        \n" +
+			"      p \n" +
+			"========\n"
+		);
+		sim.step().assertScreen(
+			"        \n" +
+			"        \n" +
+			"       p\n" +
+			"========\n"
+		);
+	}
+
+	@Test
 	public void jumpLeftAllFrames() {
 		GameSimulation sim = new GameSimulation(
 			"        \n" +
@@ -271,6 +323,46 @@ public class LadderTest {
 			"        \n" +
 			"g       \n" +
 			"========\n"
+		);
+	}
+
+	@Test
+	public void jumpRightLandOnLadder() {
+		GameSimulation sim = new GameSimulation(
+			"    H \n" +
+			"    H \n" +
+			"p   H \n" +
+			"======\n"
+		);
+		sim.jump(Lad.RIGHT).assertScreen(
+			"    H \n" +
+			" p  H \n" +
+			"    H \n" +
+			"======\n"
+		);
+		sim.jump().assertScreen(
+			"  p H \n" +
+			"    H \n" +
+			"    H \n" +
+			"======\n"
+		);
+		sim.jump().assertScreen(
+			"   pH \n" +
+			"    H \n" +
+			"    H \n" +
+			"======\n"
+		);
+		sim.step().assertScreen(
+			"    p \n" +
+			"    H \n" +
+			"    H \n" +
+			"======\n"
+		);
+		sim.step().assertScreen(
+			"    g \n" +
+			"    H \n" +
+			"    H \n" +
+			"======\n"
 		);
 	}
 
