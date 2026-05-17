@@ -166,7 +166,7 @@ public class Barrel extends Creature{
 	/**
 	 * Action choices for 4-way random decision.
 	 */
-	static final int[] LET_RIGHT_DOWN_DECISIONS = {STOP, LEFT, RIGHT, DOWN};
+	static final int[] LEFT_RIGHT_DOWN_DECISIONS = {STOP, LEFT, RIGHT, DOWN};
 
 	/**
 	 * Action choices for 3-way random decision.
@@ -199,7 +199,7 @@ public class Barrel extends Creature{
 		if (two == 'H' && five == 'H' && direction == Creature.DOWN){
 			go = Barrel.DOWN;
 		} else if (five == 'H' && two == 'H'){
-			go = LET_RIGHT_DOWN_DECISIONS[rnum.nextInt(LET_RIGHT_DOWN_DECISIONS.length)];
+			go = LEFT_RIGHT_DOWN_DECISIONS[rnum.nextInt(LEFT_RIGHT_DOWN_DECISIONS.length)];
 		} else if (two != '=' && two != '-' && two != '|'){
 			go = Barrel.DOWN;
 		} else if (five == 'H'){

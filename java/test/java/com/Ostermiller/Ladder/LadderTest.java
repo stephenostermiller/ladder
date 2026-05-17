@@ -51,14 +51,14 @@ public class LadderTest {
 
 	static class CyclingBarrelRandom extends Random {
 		private int leftRightCount = 0;
-		private int letRightDownCount = 0;
+		private int leftRightDownCount = 0;
 
 		@Override
 		public int nextInt(int bound) {
 			if (bound == Barrel.LEFT_RIGHT_DECISIONS.length) {
 				return leftRightCount++ % bound;
-			} else if (bound == Barrel.LET_RIGHT_DOWN_DECISIONS.length) {
-				return letRightDownCount++ % bound;
+			} else if (bound == Barrel.LEFT_RIGHT_DOWN_DECISIONS.length) {
+				return leftRightDownCount++ % bound;
 			}
 			throw new UnsupportedOperationException("Unexpected random bound: " + bound);
 		}
