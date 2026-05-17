@@ -33,18 +33,15 @@ public class LadderTest {
 	@Test
 	public void standingStillShowsGSymbol() {
 		GameSimulation sim = new GameSimulation(
-			"p   \n" +
-			"====\n"
+			"p   \n"
 		);
 		// Initial score is zero
 		assertEquals(0L, sim.getScore());
 		sim.assertScreen(
-			"p   \n" +
-			"====\n"
+			"p   \n"
 		);
 		sim.step().assertScreen(
-			"g   \n" +
-			"====\n"
+			"g   \n"
 		);
 	}
 
@@ -55,48 +52,38 @@ public class LadderTest {
 	@Test
 	public void moveRightAndContinueUntilWall() {
 		GameSimulation sim = new GameSimulation(
-			"p   \n" +
-			"====\n"
+			"p   \n"
 		);
 		sim.step(Lad.RIGHT).assertScreen(
-			" p  \n" +
-			"====\n"
+			" p  \n"
 		);
 		sim.step().assertScreen(
-			"  p \n" +
-			"====\n"
+			"  p \n"
 		);
 		sim.step().assertScreen(
-			"   p\n" +
-			"====\n"
+			"   p\n"
 		);
 		sim.step().assertScreen(
-			"   g\n" +
-			"====\n"
+			"   g\n"
 		);
 	}
 
 	@Test
 	public void moveLeftAndContinueUntilWall() {
 		GameSimulation sim = new GameSimulation(
-			"   p\n" +
-			"====\n"
+			"   p\n"
 		);
 		sim.step(Lad.LEFT).assertScreen(
-			"  q \n" +
-			"====\n"
+			"  q \n"
 		);
 		sim.step(Lad.LEFT).assertScreen(
-			" q  \n" +
-			"====\n"
+			" q  \n"
 		);
 		sim.step(Lad.LEFT).assertScreen(
-			"q   \n" +
-			"====\n"
+			"q   \n"
 		);
 		sim.step(Lad.LEFT).assertScreen(
-			"g   \n" +
-			"====\n"
+			"g   \n"
 		);
 	}
 
@@ -105,44 +92,37 @@ public class LadderTest {
 		GameSimulation sim = new GameSimulation(
 			" \n" +
 			" \n" +
-			"p\n" +
-			"=\n"
+			"p\n"
 		);
 		sim.step().assertScreen(
 			" \n" +
 			" \n" +
-			"g\n" +
-			"=\n"
+			"g\n"
 		);
 		sim.jump().assertScreen(
 			" \n" +
 			"g\n" +
-			" \n" +
-			"=\n"
+			" \n"
 		);
 		sim.step().assertScreen(
 			"g\n" +
 			" \n" +
-			" \n" +
-			"=\n"
+			" \n"
 		);
 		sim.step().assertScreen(
 			"g\n" +
 			" \n" +
-			" \n" +
-			"=\n"
+			" \n"
 		);
 		sim.step().assertScreen(
 			" \n" +
 			"g\n" +
-			" \n" +
-			"=\n"
+			" \n"
 		);
 		sim.step().assertScreen(
 			" \n" +
 			" \n" +
-			"g\n" +
-			"=\n"
+			"g\n"
 		);
 	}
 
@@ -151,62 +131,52 @@ public class LadderTest {
 		GameSimulation sim = new GameSimulation(
 			"        \n" +
 			"        \n" +
-			"p       \n" +
-			"========\n"
+			"p       \n"
 		);
 		sim.step().assertScreen(
 			"        \n" +
 			"        \n" +
-			"g       \n" +
-			"========\n"
+			"g       \n"
 		);
 		sim.step(Lad.RIGHT).assertScreen(
 			"        \n" +
 			"        \n" +
-			" p      \n" +
-			"========\n"
+			" p      \n"
 		);
 		sim.jump().assertScreen(
 			"        \n" +
 			"  p     \n" +
-			"        \n" +
-			"========\n"
+			"        \n"
 		);
 		sim.step().assertScreen(
 			"   p    \n" +
 			"        \n" +
-			"        \n" +
-			"========\n"
+			"        \n"
 		);
 		sim.step().assertScreen(
 			"    p   \n" +
 			"        \n" +
-			"        \n" +
-			"========\n"
+			"        \n"
 		);
 		sim.step().assertScreen(
 			"     p  \n" +
 			"        \n" +
-			"        \n" +
-			"========\n"
+			"        \n"
 		);
 		sim.step().assertScreen(
 			"        \n" +
 			"      p \n" +
-			"        \n" +
-			"========\n"
+			"        \n"
 		);
 		sim.step().assertScreen(
 			"        \n" +
 			"        \n" +
-			"       p\n" +
-			"========\n"
+			"       p\n"
 		);
 		sim.step().assertScreen(
 			"        \n" +
 			"        \n" +
-			"       g\n" +
-			"========\n"
+			"       g\n"
 		);
 	}
 
@@ -215,50 +185,42 @@ public class LadderTest {
 		GameSimulation sim = new GameSimulation(
 			"        \n" +
 			"        \n" +
-			"p       \n" +
-			"========\n"
+			"p       \n"
 		);
 		sim.jump(Lad.RIGHT).assertScreen(
 			"        \n" +
 			" p      \n" +
-			"        \n" +
-			"========\n"
+			"        \n"
 		);
 		sim.step().assertScreen(
 			"  p     \n" +
 			"        \n" +
-			"        \n" +
-			"========\n"
+			"        \n"
 		);
 		sim.step().assertScreen(
 			"   p    \n" +
 			"        \n" +
-			"        \n" +
-			"========\n"
+			"        \n"
 		);
 		sim.step().assertScreen(
 			"    p   \n" +
 			"        \n" +
-			"        \n" +
-			"========\n"
+			"        \n"
 		);
 		sim.step().assertScreen(
 			"        \n" +
 			"     p  \n" +
-			"        \n" +
-			"========\n"
+			"        \n"
 		);
 		sim.step().assertScreen(
 			"        \n" +
 			"        \n" +
-			"      p \n" +
-			"========\n"
+			"      p \n"
 		);
 		sim.step().assertScreen(
 			"        \n" +
 			"        \n" +
-			"       p\n" +
-			"========\n"
+			"       p\n"
 		);
 	}
 
@@ -267,62 +229,52 @@ public class LadderTest {
 		GameSimulation sim = new GameSimulation(
 			"        \n" +
 			"        \n" +
-			"       p\n" +
-			"========\n"
+			"       p\n"
 		);
 		sim.step().assertScreen(
 			"        \n" +
 			"        \n" +
-			"       g\n" +
-			"========\n"
+			"       g\n"
 		);
 		sim.step(Lad.LEFT).assertScreen(
 			"        \n" +
 			"        \n" +
-			"      q \n" +
-			"========\n"
+			"      q \n"
 		);
 		sim.jump().assertScreen(
 			"        \n" +
 			"     q  \n" +
-			"        \n" +
-			"========\n"
+			"        \n"
 		);
 		sim.step().assertScreen(
 			"    q   \n" +
 			"        \n" +
-			"        \n" +
-			"========\n"
+			"        \n"
 		);
 		sim.step().assertScreen(
 			"   q    \n" +
 			"        \n" +
-			"        \n" +
-			"========\n"
+			"        \n"
 		);
 		sim.step().assertScreen(
 			"  q     \n" +
 			"        \n" +
-			"        \n" +
-			"========\n"
+			"        \n"
 		);
 		sim.step().assertScreen(
 			"        \n" +
 			" q      \n" +
-			"        \n" +
-			"========\n"
+			"        \n"
 		);
 		sim.step().assertScreen(
 			"        \n" +
 			"        \n" +
-			"q       \n" +
-			"========\n"
+			"q       \n"
 		);
 		sim.step().assertScreen(
 			"        \n" +
 			"        \n" +
-			"g       \n" +
-			"========\n"
+			"g       \n"
 		);
 	}
 
@@ -331,38 +283,144 @@ public class LadderTest {
 		GameSimulation sim = new GameSimulation(
 			"    H \n" +
 			"    H \n" +
-			"p   H \n" +
-			"======\n"
+			"p   H \n"
 		);
 		sim.jump(Lad.RIGHT).assertScreen(
 			"    H \n" +
 			" p  H \n" +
-			"    H \n" +
-			"======\n"
+			"    H \n"
 		);
 		sim.jump().assertScreen(
 			"  p H \n" +
 			"    H \n" +
-			"    H \n" +
-			"======\n"
+			"    H \n"
 		);
 		sim.jump().assertScreen(
 			"   pH \n" +
 			"    H \n" +
-			"    H \n" +
-			"======\n"
+			"    H \n"
 		);
 		sim.step().assertScreen(
 			"    p \n" +
 			"    H \n" +
-			"    H \n" +
-			"======\n"
+			"    H \n"
 		);
 		sim.step().assertScreen(
 			"    g \n" +
 			"    H \n" +
+			"    H \n"
+		);
+	}
+
+	@Test
+	public void moveRightAndClimbLadder() {
+		GameSimulation sim = new GameSimulation(
 			"    H \n" +
-			"======\n"
+			"    H \n" +
+			"p   H \n"
+		);
+		sim.step(Lad.RIGHT).assertScreen(
+			"    H \n" +
+			"    H \n" +
+			" p  H \n"
+		);
+		sim.step(Lad.UP).assertScreen(
+			"    H \n" +
+			"    H \n" +
+			"  p H \n"
+		);
+		sim.step().assertScreen(
+			"    H \n" +
+			"    H \n" +
+			"   pH \n"
+		);
+		sim.step().assertScreen(
+			"    H \n" +
+			"    H \n" +
+			"    p \n"
+		);
+		sim.step().assertScreen(
+			"    H \n" +
+			"    p \n" +
+			"    H \n"
+		);
+		sim.step().assertScreen(
+			"    p \n" +
+			"    H \n" +
+			"    H \n"
+		);
+		sim.step().assertScreen(
+			"    g \n" +
+			"    H \n" +
+			"    H \n"
+		);
+	}
+
+	@Test
+	public void jumpClimbsLadder() {
+		GameSimulation sim = new GameSimulation(
+			" H \n" +
+			" H \n" +
+			"pH \n"
+		);
+		sim.step(Lad.RIGHT).assertScreen(
+			" H \n" +
+			" H \n" +
+			" p \n"
+		);
+		sim.step(Lad.STOP).assertScreen(
+			" H \n" +
+			" H \n" +
+			" g \n"
+		);
+		sim.jump().assertScreen(
+			" H \n" +
+			" g \n" +
+			" H \n"
+		);
+		sim.step().assertScreen(
+			" p \n" +
+			" H \n" +
+			" H \n"
+		);
+		sim.step().assertScreen(
+			" g \n" +
+			" H \n" +
+			" H \n"
+		);
+	}
+
+	@Test
+	public void upClimbsLadder() {
+		GameSimulation sim = new GameSimulation(
+			" H \n" +
+			" H \n" +
+			"pH \n"
+		);
+		sim.step(Lad.RIGHT).assertScreen(
+			" H \n" +
+			" H \n" +
+			" p \n"
+		);
+		sim.step(Lad.STOP).assertScreen(
+			" H \n" +
+			" H \n" +
+			" g \n"
+		);
+		sim.step(Lad.UP).assertScreen(
+			" H \n" +
+			" p \n" +
+			" H \n"
+		);
+		sim.step().assertScreen(
+			" p \n" +
+			" H \n" +
+			" H \n"
+		);
+		sim.step().assertScreen(
+			" g \n" +
+			" H \n" +
+			" H \n"
 		);
 	}
 
@@ -370,23 +428,19 @@ public class LadderTest {
 	public void ladMovesThroughLadder() {
 		// Verify that the game recognizes ladder tiles
 		GameSimulation sim = new GameSimulation(
-			"pH \n" +
-			"===\n"
+			"pH \n"
 		);
 		sim.step(Lad.RIGHT).assertScreen(
-			" p \n" +
-			"===\n"
+			" p \n"
 		);
 		sim.step(Lad.RIGHT).assertScreen(
-			" Hp\n" +
-			"===\n"
+			" Hp\n"
 		);
 	}
 	@Test
 	public void reachingGoalEndsLevel() {
 		GameSimulation sim = new GameSimulation(
-			"p$\n" +
-			"==\n"
+			"p$\n"
 		);
 		// Walk right until the lad reaches '$'
 		sim.step(Lad.RIGHT);
@@ -396,8 +450,7 @@ public class LadderTest {
 	@Test
 	public void hittingSpikeEndsGame() {
 		GameSimulation sim = new GameSimulation(
-			"p^\n" +
-			"==\n"
+			"p^\n"
 		);
 		sim.step(Lad.RIGHT);
 		sim.assertGameOver(GameEngine.G_O_SPIKE);
@@ -406,8 +459,7 @@ public class LadderTest {
 	@Test
 	public void collectStatueIncreasesScore() {
 		GameSimulation sim = new GameSimulation(
-			"p&\n" +
-			"==\n"
+			"p&\n"
 		);
 		assertEquals(0L, sim.getScore());
 		sim.step(Lad.RIGHT);
@@ -421,8 +473,7 @@ public class LadderTest {
 	@Test
 	public void cyclesDecrementEachFrame() {
 		GameSimulation sim = new GameSimulation(
-			"p   \n" +
-			"====\n"
+			"p   \n"
 		);
 		int before = sim.getCycles();
 		sim.step();
@@ -433,8 +484,7 @@ public class LadderTest {
 	public void timeRunningOutEndsGame() {
 		// Levels start with 2000 cycles; run enough frames to exhaust them
 		GameSimulation sim = new GameSimulation(
-			"p   \n" +
-			"====\n"
+			"p   \n"
 		);
 		sim.step(Lad.NONE, 2001);
 		sim.assertGameOver(GameEngine.G_O_TIME);
@@ -444,33 +494,27 @@ public class LadderTest {
 	public void disappearingFloorTest() {
 		GameSimulation sim = new GameSimulation(
 			"p  \n" +
-			"---\n" +
-			"===\n"
+			"---\n"
 		);
 		sim.step(Lad.RIGHT).assertScreen(
 			" p \n" +
-			" --\n" +
-			"===\n"
+			" --\n"
 		);
 		sim.step().assertScreen(
 			"  p\n" +
-			"  -\n" +
-			"===\n"
+			"  -\n"
 		);
 		sim.step().assertScreen(
 			"  g\n" +
-			"  -\n" +
-			"===\n"
+			"  -\n"
 		);
 		sim.step(Lad.LEFT).assertScreen(
 			" q \n" +
-			"   \n" +
-			"===\n"
+			"   \n"
 		);
 		sim.step(Lad.LEFT).assertScreen(
 			"   \n" +
-			" b \n" +
-			"===\n"
+			" b \n"
 		);
 	}
 }
