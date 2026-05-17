@@ -77,6 +77,9 @@ public class GameEngine {
 
 	private Callback callback;
 
+	private Random barrelProducerRandom;
+	private Random barrelRandom;
+
 	public GameEngine(String levelString) {
 		this(new Level(levelString), NO_OP);
 	}
@@ -85,8 +88,18 @@ public class GameEngine {
 		this(level, NO_OP);
 	}
 
+	public GameEngine(String levelString, Random barrelProducerRandom, Random barrelRandom) {
+		this(new Level(levelString), NO_OP, barrelProducerRandom, barrelRandom);
+	}
+
 	public GameEngine(Level level, Callback callback) {
+		this(level, callback, null, null);
+	}
+
+	public GameEngine(Level level, Callback callback, Random barrelProducerRandom, Random barrelRandom) {
 		this.callback = callback;
+		this.barrelProducerRandom = barrelProducerRandom;
+		this.barrelRandom = barrelRandom;
 		barrelProducers = new Vector<BarrelProducer>();
 		score = 0;
 		ladsLeft = 3;
@@ -116,6 +129,8 @@ public class GameEngine {
 		cycles = 2000;
 		screenLevel = new Level(realLevel);
 
+		BarrelProducer.clearBarrelPool();
+
 		lad.reset(ladStartPosX, ladStartPosY, Creature.STATIONARY);
 		screenLevel.setCharAt(ladStartPosY - 1, ladStartPosX - 1, 'p');
 		realLevel.setCharAt(ladStartPosY - 1, ladStartPosX - 1, ' ');
@@ -127,9 +142,11 @@ public class GameEngine {
 		}
 		for (i = 0; pos != null; i++) {
 			if (i < barrelProducers.size()) {
-				barrelProducers.elementAt(i).reset(pos.width + 1, pos.height + 1);
+				BarrelProducer bp = barrelProducers.elementAt(i);
+				bp.reset(pos.width + 1, pos.height + 1);
+				bp.setRandom(barrelProducerRandom, barrelRandom);
 			} else {
-				barrelProducers.addElement(new BarrelProducer(pos.width + 1, pos.height + 1));
+				barrelProducers.addElement(new BarrelProducer(pos.width + 1, pos.height + 1, barrelProducerRandom, barrelRandom));
 			}
 			pos.width++;
 			pos = realLevel.positionOf('V', pos);
@@ -181,6 +198,19 @@ public class GameEngine {
 	public int tick(int command, boolean jump) {
 		if (gameOver != G_O_NOT_OVER) {
 			return gameOver;
+		}
+
+		// Remove barrels that were marked for recycling in the previous frame
+		for (int k = 0; k < barrelProducers.size(); k++) {
+			BarrelProducer bp = barrelProducers.elementAt(k);
+			for (int j = bp.getBarrelCount() - 1; j >= 0; j--) {
+				Barrel barrel = bp.getBarrelAt(j);
+				if (barrel != null && barrel.isMarkedForRecycling()) {
+					screenLevel.setCharAt(barrel.getYPos() - 1, barrel.getXPos() - 1,
+						realLevel.charAt(barrel.getYPos() - 1, barrel.getXPos() - 1));
+					bp.recycleBarrel(barrel);
+				}
+			}
 		}
 
 		cycles--;
@@ -247,6 +277,12 @@ public class GameEngine {
 				if (barrel == null) {
 					continue;
 				}
+
+				// Skip processing barrels marked for recycling from previous frame
+				if (barrel.isMarkedForRecycling()) {
+					continue;
+				}
+
 				boolean isNewlyProduced = j >= barrelCountBefore;
 
 				// Check collision before barrel moves
@@ -305,11 +341,9 @@ public class GameEngine {
 					}
 				}
 
-				// Recycle barrel if it reached a recycling square
+				// Mark barrel for recycling if it reached a recycling square
 				if (realLevel.charAt(barrel.getYPos() - 1, barrel.getXPos() - 1) == '*') {
-					screenLevel.setCharAt(barrel.getYPos() - 1, barrel.getXPos() - 1,
-						realLevel.charAt(barrel.getYPos() - 1, barrel.getXPos() - 1));
-					bp.recycleBarrel(barrel);
+					barrel.markForRecycling();
 				}
 			}
 		}

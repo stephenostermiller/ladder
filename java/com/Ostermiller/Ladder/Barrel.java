@@ -27,24 +27,49 @@ import java.util.*;
 public class Barrel extends Creature{
 
 	/**
-	 * Random Number Generator for this Barrel.
+	 * Random Number Generator for this Barrel (static fallback for backwards compatibility).
 	 */
-	private static Random rnum = new Random();
+	private static Random staticRnum = new Random();
 
 	/**
-	 * Set the random number generator for testing purposes.
+	 * Instance random number generator for this barrel.
+	 */
+	private Random rnum;
+
+	/**
+	 * Set the random number generator for testing purposes (static/global).
+	 * Note: This is deprecated. Use the constructor parameters instead.
 	 *
 	 * @param random the Random instance to use
 	 */
 	public static void setRandom(Random random) {
-		rnum = random;
+		staticRnum = random;
+	}
+
+	/**
+	 * Update the random number generator for this barrel instance.
+	 * Used when recycling a barrel from the pool to a new producer.
+	 *
+	 * @param random the Random instance to use (null = use static)
+	 */
+	public void resetRandom(Random random) {
+		this.rnum = random != null ? random : staticRnum;
 	}
 
 	/**
 	 * Create a new barrel.
 	 */
 	public Barrel(){
-		this(0,0);
+		this(0, 0, Creature.STATIONARY, null);
+	}
+
+	/**
+	 * Create a new barrel with a custom Random source.
+	 *
+	 * @param random the Random instance for this barrel (null = use static)
+	 */
+	public Barrel(Random random){
+		this(0, 0, Creature.STATIONARY, random);
 	}
 
 	/**
@@ -54,7 +79,7 @@ public class Barrel extends Creature{
 	 * @param ypos the y coordinate of the barrel's position
 	 */
 	public Barrel(int xpos, int ypos){
-		this(xpos, ypos, Creature.STATIONARY);
+		this(xpos, ypos, Creature.STATIONARY, null);
 	}
 
 	/**
@@ -65,10 +90,57 @@ public class Barrel extends Creature{
 	 * @param direction the direction in which the barrel is initially moving
 	 */
 	public Barrel(int xpos, int ypos, int direction){
+		this(xpos, ypos, direction, null);
+	}
+
+	/**
+	 * Create a new barrel in the given position, going the proper direction, with custom Random.
+	 *
+	 * @param xpos the x coordinate of the barrel's position
+	 * @param ypos the y coordinate of the barrel's position
+	 * @param direction the direction in which the barrel is initially moving
+	 * @param random the Random instance for this barrel (null = use static)
+	 */
+	public Barrel(int xpos, int ypos, int direction, Random random){
 		this.xpos = xpos;
 		this.ypos = ypos;
 		this.direction = direction;
+		this.rnum = random != null ? random : staticRnum;
 		symbol = 'o';
+		markedForRecycling = false;
+	}
+
+	/**
+	 * Whether this barrel has landed on a recycling square and should be removed next frame.
+	 */
+	private boolean markedForRecycling = false;
+
+	/**
+	 * Mark this barrel for recycling (removal at the start of next frame).
+	 */
+	public void markForRecycling() {
+		markedForRecycling = true;
+	}
+
+	/**
+	 * Check if this barrel is marked for recycling.
+	 */
+	public boolean isMarkedForRecycling() {
+		return markedForRecycling;
+	}
+
+	/**
+	 * Reset the recycling flag when the barrel is reused.
+	 */
+	public void resetRecyclingFlag() {
+		markedForRecycling = false;
+	}
+
+	/**
+	 * Reset the barrel's direction and state when reused from the pool.
+	 */
+	public void resetState() {
+		this.direction = Creature.STATIONARY;
 	}
 
 	/**
@@ -90,6 +162,16 @@ public class Barrel extends Creature{
 	 * The command stop.
 	 */
 	private static final int STOP = 5;
+
+	/**
+	 * Action choices for 4-way random decision.
+	 */
+	static final int[] LET_RIGHT_DOWN_DECISIONS = {STOP, LEFT, RIGHT, DOWN};
+
+	/**
+	 * Action choices for 3-way random decision.
+	 */
+	static final int[] LEFT_RIGHT_DECISIONS = {STOP, LEFT, RIGHT};
 
 	/**
 	 * Cause this barrel to update itself.  This will tell the barrel i
@@ -117,27 +199,11 @@ public class Barrel extends Creature{
 		if (two == 'H' && five == 'H' && direction == Creature.DOWN){
 			go = Barrel.DOWN;
 		} else if (five == 'H' && two == 'H'){
-			double num = rnum.nextDouble();
-			if (num < .25){
-				go = Barrel.STOP;
-			} else if (num < .5){
-				go = Barrel.DOWN;
-			} else if (num < .75){
-				go = Barrel.RIGHT;
-			} else {
-				go = Barrel.LEFT;
-			}
+			go = LET_RIGHT_DOWN_DECISIONS[rnum.nextInt(LET_RIGHT_DOWN_DECISIONS.length)];
 		} else if (two != '=' && two != '-' && two != '|'){
 			go = Barrel.DOWN;
 		} else if (five == 'H'){
-			double num = rnum.nextDouble();
-			if (num < (double)1/3){
-				go = Barrel.STOP;
-			} else if (num < (double)2/3){
-				go = Barrel.RIGHT;
-			} else {
-				go = Barrel.LEFT;
-			}
+			go = LEFT_RIGHT_DECISIONS[rnum.nextInt(LEFT_RIGHT_DECISIONS.length)];
 		} else if (direction == Creature.LEFT){
 			go = Barrel.LEFT;
 			if (four == '=' || four == '-' || four == '|'){
@@ -149,14 +215,7 @@ public class Barrel extends Creature{
 				go = Barrel.LEFT;
 			}
 		} else {
-			double num = rnum.nextDouble();
-			if (num < (double)1/3){
-				go = Barrel.STOP;
-			} else if (num < (double)2/3){
-				go = Barrel.RIGHT;
-			} else {
-				go = Barrel.LEFT;
-			}
+			go = LEFT_RIGHT_DECISIONS[rnum.nextInt(LEFT_RIGHT_DECISIONS.length)];
 		}
 		if (go == Barrel.RIGHT){
 			if (six != '=' && six != '-' && six != '|'){

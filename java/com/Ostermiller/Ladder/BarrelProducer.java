@@ -36,17 +36,35 @@ public class BarrelProducer{
 	private static Vector<Barrel> allBarrels = new Vector<Barrel>();
 
 	/**
-	 * The random number producer for this class
+	 * Clear the global barrel pool. Useful for tests to avoid cross-test contamination.
 	 */
-	private static Random rnum = new Random();
+	public static void clearBarrelPool() {
+		allBarrels.clear();
+	}
 
 	/**
-	 * Set the random number generator for testing purposes.
+	 * The random number producer for this class (static fallback for backwards compatibility)
+	 */
+	private static Random staticRnum = new Random();
+
+	/**
+	 * The instance random number producer for this barrel producer
+	 */
+	private Random rnum;
+
+	/**
+	 * The random number producer for barrels created by this producer
+	 */
+	private Random barrelRandom;
+
+	/**
+	 * Set the random number generator for testing purposes (static/global).
+	 * Note: This is deprecated. Use the constructor parameters instead.
 	 *
 	 * @param random the Random instance to use
 	 */
 	public static void setRandom(Random random) {
-		rnum = random;
+		staticRnum = random;
 	}
 
 	/**
@@ -80,6 +98,20 @@ public class BarrelProducer{
 	 * @param ypos The y coordinate of this barrel producer
 	 */
 	public BarrelProducer(int xpos, int ypos){
+		this(xpos, ypos, null, null);
+	}
+
+	/**
+	 * Creates a new barrel producer at the given coordinate with custom Random sources
+	 *
+	 * @param xpos The x coordinate of this barrel producer
+	 * @param ypos The y coordinate of this barrel producer
+	 * @param barrelProducerRandom Random for producer decisions (null = use static)
+	 * @param barrelRandom Random for barrel movement decisions (null = use static/default)
+	 */
+	public BarrelProducer(int xpos, int ypos, Random barrelProducerRandom, Random barrelRandom){
+		this.rnum = barrelProducerRandom != null ? barrelProducerRandom : staticRnum;
+		this.barrelRandom = barrelRandom;
 		reset(xpos, ypos);
 	}
 
@@ -93,6 +125,17 @@ public class BarrelProducer{
 		clear();
 		this.xpos = xpos;
 		this.ypos = ypos;
+	}
+
+	/**
+	 * Update the random number generators for this producer.
+	 *
+	 * @param barrelProducerRandom Random for producer decisions (null = use static)
+	 * @param barrelRandom Random for barrel movement decisions (null = use static/default)
+	 */
+	public void setRandom(Random barrelProducerRandom, Random barrelRandom) {
+		this.rnum = barrelProducerRandom != null ? barrelProducerRandom : staticRnum;
+		this.barrelRandom = barrelRandom;
 	}
 
 	/**
@@ -130,7 +173,9 @@ public class BarrelProducer{
 	 */
 	public void clear(){
 		while (barrels.size() > 0){
-			allBarrels.addElement(barrels.elementAt(barrels.size()-1));
+			Barrel b = barrels.elementAt(barrels.size()-1);
+			b.resetRecyclingFlag();
+			allBarrels.addElement(b);
 			barrels.removeElementAt(barrels.size()-1);
 		}
 	}
@@ -156,11 +201,13 @@ public class BarrelProducer{
 		if (allBarrels.size() > 0){
 			b = (Barrel)allBarrels.elementAt(allBarrels.size()-1);
 			allBarrels.removeElementAt(allBarrels.size()-1);
+			b.resetRandom(barrelRandom);
 		} else {
-			b = new Barrel();
+			b = new Barrel(barrelRandom);
 		}
 		b.setXPos(xpos);
 		b.setYPos(ypos);
+		b.resetRecyclingFlag();
 		barrels.addElement(b);
 	}
 

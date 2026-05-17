@@ -165,7 +165,6 @@ public class Ladder extends JFrame {
 							Component[] levels = levelMenu.getMenuComponents();
 							if (level.isChanged()){
 								level.store(s);
-								System.out.println(s + " cleaned up and resaved.");
 							}
 							for (int i=0; i<levels.length; i++){
 								LevelMenuItem menuItem = (LevelMenuItem)levels[i];

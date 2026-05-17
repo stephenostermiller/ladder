@@ -19,6 +19,7 @@
 package com.Ostermiller.Ladder;
 
 import static org.junit.Assert.assertEquals;
+import java.util.Random;
 
 /**
  * Test helper that wraps GameEngine for frame-by-frame simulation.
@@ -72,6 +73,17 @@ public class GameSimulation {
 	 */
 	public GameSimulation(String levelString) {
 		engine = new GameEngine(levelString);
+	}
+
+	/**
+	 * Initialise a simulation with the given level string and custom Random sources.
+	 *
+	 * @param levelString ASCII art level (newline-delimited rows)
+	 * @param barrelProducerRandom Random instance for barrel producer decisions
+	 * @param barrelRandom Random instance for barrel movement decisions
+	 */
+	public GameSimulation(String levelString, Random barrelProducerRandom, Random barrelRandom) {
+		engine = new GameEngine(levelString, barrelProducerRandom, barrelRandom);
 	}
 
 	/**

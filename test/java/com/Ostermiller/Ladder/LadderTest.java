@@ -49,6 +49,21 @@ public class LadderTest {
 		}
 	}
 
+	static class CyclingBarrelRandom extends Random {
+		private int leftRightCount = 0;
+		private int letRightDownCount = 0;
+
+		@Override
+		public int nextInt(int bound) {
+			if (bound == Barrel.LEFT_RIGHT_DECISIONS.length) {
+				return leftRightCount++ % bound;
+			} else if (bound == Barrel.LET_RIGHT_DOWN_DECISIONS.length) {
+				return letRightDownCount++ % bound;
+			}
+			throw new UnsupportedOperationException("Unexpected random bound: " + bound);
+		}
+	}
+
 	@Test
 	public void standingStillShowsGSymbol() {
 		GameSimulation sim = new GameSimulation(
@@ -63,10 +78,6 @@ public class LadderTest {
 			"g   \n"
 		);
 	}
-
-	// -----------------------------------------------------------------------
-	// Horizontal movement
-	// -----------------------------------------------------------------------
 
 	@Test
 	public void moveRightAndContinueUntilWall() {
@@ -491,8 +502,7 @@ public class LadderTest {
 			"p$\n"
 		);
 		// Walk right until the lad reaches '$'
-		sim.step(Lad.RIGHT);
-		sim.assertGameOver(GameEngine.G_O_MONEY);
+		sim.step(Lad.RIGHT).assertGameOver(GameEngine.G_O_MONEY);
 	}
 
 	@Test
@@ -500,22 +510,177 @@ public class LadderTest {
 		GameSimulation sim = new GameSimulation(
 			"p^\n"
 		);
-		sim.step(Lad.RIGHT);
-		sim.assertGameOver(GameEngine.G_O_SPIKE);
+		sim.step(Lad.RIGHT).assertGameOver(GameEngine.G_O_SPIKE);
 	}
 
 	@Test
 	public void hittingBarrelEndsGame() {
-		BarrelProducer.setRandom(new DeterministicBarrelProducerRandom(1));
 		GameSimulation sim = new GameSimulation(
 			"V\n" +
-			"p\n"
+			"p\n",
+			new DeterministicBarrelProducerRandom(1),
+			null
 		);
 		sim.step().assertScreen(
 			"o\n" +
 			"g\n"
 		);
 		sim.step().assertGameOver(GameEngine.G_O_BARREL);
+	}
+
+	@Test
+	public void asteriskCollectsBarrels() {
+		GameSimulation sim = new GameSimulation(
+			" V\n" +
+			"p*\n",
+			new DeterministicBarrelProducerRandom(100),
+			null
+		);
+		sim.step().assertScreen(
+			" o\n" +
+			"g*\n"
+		);
+		sim.step().assertScreen(
+			" V\n" +
+			"go\n"
+		);
+		sim.step().assertScreen(
+			" V\n" +
+			"g*\n"
+		);
+	}
+
+	@Test
+	public void ladDeathOnAsterisk() {
+		GameSimulation sim = new GameSimulation(
+			" V\n" +
+			"p*\n",
+			new DeterministicBarrelProducerRandom(100),
+			null
+		);
+		sim.step(Lad.RIGHT).assertScreen(
+			" o\n" +
+			" p\n"
+		);
+		sim.step(Lad.STOP).assertScreen(
+			" V\n" +
+			" o\n"
+		);
+		sim.assertGameOver(GameEngine.G_O_BARREL);
+	}
+
+	@Test
+	public void ladDeathOnProducer() {
+		GameSimulation sim = new GameSimulation(
+			"* Vp\n",
+			new DeterministicBarrelProducerRandom(5),
+			new CyclingBarrelRandom()
+		);
+		sim.step().assertScreen(
+			"* og\n"
+		);
+		sim.step().assertScreen(
+			"* og\n"
+		);
+		sim.step().assertScreen(
+			"*oVg\n"
+		);
+		sim.step(Lad.LEFT).assertScreen(
+			"o q \n"
+		);
+		sim.step(Lad.STOP).assertScreen(
+			"* g \n"
+		);
+		sim.step().assertScreen(
+			"* g \n"
+		);
+		sim.assertGameOver(GameEngine.G_O_BARREL);
+	}
+
+	@Test
+	public void barrelsFindLadder() {
+		GameSimulation sim = new GameSimulation(
+			"|VH*\n" +
+			"==H=\n" +
+			"p*H*\n",
+			new DeterministicBarrelProducerRandom(8),
+			new CyclingBarrelRandom()
+		);
+		sim.step().assertScreen(
+			"|oH*\n" +
+			"==H=\n" +
+			"g*H*\n"
+		);
+		sim.step().assertScreen(
+			"|oH*\n" +
+			"==H=\n" +
+			"g*H*\n"
+		);
+		sim.step().assertScreen(
+			"|oH*\n" +
+			"==H=\n" +
+			"g*H*\n"
+		);
+		sim.step().assertScreen(
+			"|Vo*\n" +
+			"==H=\n" +
+			"g*H*\n"
+		);
+		sim.step().assertScreen(
+			"|Vo*\n" +
+			"==H=\n" +
+			"g*H*\n"
+		);
+		sim.step().assertScreen(
+			"|oH*\n" +
+			"==H=\n" +
+			"g*H*\n"
+		);
+		sim.step().assertScreen(
+			"|Vo*\n" +
+			"==H=\n" +
+			"g*H*\n"
+		);
+		sim.step().assertScreen(
+			"|VHo\n" +
+			"==H=\n" +
+			"g*H*\n"
+		);
+		sim.step().assertScreen(
+			"|oH*\n" +
+			"==H=\n" +
+			"g*H*\n"
+		);
+		sim.step().assertScreen(
+			"|Vo*\n" +
+			"==H=\n" +
+			"g*H*\n"
+		);
+		sim.step().assertScreen(
+			"|VH*\n" +
+			"==o=\n" +
+			"g*H*\n"
+		);
+		sim.step().assertScreen(
+			"|VH*\n" +
+			"==H=\n" +
+			"g*o*\n"
+		);
+		sim.step().assertScreen(
+			"|VH*\n" +
+			"==H=\n" +
+			"g*o*\n"
+		);
+		sim.step().assertScreen(
+			"|VH*\n" +
+			"==H=\n" +
+			"goH*\n"
+		);
+		sim.step().assertScreen(
+			"|VH*\n" +
+			"==H=\n" +
+			"g*H*\n"
+		);
 	}
 
 	@Test
