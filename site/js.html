@@ -1,0 +1,266 @@
+<!--
+LADDER GAME - JavaScript Port
+A classic arcade game originally written for CPM operating system
+Converted from Java to JavaScript for HTML5 Canvas
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1335 USA
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Ladder Game</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			display: flex;
+			flex-direction: column;
+			width: 100vw;
+			height: 100vh;
+			background-color: #000;
+			color: #0f0;
+			font-family: Arial, sans-serif;
+		}
+
+		h1 {
+			padding: 10px;
+			text-align: center;
+			flex-shrink: 0;
+		}
+
+		#gameContainer {
+			background-color: #000;
+			flex: 1;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			overflow: hidden;
+		}
+
+		canvas {
+			display: block;
+			background-color: #000;
+			max-width: 100%;
+			max-height: 100%;
+			width: auto;
+			height: auto;
+		}
+
+		.controls {
+			text-align: center;
+			font-size: 14px;
+			flex-shrink: 0;
+		}
+
+		.controls h3 {
+			margin: 10px 0;
+		}
+
+		.controls p {
+			margin: 5px 0;
+		}
+
+		.stats {
+			font-size: 14px;
+			text-align: center;
+			flex-shrink: 0;
+		}
+
+		.stats div {
+			margin: 5px 0;
+		}
+
+		select {
+			margin-top: 10px;
+			padding: 5px;
+			font-size: 14px;
+			color: #0f0;
+			background-color: #000;
+			border: 1px solid #0f0;
+			cursor: pointer;
+		}
+
+		button {
+			color: #0f0;
+			background-color: #000;
+			border: 1px solid #0f0;
+			cursor: pointer;
+		}
+
+		button:disabled {
+			color: #555;
+			border-color: #555;
+			cursor: not-allowed;
+		}
+
+		select:disabled {
+			color: #555;
+			border-color: #555;
+			cursor: not-allowed;
+		}
+
+		.debug {
+			padding: 10px;
+			font-size: 12px;
+			text-align: left;
+			background-color: #001;
+			border: 1px solid #0f0;
+			border-radius: 5px;
+			font-family: 'Courier New', monospace;
+			max-width: 400px;
+			display: block;
+			margin: 0;
+			flex-shrink: 0;
+			overflow-y: auto;
+			max-height: 200px;
+		}
+
+		.debug h3 {
+			margin: 0 0 10px 0;
+			color: #f0f;
+		}
+
+		.debug-row {
+			display: grid;
+			grid-template-columns: 200px 1fr;
+			margin: 3px 0;
+			gap: 10px;
+		}
+
+		.debug-label {
+			color: #0ff;
+			font-weight: bold;
+		}
+
+		.debug-toggle {
+			padding: 5px 15px;
+			margin-top: 10px;
+			border-radius: 3px;
+			display: block;
+			margin-left: auto;
+			margin-right: auto;
+			flex-shrink: 0;
+		}
+
+		.game-settings {
+			display: flex;
+			flex-direction: row;
+			gap: 20px;
+			justify-content: space-evenly;
+			flex-wrap: wrap;
+			padding: 10px;
+			align-items: flex-start;
+		}
+
+		.vertical-stack {
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+			align-items: center;
+		}
+	</style>
+</head>
+<body>
+	<h1>Ladder Game</h1>
+	<div id="gameContainer">
+		<canvas id="gameCanvas"></canvas>
+	</div>
+
+	<div class="game-settings">
+		<div class="stats">
+			<div>Score: <span id="score">0</span></div>
+			<div>Lives: <span id="lives">3</span></div>
+			<div>Level: <span id="level">1</span></div>
+			<div>Bonus Time: <span id="bonusTime">0</span></div>
+		</div>
+
+		<div class="controls">
+			<h3>Controls</h3>
+			<p>Arrow Keys: Move</p>
+			<p>Spacebar: Jump</p>
+			<p>P / Esc: Pause</p>
+		</div>
+
+		<div class="vertical-stack">
+			<label for="difficultySelect">Difficulty:</label>
+			<select id="difficultySelect">
+				<option value="EASY">Easy</option>
+				<option value="MEDIUM" selected>Medium</option>
+				<option value="HARD">Hard</option>
+				<option value="VERY_HARD">Very Hard</option>
+				<option value="IMPOSSIBLE">Impossible</option>
+			</select>
+
+			<label for="levelSelect">Level:</label>
+			<select id="levelSelect"></select>
+
+			<button id="startButton" class="debug-toggle">Start Game</button>
+			<button class="debug-toggle" onclick="toggleDebug()">Toggle Debug</button>
+		</div>
+
+		<div class="debug" id="debugPanel">
+			<h3>Debug Info</h3>
+			<div class="debug-row">
+				<div class="debug-label">Lad Position:</div>
+				<div class="debug-value" id="debug-pos">0, 0</div>
+			</div>
+			<div class="debug-row">
+				<div class="debug-label">Lad Direction:</div>
+				<div class="debug-value" id="debug-direction">-</div>
+			</div>
+			<div class="debug-row">
+				<div class="debug-label">Command:</div>
+				<div class="debug-value" id="debug-command">-</div>
+			</div>
+			<div class="debug-row">
+				<div class="debug-label">Future Direction:</div>
+				<div class="debug-value" id="debug-future-direction">-</div>
+			</div>
+			<div class="debug-row">
+				<div class="debug-label">Jump Command:</div>
+				<div class="debug-value" id="debug-jump-command">-</div>
+			</div>
+			<div class="debug-row">
+				<div class="debug-label">Jump Counter:</div>
+				<div class="debug-value" id="debug-jump-counter">0</div>
+			</div>
+			<div class="debug-row">
+				<div class="debug-label">Keys Held:</div>
+				<div class="debug-value" id="debug-keys-held">none</div>
+			</div>
+			<div class="debug-row">
+				<div class="debug-label">In Jump:</div>
+				<div class="debug-value" id="debug-in-jump">false</div>
+			</div>
+			<div class="debug-row">
+				<div class="debug-label">Can Stay Put:</div>
+				<div class="debug-value" id="debug-can-stay">-</div>
+			</div>
+			<div class="debug-row">
+				<div class="debug-label">Game Speed:</div>
+				<div class="debug-value" id="debug-game-speed">-</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="ladder.js"></script>
+</body>
+</html>

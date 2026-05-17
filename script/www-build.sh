@@ -11,6 +11,8 @@ rm -rf build/www/
 mkdir -p build/www/
 cp -vr build/bte/* build/www/ | grep -v '\.bte'
 cp -vr site/* build/www/ | grep -v '\.bte'
+cp -v js/src/* build/www/
+cp -v levels/* build/www/
 find build/www/ -name '*.bte' -delete
 cp -v build/java/ladder.jar build/www/
 cp -v releases/*.jar build/www/

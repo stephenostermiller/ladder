@@ -21,7 +21,7 @@ run-java: build/java/ladder.jar
 test: build/java/test-classes
 	@./script/test-run.sh
 
-build/www: script/www-build.sh build/java/ladder.jar $(wildcard site/*) $(wildcard releases/*)
+build/www: script/www-build.sh build/java/ladder.jar $(wildcard site/*) $(wildcard releases/*) $(wildcard src/js/*) $(wildcard levels/*)
 	@./script/www-build.sh
 
 .PHONY: clean
