@@ -25,10 +25,11 @@
 	</dependencies>
 
 	<build>
-		<sourceDirectory>java</sourceDirectory>
+		<directory>../build</directory>
+		<sourceDirectory>src</sourceDirectory>
 		<testSourceDirectory>test/java</testSourceDirectory>
-		<outputDirectory>build/classes</outputDirectory>
-		<testOutputDirectory>build/test-classes</testOutputDirectory>
+		<outputDirectory>../build/java/src-classes</outputDirectory>
+		<testOutputDirectory>../build/java/test-classes</testOutputDirectory>
 
 		<plugins>
 			<plugin>
@@ -53,7 +54,7 @@
 							<goal>copy-dependencies</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>build/lib</outputDirectory>
+							<outputDirectory>build/java/test-lib</outputDirectory>
 							<includeScope>test</includeScope>
 						</configuration>
 					</execution>

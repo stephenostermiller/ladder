@@ -1,31 +1,29 @@
 .PHONY: all
-all: test www
+all: test build/www
 
-build/lib: pom.xml
-	@mkdir -p build/lib
-	@mvn dependency:copy-dependencies -DoutputDirectory=build/lib
-	@touch build/lib
+build/java/test-lib: script/java-test-lib-download.sh java/pom.xml
+	@./script/java-test-lib-download.sh
 
-build/classes: script/java-compile.sh build/lib $(wildcard java/com/Ostermiller/Ladder/*.java)
-	@./script/java-compile.sh
+build/java/src-classes: script/java-src-compile.sh build/java/test-lib $(wildcard java/src/com/Ostermiller/Ladder/*.java)
+	@./script/java-src-compile.sh
 
-build/test-classes: script/test-compile.sh build/classes build/lib $(wildcard test/java/com/Ostermiller/Ladder/*.java)
-	@./script/test-compile.sh
+build/java/test-classes: script/java-test-compile.sh build/java/src-classes build/java/test-lib $(wildcard java/test/java/com/Ostermiller/Ladder/*.java)
+	@./script/java-test-compile.sh
 
-ladder.jar: script/jar-build.sh build/classes java/Ladder.mf $(wildcard java/com/Ostermiller/Ladder/*.ini) $(wildcard levels/*)
-	@./script/jar-build.sh
+build/java/ladder.jar: script/java-jar-build.sh build/java/src-classes java/src/Ladder.mf $(wildcard java/src/com/Ostermiller/Ladder/*.ini) $(wildcard levels/*)
+	@./script/java-jar-build.sh
 
 .PHONY: run-java
-run-java: ladder.jar
-	@java -jar ladder.jar
+run-java: build/java/ladder.jar
+	@java -jar build/java/ladder.jar
 
 .PHONY: test
-test: build/test-classes
+test: build/java/test-classes
 	@./script/test-run.sh
 
-www: script/www-build.sh ladder.jar $(wildcard site/*) $(wildcard releases/*)
+build/www: script/www-build.sh build/java/ladder.jar $(wildcard site/*) $(wildcard releases/*)
 	@./script/www-build.sh
 
 .PHONY: clean
 clean:
-	@rm -rf build/ ladder.jar www/
+	@rm -rf build/
