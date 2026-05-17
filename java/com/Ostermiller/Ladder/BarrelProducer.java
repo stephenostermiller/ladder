@@ -41,6 +41,15 @@ public class BarrelProducer{
 	private static Random rnum = new Random();
 
 	/**
+	 * Set the random number generator for testing purposes.
+	 *
+	 * @param random the Random instance to use
+	 */
+	public static void setRandom(Random random) {
+		rnum = random;
+	}
+
+	/**
 	 * The list of barrels available for use.
 	 * This list is kept so that we don't have to continually create new
 	 * instances of barrels, which would slow the application down due to

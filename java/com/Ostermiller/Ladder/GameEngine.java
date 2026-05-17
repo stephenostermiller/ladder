@@ -240,12 +240,15 @@ public class GameEngine {
 		// Update all barrel producers and their barrels
 		for (int k = 0; k < barrelProducers.size(); k++) {
 			BarrelProducer bp = barrelProducers.elementAt(k);
+			int barrelCountBefore = bp.getBarrelCount();
 			bp.update();
 			for (int j = 0; j < bp.getBarrelCount(); j++) {
 				Barrel barrel = bp.getBarrelAt(j);
 				if (barrel == null) {
 					continue;
 				}
+				boolean isNewlyProduced = j >= barrelCountBefore;
+
 				// Check collision before barrel moves
 				if (barrel.getYPos() == lad.getYPos() && lad.getXPos() == barrel.getXPos()) {
 					gameOver = G_O_BARREL;
@@ -263,23 +266,25 @@ public class GameEngine {
 					}
 				}
 
-				// Clear barrel's old screen position
-				screenLevel.setCharAt(barrel.getYPos() - 1, barrel.getXPos() - 1,
-					realLevel.charAt(barrel.getYPos() - 1, barrel.getXPos() - 1));
+				// If a barrel is newly produced, it doesn't move this frame, so skip the update and just draw it at its starting position
+				if (!isNewlyProduced) {
+					// Clear barrel's old screen position
+					screenLevel.setCharAt(barrel.getYPos() - 1, barrel.getXPos() - 1,
+						realLevel.charAt(barrel.getYPos() - 1, barrel.getXPos() - 1));
+					// Move the barrel
+					barrel.update(
+						realLevel.charAt(barrel.getYPos() - 1 + 1, barrel.getXPos() - 1 - 1),
+						realLevel.charAt(barrel.getYPos() - 1 + 1, barrel.getXPos() - 1),
+						realLevel.charAt(barrel.getYPos() - 1 + 1, barrel.getXPos() - 1 + 1),
+						realLevel.charAt(barrel.getYPos() - 1,     barrel.getXPos() - 1 - 1),
+						realLevel.charAt(barrel.getYPos() - 1,     barrel.getXPos() - 1),
+						realLevel.charAt(barrel.getYPos() - 1,     barrel.getXPos() - 1 + 1),
+						realLevel.charAt(barrel.getYPos() - 1 - 1, barrel.getXPos() - 1 - 1),
+						realLevel.charAt(barrel.getYPos() - 1 - 1, barrel.getXPos() - 1),
+						realLevel.charAt(barrel.getYPos() - 1 - 1, barrel.getXPos() - 1 + 1));
+				}
 
-				// Move the barrel
-				barrel.update(
-					realLevel.charAt(barrel.getYPos() - 1 + 1, barrel.getXPos() - 1 - 1),
-					realLevel.charAt(barrel.getYPos() - 1 + 1, barrel.getXPos() - 1),
-					realLevel.charAt(barrel.getYPos() - 1 + 1, barrel.getXPos() - 1 + 1),
-					realLevel.charAt(barrel.getYPos() - 1,     barrel.getXPos() - 1 - 1),
-					realLevel.charAt(barrel.getYPos() - 1,     barrel.getXPos() - 1),
-					realLevel.charAt(barrel.getYPos() - 1,     barrel.getXPos() - 1 + 1),
-					realLevel.charAt(barrel.getYPos() - 1 - 1, barrel.getXPos() - 1 - 1),
-					realLevel.charAt(barrel.getYPos() - 1 - 1, barrel.getXPos() - 1),
-					realLevel.charAt(barrel.getYPos() - 1 - 1, barrel.getXPos() - 1 + 1));
-
-				// Draw barrel at new position
+				// Draw barrel at position
 				screenLevel.setCharAt(barrel.getYPos() - 1, barrel.getXPos() - 1, barrel.getSymbol());
 
 				// Check collision after barrel moves

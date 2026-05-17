@@ -19,6 +19,7 @@
 package com.Ostermiller.Ladder;
 
 import org.junit.Test;
+import java.util.Random;
 import static org.junit.Assert.*;
 
 /**
@@ -29,6 +30,24 @@ import static org.junit.Assert.*;
  * game-over condition.
  */
 public class LadderTest {
+
+	static class DeterministicBarrelProducerRandom extends Random {
+		private int callCount = 0;
+		private int barrelInterval;
+
+		DeterministicBarrelProducerRandom(int barrelInterval) {
+			this.barrelInterval = barrelInterval;
+		}
+
+		@Override
+		public double nextDouble() {
+			int frame = callCount++;
+			if (frame % barrelInterval == 0) {
+				return 0.0;
+			}
+			return 1.0;
+		}
+	}
 
 	@Test
 	public void standingStillShowsGSymbol() {
@@ -84,6 +103,35 @@ public class LadderTest {
 		);
 		sim.step(Lad.LEFT).assertScreen(
 			"g   \n"
+		);
+	}
+
+
+	@Test
+	public void basicFall() {
+		GameSimulation sim = new GameSimulation(
+			"p\n" +
+			" \n" +
+			" \n" +
+			"=\n"
+		);
+		sim.step().assertScreen(
+			" \n" +
+			"b\n" +
+			" \n"+
+			"=\n"
+		);
+		sim.step().assertScreen(
+			" \n" +
+			" \n" +
+			"b\n"+
+			"=\n"
+		);
+		sim.step().assertScreen(
+			" \n" +
+			" \n" +
+			"g\n"+
+			"=\n"
 		);
 	}
 
@@ -457,6 +505,20 @@ public class LadderTest {
 	}
 
 	@Test
+	public void hittingBarrelEndsGame() {
+		BarrelProducer.setRandom(new DeterministicBarrelProducerRandom(1));
+		GameSimulation sim = new GameSimulation(
+			"V\n" +
+			"p\n"
+		);
+		sim.step().assertScreen(
+			"o\n" +
+			"g\n"
+		);
+		sim.step().assertGameOver(GameEngine.G_O_BARREL);
+	}
+
+	@Test
 	public void collectStatueIncreasesScore() {
 		GameSimulation sim = new GameSimulation(
 			"p&\n"
@@ -465,10 +527,6 @@ public class LadderTest {
 		sim.step(Lad.RIGHT);
 		assertEquals(sim.getCycles(), sim.getScore());
 	}
-
-	// -----------------------------------------------------------------------
-	// Timer
-	// -----------------------------------------------------------------------
 
 	@Test
 	public void cyclesDecrementEachFrame() {

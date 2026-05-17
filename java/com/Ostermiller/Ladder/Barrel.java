@@ -32,6 +32,15 @@ public class Barrel extends Creature{
 	private static Random rnum = new Random();
 
 	/**
+	 * Set the random number generator for testing purposes.
+	 *
+	 * @param random the Random instance to use
+	 */
+	public static void setRandom(Random random) {
+		rnum = random;
+	}
+
+	/**
 	 * Create a new barrel.
 	 */
 	public Barrel(){
