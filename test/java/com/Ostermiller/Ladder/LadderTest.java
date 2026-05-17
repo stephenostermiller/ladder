@@ -147,6 +147,134 @@ public class LadderTest {
 	}
 
 	@Test
+	public void jumpRightAllFrames() {
+		GameSimulation sim = new GameSimulation(
+			"        \n" +
+			"        \n" +
+			"p       \n" +
+			"========\n"
+		);
+		sim.step().assertScreen(
+			"        \n" +
+			"        \n" +
+			"g       \n" +
+			"========\n"
+		);
+		sim.step(Lad.RIGHT).assertScreen(
+			"        \n" +
+			"        \n" +
+			" p      \n" +
+			"========\n"
+		);
+		sim.jump().assertScreen(
+			"        \n" +
+			"  p     \n" +
+			"        \n" +
+			"========\n"
+		);
+		sim.step().assertScreen(
+			"   p    \n" +
+			"        \n" +
+			"        \n" +
+			"========\n"
+		);
+		sim.step().assertScreen(
+			"    p   \n" +
+			"        \n" +
+			"        \n" +
+			"========\n"
+		);
+		sim.step().assertScreen(
+			"     p  \n" +
+			"        \n" +
+			"        \n" +
+			"========\n"
+		);
+		sim.step().assertScreen(
+			"        \n" +
+			"      p \n" +
+			"        \n" +
+			"========\n"
+		);
+		sim.step().assertScreen(
+			"        \n" +
+			"        \n" +
+			"       p\n" +
+			"========\n"
+		);
+		sim.step().assertScreen(
+			"        \n" +
+			"        \n" +
+			"       g\n" +
+			"========\n"
+		);
+	}
+
+	@Test
+	public void jumpLeftAllFrames() {
+		GameSimulation sim = new GameSimulation(
+			"        \n" +
+			"        \n" +
+			"       p\n" +
+			"========\n"
+		);
+		sim.step().assertScreen(
+			"        \n" +
+			"        \n" +
+			"       g\n" +
+			"========\n"
+		);
+		sim.step(Lad.LEFT).assertScreen(
+			"        \n" +
+			"        \n" +
+			"      q \n" +
+			"========\n"
+		);
+		sim.jump().assertScreen(
+			"        \n" +
+			"     q  \n" +
+			"        \n" +
+			"========\n"
+		);
+		sim.step().assertScreen(
+			"    q   \n" +
+			"        \n" +
+			"        \n" +
+			"========\n"
+		);
+		sim.step().assertScreen(
+			"   q    \n" +
+			"        \n" +
+			"        \n" +
+			"========\n"
+		);
+		sim.step().assertScreen(
+			"  q     \n" +
+			"        \n" +
+			"        \n" +
+			"========\n"
+		);
+		sim.step().assertScreen(
+			"        \n" +
+			" q      \n" +
+			"        \n" +
+			"========\n"
+		);
+		sim.step().assertScreen(
+			"        \n" +
+			"        \n" +
+			"q       \n" +
+			"========\n"
+		);
+		sim.step().assertScreen(
+			"        \n" +
+			"        \n" +
+			"g       \n" +
+			"========\n"
+		);
+	}
+
+	@Test
 	public void ladMovesThroughLadder() {
 		// Verify that the game recognizes ladder tiles
 		GameSimulation sim = new GameSimulation(
