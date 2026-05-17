@@ -1,36 +1,34 @@
 .PHONY: all
-all: test build/www
+all: build/java-test build/js-test build/www
 
 build/java/test-lib: script/java-test-lib-download.sh java/pom.xml
-	@./script/java-test-lib-download.sh
+	./script/java-test-lib-download.sh
 
 build/java/src-classes: script/java-src-compile.sh build/java/test-lib $(wildcard java/src/com/Ostermiller/Ladder/*.java)
-	@./script/java-src-compile.sh
+	./script/java-src-compile.sh
 
 build/java/test-classes: script/java-test-compile.sh build/java/src-classes build/java/test-lib $(wildcard java/test/java/com/Ostermiller/Ladder/*.java)
-	@./script/java-test-compile.sh
+	./script/java-test-compile.sh
 
 build/java/ladder.jar: script/java-jar-build.sh build/java/src-classes java/src/Ladder.mf $(wildcard java/src/com/Ostermiller/Ladder/*.ini) $(wildcard levels/*)
-	@./script/java-jar-build.sh
+	./script/java-jar-build.sh
 
 .PHONY: run-java
 run-java: build/java/ladder.jar
-	@java -jar build/java/ladder.jar
+	java -jar build/java/ladder.jar
 
-.PHONY: test
-test: build/java/test-classes
-	@./script/test-run.sh
+build/java-test: build/java/test-classes build/java/src-classes build/java/test-lib
+	./script/java-tests-run.sh
 
 build/js/node_modules: script/js-install.sh js/package.json js/package-lock.json
-	@./script/js-install.sh
+	./script/js-install.sh
 
-.PHONY: js-test
-js-test: build/js/node_modules
-	@cd js && npm test
+build/js-test: build/js/node_modules script/js-tests-run.sh $(wildcard js/src/*) $(wildcard js/test/*)
+	./script/js-tests-run.sh
 
 build/www: script/www-build.sh build/java/ladder.jar $(wildcard site/*) $(wildcard releases/*) $(wildcard src/js/*) $(wildcard levels/*)
-	@./script/www-build.sh
+	./script/www-build.sh
 
 .PHONY: clean
 clean:
-	@rm -rf build/
+	rm -rf build/

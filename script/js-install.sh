@@ -9,4 +9,6 @@ pushd build/js
 	npm install
 popd
 cp build/js/package-lock.json js/package-lock.json
+rm -rf js/node_modules
+ln -s ../build/js/node_modules js/node_modules
 touch build/js/node_modules

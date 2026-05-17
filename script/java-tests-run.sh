@@ -9,3 +9,6 @@ java \
 	-cp "build/java/src-classes/:build/java/test-classes/:build/java/test-lib/*:${JUNIT_JAR}:${HAMCREST_JAR}" \
 	org.junit.runner.JUnitCore \
 	com.Ostermiller.Ladder.LadderTest
+
+mkdir -p build
+touch build/java-test
