@@ -1,0 +1,12 @@
+name: standingStillShowsGSymbol
+level: |-
+  |p   |
+initialCheck:
+  score: 0
+steps:
+  - action: ""
+    assertScreen: |-
+      |p   |
+  - action: step
+    assertScreen: |-
+      |g   |

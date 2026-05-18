@@ -152,8 +152,12 @@ public class GameSimulation {
 	 * @return this, for chaining
 	 */
 	public GameSimulation assertScreen(String expected) {
-		assertEquals(expected, getScreen());
+		assertEquals(stripTrailingNewlines(expected), stripTrailingNewlines(getScreen()));
 		return this;
+	}
+
+	private static String stripTrailingNewlines(String s) {
+		return s.replaceAll("\\n+$", "");
 	}
 
 	/**

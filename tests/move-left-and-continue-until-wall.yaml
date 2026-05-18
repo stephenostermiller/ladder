@@ -1,0 +1,20 @@
+name: moveLeftAndContinueUntilWall
+level: |-
+  |   p|
+steps:
+  - action: step
+    command: LEFT
+    assertScreen: |-
+      |  q |
+  - action: step
+    command: LEFT
+    assertScreen: |-
+      | q  |
+  - action: step
+    command: LEFT
+    assertScreen: |-
+      |q   |
+  - action: step
+    command: LEFT
+    assertScreen: |-
+      |g   |

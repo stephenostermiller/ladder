@@ -1,0 +1,9 @@
+name: collectStatueIncreasesScore
+level: |-
+  |p&|
+initialCheck:
+  score: 0
+steps:
+  - action: step
+    command: RIGHT
+    checkScore: true

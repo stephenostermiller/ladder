@@ -1,0 +1,42 @@
+name: jumpRightSimultaneous
+level: |-
+  |        |
+  |        |
+  |p       |
+steps:
+  - action: jump
+    command: RIGHT
+    assertScreen: |-
+      |        |
+      | p      |
+      |        |
+  - action: step
+    assertScreen: |-
+      |  p     |
+      |        |
+      |        |
+  - action: step
+    assertScreen: |-
+      |   p    |
+      |        |
+      |        |
+  - action: step
+    assertScreen: |-
+      |    p   |
+      |        |
+      |        |
+  - action: step
+    assertScreen: |-
+      |        |
+      |     p  |
+      |        |
+  - action: step
+    assertScreen: |-
+      |        |
+      |        |
+      |      p |
+  - action: step
+    assertScreen: |-
+      |        |
+      |        |
+      |       p|

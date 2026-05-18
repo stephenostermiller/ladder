@@ -85,7 +85,4 @@ class Level {
 	}
 }
 
-// Export for Node.js
-if (typeof module !== 'undefined' && module.exports) {
-	module.exports = Level;
-}
+export default Level;

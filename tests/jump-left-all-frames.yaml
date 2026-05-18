@@ -1,0 +1,52 @@
+name: jumpLeftAllFrames
+level: |-
+  |        |
+  |        |
+  |       p|
+steps:
+  - action: step
+    assertScreen: |-
+      |        |
+      |        |
+      |       g|
+  - action: step
+    command: LEFT
+    assertScreen: |-
+      |        |
+      |        |
+      |      q |
+  - action: jump
+    assertScreen: |-
+      |        |
+      |     q  |
+      |        |
+  - action: step
+    assertScreen: |-
+      |    q   |
+      |        |
+      |        |
+  - action: step
+    assertScreen: |-
+      |   q    |
+      |        |
+      |        |
+  - action: step
+    assertScreen: |-
+      |  q     |
+      |        |
+      |        |
+  - action: step
+    assertScreen: |-
+      |        |
+      | q      |
+      |        |
+  - action: step
+    assertScreen: |-
+      |        |
+      |        |
+      |q       |
+  - action: step
+    assertScreen: |-
+      |        |
+      |        |
+      |g       |

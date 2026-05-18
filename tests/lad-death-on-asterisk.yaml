@@ -1,0 +1,19 @@
+name: ladDeathOnAsterisk
+level: |-
+  | V|
+  |p*|
+producer:
+  type: DeterministicBarrelProducerRandom
+  barrelInterval: 100
+steps:
+  - action: step
+    command: RIGHT
+    assertScreen: |-
+      | o|
+      | p|
+  - action: step
+    command: STOP
+    assertScreen: |-
+      | V|
+      | o|
+  - assertGameOver: G_O_BARREL

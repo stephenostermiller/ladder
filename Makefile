@@ -1,6 +1,9 @@
 .PHONY: all
 all: build/www
 
+.PHONY: test
+test: build/java-test build/js-test
+
 build/java/test-lib: script/java-test-lib-download.sh java/pom.xml
 	./script/java-test-lib-download.sh
 

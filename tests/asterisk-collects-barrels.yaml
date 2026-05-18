@@ -1,0 +1,20 @@
+name: asteriskCollectsBarrels
+level: |-
+  | V|
+  |p*|
+producer:
+  type: DeterministicBarrelProducerRandom
+  barrelInterval: 100
+steps:
+  - action: step
+    assertScreen: |-
+      | o|
+      |g*|
+  - action: step
+    assertScreen: |-
+      | V|
+      |go|
+  - action: step
+    assertScreen: |-
+      | V|
+      |g*|

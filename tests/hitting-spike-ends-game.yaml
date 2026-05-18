@@ -1,0 +1,7 @@
+name: hittingSpikeEndsGame
+level: |-
+  |p^|
+steps:
+  - action: step
+    command: RIGHT
+    assertGameOver: G_O_SPIKE

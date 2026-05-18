@@ -1,0 +1,12 @@
+name: ladMovesThroughLadder
+level: |-
+  |pH |
+steps:
+  - action: step
+    command: RIGHT
+    assertScreen: |-
+      | p |
+  - action: step
+    command: RIGHT
+    assertScreen: |-
+      | Hp|

@@ -4,12 +4,9 @@
 
 "use strict";
 
-let GameEngine, Lad, BarrelProducer;
-if (typeof module !== 'undefined' && module.exports) {
-	GameEngine = require('../src/GameEngine');
-	Lad = require('../src/Lad');
-	BarrelProducer = require('../src/BarrelProducer');
-}
+import GameEngine from '../src/GameEngine.js';
+import Lad from '../src/Lad.js';
+import BarrelProducer from '../src/BarrelProducer.js';
 
 class GameSimulation {
 	constructor(levelString, barrelProducerRandom = null, barrelRandom = null) {
@@ -51,9 +48,11 @@ class GameSimulation {
 
 	assertScreen(expected) {
 		const actual = this.getScreen();
-		if (actual !== expected) {
+		const expectedStripped = expected.replace(/\n+$/, '');
+		const actualStripped = actual.replace(/\n+$/, '');
+		if (actualStripped !== expectedStripped) {
 			throw new Error(
-				`Screen mismatch!\nExpected:\n${expected}\nActual:\n${actual}`
+				`Screen mismatch!\nExpected:\n${expectedStripped}\nActual:\n${actualStripped}`
 			);
 		}
 		return this;

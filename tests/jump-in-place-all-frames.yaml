@@ -1,0 +1,36 @@
+name: jumpInPlaceAllFrames
+level: |-
+  | |
+  | |
+  |p|
+steps:
+  - action: step
+    assertScreen: |-
+      | |
+      | |
+      |g|
+  - action: jump
+    assertScreen: |-
+      | |
+      |g|
+      | |
+  - action: step
+    assertScreen: |-
+      |g|
+      | |
+      | |
+  - action: step
+    assertScreen: |-
+      |g|
+      | |
+      | |
+  - action: step
+    assertScreen: |-
+      | |
+      |g|
+      | |
+  - action: step
+    assertScreen: |-
+      | |
+      | |
+      |g|

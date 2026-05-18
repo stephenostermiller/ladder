@@ -1,0 +1,43 @@
+name: moveRightAndClimbLadder
+level: |-
+  |    H |
+  |    H |
+  |p   H |
+steps:
+  - action: step
+    command: RIGHT
+    assertScreen: |-
+      |    H |
+      |    H |
+      | p  H |
+  - action: step
+    command: UP
+    assertScreen: |-
+      |    H |
+      |    H |
+      |  p H |
+  - action: step
+    assertScreen: |-
+      |    H |
+      |    H |
+      |   pH |
+  - action: step
+    assertScreen: |-
+      |    H |
+      |    H |
+      |    p |
+  - action: step
+    assertScreen: |-
+      |    H |
+      |    p |
+      |    H |
+  - action: step
+    assertScreen: |-
+      |    p |
+      |    H |
+      |    H |
+  - action: step
+    assertScreen: |-
+      |    g |
+      |    H |
+      |    H |

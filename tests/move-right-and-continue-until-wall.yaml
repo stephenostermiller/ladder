@@ -1,0 +1,17 @@
+name: moveRightAndContinueUntilWall
+level: |-
+  |p   |
+steps:
+  - action: step
+    command: RIGHT
+    assertScreen: |-
+      | p  |
+  - action: step
+    assertScreen: |-
+      |  p |
+  - action: step
+    assertScreen: |-
+      |   p|
+  - action: step
+    assertScreen: |-
+      |   g|

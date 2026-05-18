@@ -1,0 +1,138 @@
+name: barrelsFindLadder
+level: |-
+  | *HV|
+  |==H=|
+  |p*H*|
+producer:
+  type: DeterministicBarrelProducerRandom
+  barrelInterval: 20
+direction:
+  type: CyclingBarrelRandom
+initialCheck:
+  direction:
+    leftRightCount: 0
+    leftRightDownCount: 0
+steps:
+  - action: step
+    assertScreen: |-
+      | *Ho|
+      |==H=|
+      |g*H*|
+    checkDirection:
+      leftRightCount: 0
+  - action: step
+    assertScreen: |-
+      | *Ho|
+      |==H=|
+      |g*H*|
+    checkDirection:
+      leftRightCount: 1
+  - action: step
+    assertScreen: |-
+      | *oV|
+      |==H=|
+      |g*H*|
+    checkDirection:
+      leftRightCount: 2
+  - action: step
+    assertScreen: |-
+      | *oV|
+      |==H=|
+      |g*H*|
+    checkDirection:
+      leftRightDownCount: 1
+  - action: step
+    assertScreen: |-
+      | oHV|
+      |==H=|
+      |g*H*|
+    checkDirection:
+      leftRightDownCount: 2
+  - action: step
+    assertScreen: |-
+      | *HV|
+      |==H=|
+      |g*H*|
+  - action: step
+    command: NONE
+    frames: 15
+    assertScreen: |-
+      | *Ho|
+      |==H=|
+      |g*H*|
+  - action: step
+    assertScreen: |-
+      | *Ho|
+      |==H=|
+      |g*H*|
+    checkDirection:
+      leftRightCount: 3
+  - action: step
+    assertScreen: |-
+      | *Ho|
+      |==H=|
+      |g*H*|
+    checkDirection:
+      leftRightCount: 4
+  - action: step
+    assertScreen: |-
+      | *oV|
+      |==H=|
+      |g*H*|
+    checkDirection:
+      leftRightCount: 5
+  - action: step
+    assertScreen: |-
+      | *Ho|
+      |==H=|
+      |g*H*|
+    checkDirection:
+      leftRightDownCount: 3
+  - action: step
+    assertScreen: |-
+      | *Ho|
+      |==H=|
+      |g*H*|
+    checkDirection:
+      leftRightCount: 6
+  - action: step
+    assertScreen: |-
+      | *Ho|
+      |==H=|
+      |g*H*|
+    checkDirection:
+      leftRightCount: 7
+  - action: step
+    assertScreen: |-
+      | *oV|
+      |==H=|
+      |g*H*|
+    checkDirection:
+      leftRightCount: 8
+  - action: step
+    assertScreen: |-
+      | *HV|
+      |==o=|
+      |g*H*|
+    checkDirection:
+      leftRightDownCount: 4
+  - action: step
+    assertScreen: |-
+      | *HV|
+      |==H=|
+      |g*o*|
+  - action: step
+    assertScreen: |-
+      | *HV|
+      |==H=|
+      |g*Ho|
+    checkDirection:
+      leftRightCount: 9
+  - action: step
+    assertScreen: |-
+      | *HV|
+      |==H=|
+      |g*H*|
+    checkDirection:
+      leftRightCount: 9
+      leftRightDownCount: 4

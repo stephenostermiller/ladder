@@ -5,11 +5,8 @@
 
 "use strict";
 
-let Barrel, Creature;
-if (typeof module !== 'undefined' && module.exports) {
-	Barrel = require('./Barrel');
-	Creature = require('./Creature');
-}
+import Barrel from './Barrel.js';
+import Creature from './Creature.js';
 
 class BarrelProducer {
 	static MAX_BARRELS = 30;
@@ -91,7 +88,4 @@ class BarrelProducer {
 	}
 }
 
-// Export for Node.js
-if (typeof module !== 'undefined' && module.exports) {
-	module.exports = BarrelProducer;
-}
+export default BarrelProducer;

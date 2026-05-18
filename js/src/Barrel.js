@@ -5,10 +5,7 @@
 
 "use strict";
 
-let Creature;
-if (typeof module !== 'undefined' && module.exports) {
-	Creature = require('./Creature');
-}
+import Creature from './Creature.js';
 
 class DefaultBarrelRandom {
 	nextInt(bound) {
@@ -115,7 +112,4 @@ class Barrel extends Creature {
 Barrel.LEFT_RIGHT_DECISIONS = [Barrel.STOP, Barrel.LEFT, Barrel.RIGHT];
 Barrel.LEFT_RIGHT_DOWN_DECISIONS = [Barrel.STOP, Barrel.LEFT, Barrel.RIGHT, Barrel.DOWN];
 
-// Export for Node.js
-if (typeof module !== 'undefined' && module.exports) {
-	module.exports = Barrel;
-}
+export default Barrel;

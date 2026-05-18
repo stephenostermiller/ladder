@@ -1,0 +1,34 @@
+name: upClimbsLadder
+level: |-
+  | H |
+  | H |
+  |pH |
+steps:
+  - action: step
+    command: RIGHT
+    assertScreen: |-
+      | H |
+      | H |
+      | p |
+  - action: step
+    command: STOP
+    assertScreen: |-
+      | H |
+      | H |
+      | g |
+  - action: step
+    command: UP
+    assertScreen: |-
+      | H |
+      | p |
+      | H |
+  - action: step
+    assertScreen: |-
+      | p |
+      | H |
+      | H |
+  - action: step
+    assertScreen: |-
+      | g |
+      | H |
+      | H |

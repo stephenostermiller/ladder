@@ -1,0 +1,6 @@
+name: cyclesDecrementEachFrame
+level: |-
+  |p   |
+steps:
+  - action: step
+    checkCycles: -1

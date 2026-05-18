@@ -1,0 +1,25 @@
+name: basicFall
+level: |-
+  |p|
+  | |
+  | |
+  |=|
+steps:
+  - action: step
+    assertScreen: |-
+      | |
+      |b|
+      | |
+      |=|
+  - action: step
+    assertScreen: |-
+      | |
+      | |
+      |b|
+      |=|
+  - action: step
+    assertScreen: |-
+      | |
+      | |
+      |g|
+      |=|

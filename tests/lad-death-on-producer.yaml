@@ -1,0 +1,30 @@
+name: ladDeathOnProducer
+level: |-
+  |* Vp|
+producer:
+  type: DeterministicBarrelProducerRandom
+  barrelInterval: 5
+direction:
+  type: CyclingBarrelRandom
+steps:
+  - action: step
+    assertScreen: |-
+      |* og|
+  - action: step
+    assertScreen: |-
+      |* og|
+  - action: step
+    assertScreen: |-
+      |*oVg|
+  - action: step
+    command: LEFT
+    assertScreen: |-
+      |o q |
+  - action: step
+    command: STOP
+    assertScreen: |-
+      |* g |
+  - action: step
+    assertScreen: |-
+      |* g |
+  - assertGameOver: G_O_BARREL

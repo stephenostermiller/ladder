@@ -5,10 +5,7 @@
 
 "use strict";
 
-let Creature;
-if (typeof module !== 'undefined' && module.exports) {
-	Creature = require('./Creature');
-}
+import Creature from './Creature.js';
 
 function randNextInt(max) {
 	return Math.floor(Math.random() * (Math.floor(max) + 1));
@@ -676,7 +673,4 @@ class Lad extends Creature {
 	}
 }
 
-// Export for Node.js
-if (typeof module !== 'undefined' && module.exports) {
-	module.exports = Lad;
-}
+export default Lad;

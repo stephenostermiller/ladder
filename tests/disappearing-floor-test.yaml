@@ -1,0 +1,28 @@
+name: disappearingFloorTest
+level: |-
+  |p  |
+  |---|
+steps:
+  - action: step
+    command: RIGHT
+    assertScreen: |-
+      | p |
+      | --|
+  - action: step
+    assertScreen: |-
+      |  p|
+      |  -|
+  - action: step
+    assertScreen: |-
+      |  g|
+      |  -|
+  - action: step
+    command: LEFT
+    assertScreen: |-
+      | q |
+      |   |
+  - action: step
+    command: LEFT
+    assertScreen: |-
+      |   |
+      | b |

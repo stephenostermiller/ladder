@@ -1,0 +1,32 @@
+name: jumpRightLandOnLadder
+level: |-
+  |    H |
+  |    H |
+  |p   H |
+steps:
+  - action: jump
+    command: RIGHT
+    assertScreen: |-
+      |    H |
+      | p  H |
+      |    H |
+  - action: jump
+    assertScreen: |-
+      |  p H |
+      |    H |
+      |    H |
+  - action: jump
+    assertScreen: |-
+      |   pH |
+      |    H |
+      |    H |
+  - action: step
+    assertScreen: |-
+      |    p |
+      |    H |
+      |    H |
+  - action: step
+    assertScreen: |-
+      |    g |
+      |    H |
+      |    H |

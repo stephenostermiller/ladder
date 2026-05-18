@@ -10,14 +10,11 @@
 
 "use strict";
 
-let Level, Creature, Lad, Barrel, BarrelProducer;
-if (typeof module !== 'undefined' && module.exports) {
-	Level = require('./Level');
-	Creature = require('./Creature');
-	Lad = require('./Lad');
-	Barrel = require('./Barrel');
-	BarrelProducer = require('./BarrelProducer');
-}
+import Level from './Level.js';
+import Creature from './Creature.js';
+import Lad from './Lad.js';
+import Barrel from './Barrel.js';
+import BarrelProducer from './BarrelProducer.js';
 
 class GameEngine {
 	static G_O_NOT_OVER = 0;
@@ -293,7 +290,4 @@ class GameEngine {
 	getLadY() { return this.lad.getYPos(); }
 }
 
-// Export for Node.js
-if (typeof module !== 'undefined' && module.exports) {
-	module.exports = GameEngine;
-}
+export default GameEngine;

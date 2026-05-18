@@ -1,0 +1,52 @@
+name: jumpRightAllFrames
+level: |-
+  |        |
+  |        |
+  |p       |
+steps:
+  - action: step
+    assertScreen: |-
+      |        |
+      |        |
+      |g       |
+  - action: step
+    command: RIGHT
+    assertScreen: |-
+      |        |
+      |        |
+      | p      |
+  - action: jump
+    assertScreen: |-
+      |        |
+      |  p     |
+      |        |
+  - action: step
+    assertScreen: |-
+      |   p    |
+      |        |
+      |        |
+  - action: step
+    assertScreen: |-
+      |    p   |
+      |        |
+      |        |
+  - action: step
+    assertScreen: |-
+      |     p  |
+      |        |
+      |        |
+  - action: step
+    assertScreen: |-
+      |        |
+      |      p |
+      |        |
+  - action: step
+    assertScreen: |-
+      |        |
+      |        |
+      |       p|
+  - action: step
+    assertScreen: |-
+      |        |
+      |        |
+      |       g|

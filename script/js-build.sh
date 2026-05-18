@@ -30,14 +30,16 @@ cat > build/js/ladder.js << 'EOF'
 
 EOF
 
-# Function to extract class/utility content, removing CommonJS wrapper
+# Function to extract class/utility content, removing imports and exports
 extract_content() {
 	local file=$1
-	# Remove: "use strict", let/const/var declarations, and CommonJS require/export blocks
+	# Remove: "use strict", import statements, let/const/var declarations, and export statements
 	sed -e '1,/^"use strict";$/d' \
+		-e '/^import .*/d' \
 		-e '/^let [A-Za-z]/d' \
 		-e '/^const [A-Za-z]/d' \
 		-e '/^var [A-Za-z]/d' \
+		-e '/^export default/d' \
 		-e '/^if (typeof module/,/^\s*}$/d' \
 		"$file"
 }

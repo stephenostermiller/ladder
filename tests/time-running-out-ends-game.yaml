@@ -1,0 +1,8 @@
+name: timeRunningOutEndsGame
+level: |-
+  |p   |
+steps:
+  - action: step
+    command: NONE
+    frames: 2001
+    assertGameOver: G_O_TIME

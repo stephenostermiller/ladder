@@ -1,9 +1,13 @@
 {
+	"type": "module",
 	"name": "ladder-js",
 	"version": "1.0.0",
 	"description": "Ladder Game - JavaScript implementation",
 	"scripts": {
-		"test": "vitest"
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"js-yaml": "^4.1.0"
 	},
 	"devDependencies": {
 		"vitest": "^2.0.0"
