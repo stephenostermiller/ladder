@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+<head>
+  <title>$title$</title>
+$if(description)$
+  <meta name="description" content="$description$">
+$endif$
+$if(keywords)$
+  <meta name="keywords" content="$keywords$">
+$endif$
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" media="screen" title="Web View" href="style.css" type="text/css">
+  <link rel="stylesheet" media="print" href="printable.css" type="text/css">
+  <link rel="alternate stylesheet" media="screen" title="Print Preview" href="printable.css" type="text/css">
+</head>
+<body>
+
+<div id=head>
+  <div style="float:left;padding-right:1cm;">
+    <h1><a name="content">$title$</a></h1>
+  </div>
+  <div>
+    $if(description)$
+    $description$
+    $endif$
+  </div>
+</div>
+
+<div id=content>$body$</div>
+
+<div id=menu>
+<ul>
+<li><a href="./">Ladder</a></li>
+<li><a href="download.html">Download</a></li>
+<li><a href="instructions.html">Instructions</a></li>
+<li><a href="levels.html">Levels</a>$if(is_levels)$
+<ul class=sidebar>
+<li><a href="ladder1levels.html">Ladder 1 Levels</a></li>
+<li><a href="ladder2levels.html">Ladder 2 Levels</a></li>
+<li><a href="newLevel.html">New Levels</a></li>
+<li><a href="https://ostermiller.org/contact.pl?regarding=New+Ladder+Level">Submit</a></li>
+</ul>
+$endif$</li>
+<li><a href="differences.html">Differences from Original</a></li>
+<li><a href="customize.html">Customization</a></li>
+<li><a href="history.html">Version History</a></li>
+<li><a href="license.html">License</a></li>
+</ul>
+</div>
+
+<div id=foot>
+<p>Copyright &copy; <a href="https://ostermiller.org/contact.pl?regarding=Ladder" class=mail>Stephen Ostermiller</a> 1999-2020</p>
+</div>
+
+</body>
+</html>
