@@ -1,4 +1,4 @@
-<%bte.doc super="downloadPage.bte"%>
+<%bte.doc super="page.bte"%>
 <%bte.tpl name=pageTitle %>Ladder Downloads<%/bte.tpl%>
 <%bte.tpl name=description %>Download the game of Ladder and the source code for Java<%/bte.tpl%>
 <%bte.tpl name=keywords %>ladder download, download ladder, ladder jar<%/bte.tpl%>
@@ -6,7 +6,7 @@
 <%bte.tpl name=pageContent %>
 <p><big><b><a href="https://www.java.com/en/" target="_new">Download</a></b></big> and install the Java Runtime Environment (JRE) if you do not already have it installed.</p>
 
-<p><big><b><a href="ladder.jar">Download</a></b></big> the latest version of Ladder (Executable Jar - 107K) <small>(<a href="alternate.html">Alternate download sites</a>)</small></p>
+<p><big><b><a href="ladder.jar">Download</a></b></big> the latest version of Ladder (Executable Jar - 0K) <small></small></p>
 
 <p>All you need to do is double click the jar file to start Ladder.</p>
 

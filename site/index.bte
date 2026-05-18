@@ -1,6 +1,6 @@
 <%bte.doc super="page.bte"%>
 <%bte.tpl name=pageTitle %>Ladder<%/bte.tpl%>
-<%bte.tpl name=description %>A freeware ASCII arcade game similar to Donkey Kong<%/bte.tpl%>
+<%bte.tpl name=description %>An ASCII arcade originally for CPM, rewritten for modern computers<%/bte.tpl%>
 <%bte.tpl name=keywords %>ladder, game of ladder, der rock, lad, kaypro game, ASCII game, CPM game, open source game, java game, freeware game, GPL game<%/bte.tpl%>
 <%bte.tpl name=homeLinkText %><b>Home</b><%/bte.tpl%>
 <%bte.tpl name=pageContent %>

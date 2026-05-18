@@ -42,15 +42,12 @@ name=customizeLinkText %><%/bte.grp %></li>
 <li><%bte.grp onDefault=ok %><%bte.inc
 name=historyLinkText %><%/bte.grp %></li>
 <li><%bte.grp onDefault=ok %><%bte.inc
-name=externalLinkText %><%/bte.grp %></li>
-<li><%bte.grp onDefault=ok %><%bte.inc
 name=licenseLinkText %><%/bte.grp %></li>
 </ul>
 </div>
 
 <div id=foot>
-<p>Copyright &copy; <a href="http://ostermiller.org/contact.pl?regarding=Ladder" class=mail>Stephen Ostermiller</a> 1999-2020</p>
-<p style="text-align:right;font-size:smaller"><a href="http://ostermiller.org/">ostermiller.org</a> (<a href="http://ostermiller.org/siteindex.html">site index</a>)</p>
+<p>Copyright &copy; <a href="https://ostermiller.org/contact.pl?regarding=Ladder" class=mail>Stephen Ostermiller</a> 1999-2020</p>
 </div>
 
 </body>
@@ -63,5 +60,4 @@ name=licenseLinkText %><%/bte.grp %></li>
 <%bte.tpl name=historyLinkText %><a href="history.html">Version History</a><%/bte.tpl%>
 <%bte.tpl name=licenseLinkText %><a href="license.html">License</a><%/bte.tpl%>
 <%bte.tpl name=customizeLinkText %><a href="customize.html">Customization</a><%/bte.tpl%>
-<%bte.tpl name=externalLinkText %><a href="external.html">Bugs/JavaDoc/Source</a><%/bte.tpl%>
 <%/bte.doc%>

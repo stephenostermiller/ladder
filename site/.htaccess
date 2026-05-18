@@ -1,0 +1,11 @@
+AddType application/octet-stream jar
+Redirect permanent /Ladder.jar /ladder.jar
+Redirect seeother /Ladder_0_4.jar /ladder_0_4.jar
+Redirect seeother /Ladder_1_0.jar /ladder_1_0.jar
+Redirect seeother /Ladder_1_1.jar /ladder_1_1.jar
+Redirect seeother /LadderSource.jar /ladder.jar
+Redirect seeother /LadderSource_0_4.jar /ladder
+Redirect seeother /LadderSource_1_0.jar /ladder_1_0.jar
+Redirect seeother "/download.html " /download.html
+Redirect gone /alternate.html
+Redirect gone /external.html

@@ -32,7 +32,7 @@ build/js/ladder.js: build/js-test script/js-build.sh $(wildcard js/src/*.js)
 build/js-test: build/js/node_modules script/js-tests-run.sh $(wildcard js/src/*) $(wildcard js/test/*)
 	./script/js-tests-run.sh
 
-build/www: script/www-build.sh build/java/ladder.jar build/js/ladder.js $(wildcard site/*) $(wildcard releases/*) $(wildcard levels/*)
+build/www: script/www-build.sh build/java/ladder.jar build/js/ladder.js $(wildcard site/*) $(wildcard site/.*) $(wildcard releases/*) $(wildcard levels/*)
 	./script/www-build.sh
 
 .PHONY: clean
