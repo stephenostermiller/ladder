@@ -10,7 +10,7 @@ Ladder comes with a level editor and you can create new levels ([instructions](l
 
 ## LadderUser.ini
 
-The Java version of Ladder creates a user configuration file called  
+The Java version of Ladder creates a user configuration file called
 `<UserHome>/.java/Ladder/LadderUser.ini`.
 
 `<UserHome>` is your home directory, often `c:\Windows` on Win9x systems, and `c:\Documents and Settings\<UserName>` on other Windows computers. You can hack Ladder by adding content to this file. Values that are in this file override the values from the default configuration file.

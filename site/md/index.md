@@ -4,10 +4,25 @@ description: An ASCII arcade originally for CPM, rewritten for modern computers
 keywords: ladder, game of ladder, der rock, lad, kaypro game, ASCII game, CPM game, open source game, java game, freeware game, GPL game
 ---
 
-<pre data-level="EasyStreet"><code></code></pre>
+<div id="gameContainer">
+<canvas id="gameCanvas"></canvas>
+</div>
 
-Ladder brings us back to the days of classic computer games. Back when computer games were written without any fancy graphics. Heck, they were written without any graphics at all!
+<div class="game-settings">
+<div class="difficulty-select"><select id="difficultySelect"><option value="EASY">Easy</option><option value="MEDIUM" selected>Medium</option><option value="HARD">Hard</option><option value="VERY_HARD">Very Hard</option><option value="IMPOSSIBLE">Impossible</option></select><label for="difficultySelect">Difficulty</label></div>
 
-Using only ASCII characters, ladder was an addictive game that was very popular for computers running the CPM operating system. Seeing the game, you might be very much reminded of "Donkey Kong".
+<div class="level-select"><select id="levelSelect"></select><label for="levelSelect">Level</label></div>
 
-Now Ladder has been rewritten in Java and can be played on most of today's computers. This version includes all the original levels and several new ones. It also comes with a level editor so that you can make your own.
+<button id="startButton">Start Game</button>
+
+<div class="controls">
+<h3>Controls</h3>
+<div>Arrow Keys: Move</div>
+<div>Spacebar: Jump</div>
+<div>P / Esc: Play and Pause</div>
+</div>
+
+<button id="fullscreenButton">Fullscreen</button>
+</div>
+
+<script src="ladder.js"></script>

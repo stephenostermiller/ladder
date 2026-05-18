@@ -66,6 +66,8 @@ class GameCanvas {
 		this.letterWidth = 8;
 		this.letterHeight = 16;
 		this.canvasScale = 1;
+		this.offsetX = 0;
+		this.offsetY = 0;
 
 		// Callback for when game ends
 		this.onGameOver = null;
@@ -154,7 +156,6 @@ class GameCanvas {
 			if (this.engine.cycles > 0) {
 				this.engine.scoreMoney();
 				this.engine.cycles -= 100;
-				this.updateStats();
 			} else {
 				this.inBonusCountdown = false;
 				this.loadingNextLevel = true;
@@ -219,13 +220,11 @@ class GameCanvas {
 		           result === GameEngine.G_O_TIME ||
 		           result === GameEngine.G_O_SPIKE) {
 			this.ladsLeft--;
-			this.updateStats();
 			this.pendingGameOver = result;
 			this.startDeathAnimation(this.engine.getLadX(), this.engine.getLadY());
 		}
 
 		this.render();
-		this.updateStats();
 	}
 
 	resetLad() {
@@ -251,32 +250,32 @@ class GameCanvas {
 		this.deathAnimationY = y;
 	}
 
-	updateStats() {
-		document.getElementById('score').textContent = this.engine.getScore();
-		document.getElementById('lives').textContent = this.ladsLeft;
-		document.getElementById('bonusTime').textContent = Math.max(0, this.engine.getCycles());
-	}
 
 	resizeCanvas() {
 		const container = this.canvas.parentElement;
-		const maxWidth = container.clientWidth;
-		const maxHeight = container.clientHeight;
+		const containerWidth = container.clientWidth;
+		const containerHeight = container.clientHeight;
 
 		// Calculate aspect ratio to maintain square pixels
 		const levelWidth = this.engine.screenLevel.getWidth();
 		const levelHeight = this.engine.screenLevel.getHeight();
 
-		// Calculate scale to fit in container
-		const scaleX = Math.floor(maxWidth / (levelWidth * this.letterWidth));
-		const scaleY = Math.floor(maxHeight / ((levelHeight + 1) * this.letterHeight));
+		// Calculate scale to fit in container while maintaining aspect ratio
+		const scaleX = containerWidth / (levelWidth * this.letterWidth);
+		const scaleY = containerHeight / (levelHeight * this.letterHeight);
 		const scale = Math.max(1, Math.min(scaleX, scaleY));
 
-		// Set canvas display size and internal resolution
-		const newWidth = levelWidth * this.letterWidth * scale;
-		const newHeight = (levelHeight + 1) * this.letterHeight * scale;
+		// Calculate game content size
+		const gameWidth = levelWidth * this.letterWidth * scale;
+		const gameHeight = levelHeight * this.letterHeight * scale;
 
-		this.canvas.width = newWidth;
-		this.canvas.height = newHeight;
+		// Set canvas to fill container
+		this.canvas.width = containerWidth;
+		this.canvas.height = containerHeight;
+
+		// Calculate offsets to center the game with letterboxing
+		this.offsetX = (containerWidth - gameWidth) / 2;
+		this.offsetY = (containerHeight - gameHeight) / 2;
 
 		// Store scale for use in rendering
 		this.canvasScale = scale;
@@ -300,33 +299,50 @@ class GameCanvas {
 			for (let x = 0; x < this.engine.screenLevel.getWidth(); x++) {
 				const char = this.engine.screenLevel.getCharAt(y, x);
 				if (char !== ' ') {
-					this.ctx.fillText(char, x * this.letterWidth * this.canvasScale, (y + 1) * this.letterHeight * this.canvasScale);
+					this.ctx.fillText(char, this.offsetX + x * this.letterWidth * this.canvasScale, this.offsetY + (y + 1) * this.letterHeight * this.canvasScale);
 				}
 			}
 		}
 
+		// Draw stats at the bottom (not on title screen)
+		if (!this.isShowingTitle) {
+			const levelHeight = this.engine.screenLevel.getHeight();
+			const statsY = this.offsetY + (levelHeight + 1) * this.letterHeight * this.canvasScale;
+			const statsText = `Score: ${this.engine.getScore()}  Lives: ${this.ladsLeft}  Level: ${this.currentLevelIndex + 1}  Bonus: ${Math.max(0, this.engine.getCycles())}`;
+			this.ctx.fillText(statsText, this.offsetX, statsY + this.letterHeight * this.canvasScale);
+		}
+
+
 		// Draw pause message
 		if (this.paused) {
+			const levelWidth = this.engine.screenLevel.getWidth();
+			const levelHeight = this.engine.screenLevel.getHeight();
+			const gameWidth = levelWidth * this.letterWidth * this.canvasScale;
+			const gameHeight = (levelHeight + 1) * this.letterHeight * this.canvasScale;
 			this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-			this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+			this.ctx.fillRect(this.offsetX, this.offsetY, gameWidth, gameHeight);
 			this.ctx.fillStyle = '#0f0';
 			this.ctx.font = 'bold ' + Math.floor(24 * this.canvasScale) + 'px Arial';
 			this.ctx.textAlign = 'center';
-			this.ctx.fillText('PAUSED', this.canvas.width / 2, this.canvas.height / 2);
+			this.ctx.fillText('PAUSED', this.offsetX + gameWidth / 2, this.offsetY + gameHeight / 2);
 			this.ctx.textAlign = 'left';
 		}
 
 		// Draw game over message
 		if (this.gameOver !== GameCanvas.G_O_NOT_OVER) {
+			const levelWidth = this.engine.screenLevel.getWidth();
+			const levelHeight = this.engine.screenLevel.getHeight();
+			const gameWidth = levelWidth * this.letterWidth * this.canvasScale;
+			const gameHeight = (levelHeight + 1) * this.letterHeight * this.canvasScale;
 			this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-			this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+			this.ctx.fillRect(this.offsetX, this.offsetY, gameWidth, gameHeight);
 			this.ctx.fillStyle = '#f00';
 			this.ctx.font = 'bold ' + Math.floor(24 * this.canvasScale) + 'px Arial';
 			this.ctx.textAlign = 'center';
 
 			let message = 'GAME OVER';
 
-			this.ctx.fillText(message, this.canvas.width / 2, this.canvas.height / 2);
+			this.ctx.fillText(message, this.offsetX + gameWidth / 2, this.offsetY + gameHeight / 2);
 			this.ctx.textAlign = 'left';
 		}
 	}
@@ -388,7 +404,6 @@ class GameCanvas {
 		this.gameOver = GameCanvas.G_O_NOT_OVER;
 		this.inBonusCountdown = false;
 		this.loadingNextLevel = false;
-		this.updateStats();
 		this.startGameLoop();
 	}
 }
@@ -463,6 +478,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 	const difficultySelect = document.getElementById('difficultySelect');
 	const levelSelect = document.getElementById('levelSelect');
 	const startButton = document.getElementById('startButton');
+	const fullscreenButton = document.getElementById('fullscreenButton');
 
 	// Populate level select dropdown
 	levelSelect.innerHTML = '';
@@ -480,7 +496,6 @@ window.addEventListener('DOMContentLoaded', async () => {
 	if (firstLevelData) {
 		game = new GameCanvas(canvas, firstLevelData, 0);
 		game.setDifficulty(GameCanvas.MEDIUM);
-		game.updateStats();
 		game.stopGameLoop();
 	} else {
 		console.error('Failed to load initial level');
@@ -558,6 +573,27 @@ window.addEventListener('DOMContentLoaded', async () => {
 			game.currentLevelIndex = levelIdx;
 			game.changeLevel(levelData);
 			updateStartButtonState();
+		}
+	});
+
+	// Handle fullscreen button
+	fullscreenButton.addEventListener('click', () => {
+		const container = document.getElementById('gameContainer');
+		if (!document.fullscreenElement) {
+			container.requestFullscreen().catch(err => {
+				console.error(`Error attempting to enable fullscreen: ${err.message}`);
+			});
+		} else {
+			document.exitFullscreen();
+		}
+	});
+
+	// Update button text when fullscreen changes
+	document.addEventListener('fullscreenchange', () => {
+		if (document.fullscreenElement) {
+			fullscreenButton.textContent = 'Exit Fullscreen';
+		} else {
+			fullscreenButton.textContent = 'Fullscreen';
 		}
 	});
 });

@@ -5,7 +5,7 @@
   ],
   "hooks": {
     "before_tool_use": {
-      "before_bash": "if [ \"$1\" != \"npm\" ] && [ \"$1\" != \"mvn\" ]; then echo '📝 Reminder: consult .agents/README.md for build instructions'; fi"
+      "before_bash": "if [ \"$1\" = \"npm\" ] || [ \"$1\" = \"mvn\" ] || [ \"$1\" = \"bash\" ]; then echo '📝 Reminder: Run `make` instead - consult .agents/README.md for build instructions'; fi"
     }
   }
 }
