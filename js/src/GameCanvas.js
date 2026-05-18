@@ -438,13 +438,24 @@ let game = null;
 function disableGameControls() {
 	document.getElementById('difficultySelect').disabled = true;
 	document.getElementById('levelSelect').disabled = true;
-	document.getElementById('startButton').disabled = true;
 }
 
 function enableGameControls() {
 	document.getElementById('difficultySelect').disabled = false;
 	document.getElementById('levelSelect').disabled = false;
-	document.getElementById('startButton').disabled = false;
+}
+
+function updateStartButtonState() {
+	const button = document.getElementById('startButton');
+	if (!game) return;
+
+	if (game.isShowingTitle || game.gameOver !== GameCanvas.G_O_NOT_OVER) {
+		button.textContent = 'Start Game';
+	} else if (game.paused) {
+		button.textContent = 'Resume';
+	} else {
+		button.textContent = 'Pause';
+	}
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
@@ -487,30 +498,40 @@ window.addEventListener('DOMContentLoaded', async () => {
 	startButton.disabled = false;
 	difficultySelect.disabled = false;
 	levelSelect.disabled = false;
+	updateStartButtonState();
 
 	// Set game over callback
 	game.onGameOver = () => {
 		enableGameControls();
+		updateStartButtonState();
 	};
 
 	// Handle start button click
 	startButton.addEventListener('click', () => {
 		if (game) {
-			// Read the selected difficulty and apply it
-			const selectedDifficulty = difficultySelect.value;
-			const diffMap = {
-				'EASY': GameCanvas.EASY,
-				'MEDIUM': GameCanvas.MEDIUM,
-				'HARD': GameCanvas.HARD,
-				'VERY_HARD': GameCanvas.VERY_HARD,
-				'IMPOSSIBLE': GameCanvas.IMPOSSIBLE
-			};
-			game.setDifficulty(diffMap[selectedDifficulty]);
+			// If showing title or game over, start the game
+			if (game.isShowingTitle || game.gameOver !== GameCanvas.G_O_NOT_OVER) {
+				// Read the selected difficulty and apply it
+				const selectedDifficulty = difficultySelect.value;
+				const diffMap = {
+					'EASY': GameCanvas.EASY,
+					'MEDIUM': GameCanvas.MEDIUM,
+					'HARD': GameCanvas.HARD,
+					'VERY_HARD': GameCanvas.VERY_HARD,
+					'IMPOSSIBLE': GameCanvas.IMPOSSIBLE
+				};
+				game.setDifficulty(diffMap[selectedDifficulty]);
 
-			// Hide title and start the actual game
-			game.isShowingTitle = false;
-			disableGameControls();
-			game.restartGame();  // Properly restart from the beginning
+				// Hide title and start the actual game
+				game.isShowingTitle = false;
+				game.paused = false;
+				disableGameControls();
+				game.restartGame();  // Properly restart from the beginning
+			} else {
+				// Otherwise toggle pause
+				game.togglePause();
+			}
+			updateStartButtonState();
 		}
 	});
 
@@ -536,6 +557,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 		if (levelData && game) {
 			game.currentLevelIndex = levelIdx;
 			game.changeLevel(levelData);
+			updateStartButtonState();
 		}
 	});
 });
