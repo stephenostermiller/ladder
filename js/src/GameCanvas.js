@@ -12,11 +12,6 @@
 
 // Game Canvas/Engine class
 class GameCanvas {
-	static SCORE_RESET = 0;
-	static SCORE_BARREL = 1;
-	static SCORE_STATUE = 2;
-	static SCORE_MONEY = 3;
-
 	static G_O_NOT_OVER = 0;
 	static G_O_BARREL = 1;
 	static G_O_TIME = 2;
@@ -40,36 +35,19 @@ class GameCanvas {
 		this.ctx = canvas.getContext('2d');
 
 		this.currentLevelIndex = levelIndex;
-		this.currentLevelData = levelString;  // Store for restarting the game
-		this.titleScreen = null;  // Will hold the title level data
-		this.isShowingTitle = false;  // Flag to indicate we're showing title
-		this.realLevel = new Level(levelString);
-		this.screenLevel = new Level(levelString);
+		this.currentLevelData = levelString;
 
-		// Find the starting position marked by 'p' in the level (0-based from positionOf)
-		const startPos = this.realLevel.positionOf('p');
-		const ladX = startPos ? startPos.x + 1 : 1;  // Convert 0-based to 1-based for Lad
-		const ladY = startPos ? startPos.y + 1 : 1;  // Convert 0-based to 1-based for Lad
+		this.engine = new GameEngine(levelString);
+		this.startLadX = this.engine.ladStartPosX;
+		this.startLadY = this.engine.ladStartPosY;
 
-		// Save the starting position for respawning
-		this.startLadX = ladX;
-		this.startLadY = ladY;
-
-		// Replace the 'p' marker with a space (positions are 0-based)
-		if (startPos) {
-			this.realLevel.setCharAt(startPos.y, startPos.x, ' ');
-			this.screenLevel.setCharAt(startPos.y, startPos.x, ' ');
-		}
-
-		this.lad = new Lad(ladX, ladY, Creature.STATIONARY);
-		this.barrelProducers = [];
+		this.titleScreen = null;
+		this.isShowingTitle = false;
 
 		this.nextCommand = Lad.STOP;
 		this.jumpCommand = false;
 
-		this.score = 0;
 		this.ladsLeft = 3;
-		this.cycles = 2000;
 		this.gameOver = GameCanvas.G_O_NOT_OVER;
 		this.inBonusCountdown = false;
 		this.loadingNextLevel = false;
@@ -77,7 +55,7 @@ class GameCanvas {
 		this.running = true;
 		this.difficulty = GameCanvas.MEDIUM;
 		this.gameSpeed = GameCanvas.MEDIUM_SPEED;
-		this.nextNewLad = 10000;
+		this.pendingGameOver = GameCanvas.G_O_NOT_OVER;
 
 		// Death animation state
 		this.deathAnimationFrame = -1;
@@ -95,27 +73,12 @@ class GameCanvas {
 		// Game loop timing
 		this.lastUpdateTime = Date.now();
 
-		this.setupLevelProducers();
 		this.setupKeyboardControls();
 
 		this.gameRunning = false;
 		this.startGameLoop();
 	}
 
-	setupLevelProducers() {
-		this.barrelProducers = [];
-		const level = this.realLevel;
-
-		for (let y = 0; y < level.getHeight(); y++) {
-			for (let x = 0; x < level.getWidth(); x++) {
-				// Use 0-based coordinates for Level methods
-				if (level.getCharAt(y, x) === 'V') {
-					// BarrelProducer receives 1-based coordinates
-					this.barrelProducers.push(new BarrelProducer(x + 1, y + 1));
-				}
-			}
-		}
-	}
 
 	setupKeyboardControls() {
 		document.addEventListener('keydown', (e) => {
@@ -184,75 +147,15 @@ class GameCanvas {
 		}
 	}
 
-	getContext(x, y) {
-		// Get 3x3 grid around position for collision detection from screenLevel
-		// x,y are 1-based (from Lad position), convert to 0-based for Level
-		// Positions numbered like a keypad: 7 8 9, 4 5 6, 1 2 3
-		// Parameters are: one(1), two(2), three(3), four(4), five(5), six(6), seven(7), eight(8), nine(9)
-		const context = [];
-		const offsets = [
-			[-1, 1],   // one: down-left
-			[0, 1],    // two: down
-			[1, 1],    // three: down-right
-			[-1, 0],   // four: left
-			[0, 0],    // five: center
-			[1, 0],    // six: right
-			[-1, -1],  // seven: up-left
-			[0, -1],   // eight: up
-			[1, -1]    // nine: up-right
-		];
-
-		// Convert from 1-based Lad coordinates to 0-based Level coordinates
-		const ladRow = y - 1;
-		const ladCol = x - 1;
-
-		for (let offset of offsets) {
-			const cx = ladCol + offset[0];
-			const cy = ladRow + offset[1];
-			context.push(this.screenLevel.getCharAt(cy, cx));
-		}
-		return context;
-	}
-
-	getContextFromRealLevel(x, y) {
-		// Get 3x3 grid around position from realLevel for barrel collision detection
-		// This prevents barrels from seeing each other and making incorrect decisions
-		// x,y are 1-based (from Barrel position), convert to 0-based for Level
-		// Positions numbered like a keypad: 7 8 9, 4 5 6, 1 2 3
-		const context = [];
-		const offsets = [
-			[-1, 1],   // one: down-left
-			[0, 1],    // two: down
-			[1, 1],    // three: down-right
-			[-1, 0],   // four: left
-			[0, 0],    // five: center
-			[1, 0],    // six: right
-			[-1, -1],  // seven: up-left
-			[0, -1],   // eight: up
-			[1, -1]    // nine: up-right
-		];
-
-		// Convert from 1-based creature coordinates to 0-based Level coordinates
-		const barrelRow = y - 1;
-		const barrelCol = x - 1;
-
-		for (let offset of offsets) {
-			const cx = barrelCol + offset[0];
-			const cy = barrelRow + offset[1];
-			context.push(this.realLevel.getCharAt(cy, cx));
-		}
-		return context;
-	}
 
 	updateGame() {
-		// Handle bonus countdown (like Java's dollarCountdown)
+		// Handle bonus countdown (UI concern)
 		if (this.inBonusCountdown) {
-			if (this.cycles > 0) {
-				this.addScore(GameCanvas.SCORE_MONEY*100);
-				this.cycles-=100;
+			if (this.engine.cycles > 0) {
+				this.engine.scoreMoney();
+				this.engine.cycles -= 100;
 				this.updateStats();
 			} else {
-				// Countdown complete, move to next level
 				this.inBonusCountdown = false;
 				this.loadingNextLevel = true;
 				this.nextLevel();
@@ -271,16 +174,18 @@ class GameCanvas {
 		if (this.deathAnimationFrame >= 0) {
 			this.deathAnimationFrame++;
 			if (this.deathAnimationFrame < this.deathAnimationSymbols.length) {
-				this.screenLevel.setCharAt(this.deathAnimationY - 1, this.deathAnimationX - 1, this.deathAnimationSymbols[this.deathAnimationFrame]);
+				this.engine.screenLevel.setCharAt(
+					this.deathAnimationY - 1, this.deathAnimationX - 1,
+					this.deathAnimationSymbols[this.deathAnimationFrame]);
 				this.render();
 				return;
 			} else {
-				// Death animation complete
 				this.deathAnimationFrame = -1;
-				this.screenLevel.setCharAt(this.deathAnimationY - 1, this.deathAnimationX - 1, ' ');
+				this.engine.screenLevel.setCharAt(
+					this.deathAnimationY - 1, this.deathAnimationX - 1, ' ');
 
 				if (this.ladsLeft <= 0) {
-					this.setGameOverState(GameCanvas.G_O_BARREL);
+					this.setGameOverState(this.pendingGameOver);
 				} else {
 					this.resetLad();
 				}
@@ -295,159 +200,28 @@ class GameCanvas {
 			return;
 		}
 
+		// Sync extra lives earned through score milestones
+		const prevEngineLadsLeft = this.engine.getLadsLeft();
 
-		this.cycles--;
-		if (this.cycles <= 0) {
-			this.ladsLeft--;
-			this.updateStats();
-			if (this.ladsLeft <= 0) {
-				this.setGameOverState(GameCanvas.G_O_TIME);
-			} else {
-				this.cycles = 2000;
-				this.resetLad();
-			}
-			this.render();
-			return
-		}
-
-		// Update lad (Lad positions are 1-based, Level methods use 0-based)
-		// Clear lad's old position before updating
-		const oldLadX = this.lad.getXPos();
-		const oldLadY = this.lad.getYPos();
-		this.screenLevel.setCharAt(oldLadY - 1, oldLadX - 1, this.realLevel.getCharAt(oldLadY - 1, oldLadX - 1));
-		this.lad.setCommand(this.nextCommand);
+		const result = this.engine.tick(this.nextCommand, this.jumpCommand);
 		this.nextCommand = Lad.NONE;
-
-		if (this.jumpCommand) {
-			this.lad.setJump();
-		}
 		this.jumpCommand = false;
 
-		this.lad.update(...this.getContext(this.lad.getXPos(), this.lad.getYPos()));
+		// Sync extra lives from engine
+		const engineLadsIncrease = this.engine.getLadsLeft() - prevEngineLadsLeft;
+		if (engineLadsIncrease > 0) {
+			this.ladsLeft += engineLadsIncrease;
+		}
 
-		// Draw lad at new position (convert 1-based to 0-based for Level)
-		this.screenLevel.setCharAt(this.lad.getYPos() - 1, this.lad.getXPos() - 1, this.lad.getSymbol());
-
-		// Check if lad touched goal (check realLevel like Java does, convert 1-based to 0-based)
-		const realLadChar = this.realLevel.getCharAt(this.lad.getYPos() - 1, this.lad.getXPos() - 1);
-		if (realLadChar === '$') {
-			// Start bonus countdown mode (like Java's dollarCountdown)
+		if (result === GameEngine.G_O_MONEY) {
 			this.inBonusCountdown = true;
-			return;
-		}
-
-		if(realLadChar == '^'){
-			this.gameOver = G_O_SPIKE; // Impaled, game over
-			return;
-		}
-
-		// Check for statue (gives bonus score but doesn't end level)
-		if (realLadChar === '&') {
-			this.addScore(GameCanvas.SCORE_STATUE);
-			this.realLevel.setCharAt(this.lad.getYPos() - 1, this.lad.getXPos() - 1, ' ');
-		}
-
-		// Check for disappearing platforms (walk on '-' causes it to disappear)
-		if (oldLadX !== this.lad.getXPos() && this.lad.getYPos() >= oldLadY) {
-			// Lad moved horizontally without jumping, convert 1-based to 0-based
-			const platformBelow = this.realLevel.getCharAt(oldLadY, oldLadX - 1);
-			if (platformBelow === '-') {
-				// Platform disappears
-				this.realLevel.setCharAt(oldLadY, oldLadX - 1, ' ');
-				this.screenLevel.setCharAt(oldLadY, oldLadX - 1, ' ');
-			}
-		}
-
-		// Update and repaint all the barrels
-		for (let k = 0; k < this.barrelProducers.length; k++) {
-			const BP = this.barrelProducers[k];
-			BP.update();
-
-			for (let j = 0; j < BP.getBarrelCount(); j++) {
-				const barrel = BP.getBarrelAt(j);
-				if (barrel !== null) {
-					// Check collision with lad before update
-					if (barrel.getYPos() === this.lad.getYPos() && this.lad.getXPos() === barrel.getXPos()) {
-						this.ladsLeft--;
-						this.updateStats();
-						this.startDeathAnimation(this.lad.getXPos(), this.lad.getYPos());
-					}
-
-					// First barrel jump score check (before barrel update)
-					// No score if on a ladder
-					const realLadPos = this.realLevel.getCharAt(this.lad.getYPos() - 1, this.lad.getXPos() - 1);
-					if (realLadPos !== 'H') {
-						// Check if barrel is directly above lad
-						if (barrel.getYPos() - 1 === this.lad.getYPos() && this.lad.getXPos() === barrel.getXPos()) {
-							this.addScore(GameCanvas.SCORE_BARREL);
-						}
-						// Check if barrel is 2 above lad and lad isn't on solid ground
-						else if (barrel.getYPos() - 2 === this.lad.getYPos() && this.lad.getXPos() === barrel.getXPos() &&
-							this.realLevel.getCharAt(this.lad.getYPos(), this.lad.getXPos() - 1) !== '=' &&
-							this.realLevel.getCharAt(this.lad.getYPos(), this.lad.getXPos() - 1) !== '|' &&
-							this.realLevel.getCharAt(this.lad.getYPos(), this.lad.getXPos() - 1) !== '-') {
-							this.addScore(GameCanvas.SCORE_BARREL);
-						}
-					}
-
-					// Clear barrel from its previous position (convert 1-based to 0-based for Level)
-					this.screenLevel.setCharAt(barrel.getYPos() - 1, barrel.getXPos() - 1,
-						this.realLevel.getCharAt(barrel.getYPos() - 1, barrel.getXPos() - 1));
-
-					// Get context for barrel from realLevel
-					const bctx = this.getContextFromRealLevel(barrel.getXPos(), barrel.getYPos());
-					barrel.update(...bctx);
-
-					// Draw barrel at new position (convert 1-based to 0-based for Level)
-					this.screenLevel.setCharAt(barrel.getYPos() - 1, barrel.getXPos() - 1, barrel.getSymbol());
-
-					// Check collision with lad after update
-					if (barrel.getYPos() === this.lad.getYPos() && this.lad.getXPos() === barrel.getXPos()) {
-						this.ladsLeft--;
-						this.updateStats();
-						this.startDeathAnimation(this.lad.getXPos(), this.lad.getYPos());
-					}
-
-					// Second barrel jump score check (after barrel update)
-					// No score if lad is moving up or down (to avoid double counting)
-					// No score if on a ladder
-					if (this.lad.getDirection() !== Creature.UP && this.lad.getDirection() !== Creature.DOWN && realLadPos !== 'H') {
-						// Check if barrel is directly above lad
-						if (barrel.getYPos() - 1 === this.lad.getYPos() && this.lad.getXPos() === barrel.getXPos()) {
-							this.addScore(GameCanvas.SCORE_BARREL);
-						}
-						// Check if barrel is 2 above lad and lad isn't on solid ground
-						else if (barrel.getYPos() - 2 === this.lad.getYPos() && this.lad.getXPos() === barrel.getXPos() &&
-							this.realLevel.getCharAt(this.lad.getYPos(), this.lad.getXPos() - 1) !== '=' &&
-							this.realLevel.getCharAt(this.lad.getYPos(), this.lad.getXPos() - 1) !== '|' &&
-							this.realLevel.getCharAt(this.lad.getYPos(), this.lad.getXPos() - 1) !== '-') {
-							this.addScore(GameCanvas.SCORE_BARREL);
-						}
-					}
-
-					// Check if barrel hit an asterisk (convert 1-based to 0-based for Level)
-					const realCharAtBarrel = this.realLevel.getCharAt(barrel.getYPos() - 1, barrel.getXPos() - 1);
-					if (realCharAtBarrel === '*') {
-						// Keep the asterisk visible
-						this.screenLevel.setCharAt(barrel.getYPos() - 1, barrel.getXPos() - 1,
-							this.realLevel.getCharAt(barrel.getYPos() - 1, barrel.getXPos() - 1));
-						// Remove barrel from producer
-						BP.recycleBarrel(barrel);
-					}
-				}
-			}
-		}
-
-		this.cycles--;
-		if (this.cycles <= 0) {
+		} else if (result === GameEngine.G_O_BARREL ||
+		           result === GameEngine.G_O_TIME ||
+		           result === GameEngine.G_O_SPIKE) {
 			this.ladsLeft--;
 			this.updateStats();
-			if (this.ladsLeft <= 0) {
-				this.setGameOverState(GameCanvas.G_O_TIME);
-			} else {
-				this.cycles = 2000;
-				this.resetLad();
-			}
+			this.pendingGameOver = result;
+			this.startDeathAnimation(this.engine.getLadX(), this.engine.getLadY());
 		}
 
 		this.render();
@@ -456,21 +230,7 @@ class GameCanvas {
 	}
 
 	resetLad() {
-		// Restore screenLevel from realLevel to preserve ladders and other level elements
-		this.screenLevel = this.realLevel.clone();
-
-		// Use the saved starting position (1-based for Lad)
-		this.lad.reset(this.startLadX, this.startLadY, Creature.STATIONARY);
-
-		// Place the lad at starting position (convert 1-based to 0-based for Level)
-		this.screenLevel.setCharAt(this.startLadY - 1, this.startLadX - 1, 'p');
-
-		// Reset all barrel producers (clear their barrels)
-		for (let producer of this.barrelProducers) {
-			producer.clear();
-		}
-
-		// Reset bonus countdown state
+		this.engine.reset();
 		this.inBonusCountdown = false;
 		this.loadingNextLevel = false;
 	}
@@ -485,28 +245,6 @@ class GameCanvas {
 		}
 	}
 
-	addScore(scoreType) {
-		switch (scoreType) {
-			case GameCanvas.SCORE_STATUE:
-				// Statue gives bonus based on remaining time
-				this.score += this.cycles;
-				break;
-			case GameCanvas.SCORE_BARREL:
-				// Jumping over barrel
-				this.score += 200;
-				break;
-			case GameCanvas.SCORE_MONEY:
-				// Collecting money
-				this.score += 10;
-				break;
-		}
-
-		// Check if score threshold for extra life
-		if (this.score >= this.nextNewLad) {
-			this.ladsLeft++;
-			this.nextNewLad += 10000;
-		}
-	}
 
 	startDeathAnimation(x, y) {
 		this.deathAnimationFrame = 0;
@@ -515,9 +253,9 @@ class GameCanvas {
 	}
 
 	updateStats() {
-		document.getElementById('score').textContent = this.score;
+		document.getElementById('score').textContent = this.engine.getScore();
 		document.getElementById('lives').textContent = this.ladsLeft;
-		document.getElementById('bonusTime').textContent = Math.max(0, this.cycles);
+		document.getElementById('bonusTime').textContent = Math.max(0, this.engine.getCycles());
 	}
 
 	resizeCanvas() {
@@ -526,8 +264,8 @@ class GameCanvas {
 		const maxHeight = container.clientHeight;
 
 		// Calculate aspect ratio to maintain square pixels
-		const levelWidth = this.screenLevel.getWidth();
-		const levelHeight = this.screenLevel.getHeight();
+		const levelWidth = this.engine.screenLevel.getWidth();
+		const levelHeight = this.engine.screenLevel.getHeight();
 
 		// Calculate scale to fit in container
 		const scaleX = Math.floor(maxWidth / (levelWidth * this.letterWidth));
@@ -559,9 +297,9 @@ class GameCanvas {
 		this.ctx.fillStyle = '#0f0';
 
 		// Draw level (iterate 0-based array, use 0-based for getCharAt)
-		for (let y = 0; y < this.screenLevel.getHeight(); y++) {
-			for (let x = 0; x < this.screenLevel.getWidth(); x++) {
-				const char = this.screenLevel.getCharAt(y, x);
+		for (let y = 0; y < this.engine.screenLevel.getHeight(); y++) {
+			for (let x = 0; x < this.engine.screenLevel.getWidth(); x++) {
+				const char = this.engine.screenLevel.getCharAt(y, x);
 				if (char !== ' ') {
 					this.ctx.fillText(char, x * this.letterWidth * this.canvasScale, (y + 1) * this.letterHeight * this.canvasScale);
 				}
@@ -637,39 +375,20 @@ class GameCanvas {
 	showTitle() {
 		// Display the title screen and render it
 		if (this.titleScreen) {
-			this.screenLevel = this.titleScreen.clone();
+			this.engine.screenLevel = this.titleScreen.clone();
 		}
 	}
 
 	changeLevel(levelData) {
 		this.stopGameLoop();
-		this.currentLevelData = levelData;  // Store for restarting
-		this.realLevel = new Level(levelData);
-		this.screenLevel = new Level(levelData);
-
-		// Find the starting position marked by 'p' in the level (0-based from positionOf)
-		const startPos = this.realLevel.positionOf('p');
-		const ladX = startPos ? startPos.x + 1 : 1;  // Convert 0-based to 1-based for Lad
-		const ladY = startPos ? startPos.y + 1 : 1;  // Convert 0-based to 1-based for Lad
-
-		// Save the starting position for respawning
-		this.startLadX = ladX;
-		this.startLadY = ladY;
-
-		// Replace the 'p' marker with a space (positions are 0-based)
-		if (startPos) {
-			this.realLevel.setCharAt(startPos.y, startPos.x, ' ');
-			this.screenLevel.setCharAt(startPos.y, startPos.x, ' ');
-		}
-
-		this.lad.reset(ladX, ladY, Creature.STATIONARY);
+		this.currentLevelData = levelData;
+		this.engine.setLevel(levelData);
+		this.startLadX = this.engine.ladStartPosX;
+		this.startLadY = this.engine.ladStartPosY;
 		this.ladsLeft = 3;
-		this.cycles = 2000;
 		this.gameOver = GameCanvas.G_O_NOT_OVER;
 		this.inBonusCountdown = false;
 		this.loadingNextLevel = false;
-		this.barrelProducers = [];
-		this.setupLevelProducers();
 		this.updateStats();
 		this.startGameLoop();
 	}
@@ -868,7 +587,7 @@ function updateDebugDisplay(gameCanvas) {
 		return;
 	}
 
-	const lad = gameCanvas.lad;
+	const lad = gameCanvas.engine.lad;
 
 	// Update position
 	document.getElementById('debug-pos').textContent = `${lad.getXPos()}, ${lad.getYPos()}`;

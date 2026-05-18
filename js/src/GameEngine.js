@@ -272,6 +272,38 @@ class GameEngine {
 		}
 	}
 
+	scoreMoney() {
+		this.updateScore(GameEngine.SCORE_MONEY);
+	}
+
+	reset() {
+		this.gameOver = GameEngine.G_O_NOT_OVER;
+		this.cycles = 2000;
+		this.screenLevel = this.realLevel.clone();
+
+		this.lad.reset(this.ladStartPosX, this.ladStartPosY, Creature.STATIONARY);
+		this.screenLevel.setCharAt(this.ladStartPosY - 1, this.ladStartPosX - 1, 'p');
+
+		for (const producer of this.barrelProducers) {
+			producer.clear();
+		}
+	}
+
+	setLevel(levelString) {
+		this.realLevel = new Level(levelString);
+		const startPos = this.realLevel.positionOf('p');
+		this.ladStartPosX = startPos ? startPos.x + 1 : 1;
+		this.ladStartPosY = startPos ? startPos.y + 1 : 1;
+		if (startPos) {
+			this.realLevel.setCharAt(startPos.y, startPos.x, ' ');
+		}
+		this.reset();
+	}
+
+	getLadsLeft() {
+		return this.ladsLeft;
+	}
+
 	getScreenState() {
 		let result = '';
 		for (let y = 0; y < this.screenLevel.getHeight(); y++) {
