@@ -14,6 +14,37 @@ $endif$
   <link rel="alternate stylesheet" media="screen" title="Print Preview" href="printable.css" type="text/css">
 </head>
 <body>
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+  const preBlocks = document.querySelectorAll('pre[data-level]');
+  for (let pre of preBlocks) {
+    const levelName = pre.getAttribute('data-level');
+
+    if (!levelName) {
+      console.log('No level name found, skipping');
+      continue;
+    }
+
+    const code = pre.querySelector('code');
+    if (!code) {
+      console.error('No code element found in pre for level ' + levelName);
+      continue;
+    }
+
+    try {
+      const response = await fetch(levelName + '.lvl');
+      if (response.ok) {
+        const text = await response.text();
+        code.textContent = text;
+      } else {
+        console.error('Failed to fetch ' + levelName + '.lvl: ' + response.status);
+      }
+    } catch (e) {
+      console.error('Error loading level ' + levelName + ':', e);
+    }
+  }
+});
+</script>
 
 <div id=head>
   <div style="float:left;padding-right:1cm;">

@@ -4,28 +4,7 @@ description: An ASCII arcade originally for CPM, rewritten for modern computers
 keywords: ladder, game of ladder, der rock, lad, kaypro game, ASCII game, CPM game, open source game, java game, freeware game, GPL game
 ---
 
-```
-                                                    V                 $
-                                                                        H
-                H                                                       H
-        =========H==================================================
-                H
-                H
-                H          H                                           H
-================H==========H==================   ========H=====================
-                &          H                                           H          |     |
-                                                                                Easy Street
-                H                                                       H
-        =========H==========H=========  =======================
-                H
-                H
-                H                                                       H
-======================== ======================  =========H==============
-                                                                        H
-                                                                        H
-*    p                                                                  H               *
-===============================================================================
-```
+<pre data-level="EasyStreet"><code></code></pre>
 
 Ladder brings us back to the days of classic computer games. Back when computer games were written without any fancy graphics. Heck, they were written without any graphics at all!
 
