@@ -225,7 +225,6 @@ class GameCanvas {
 		}
 
 		this.render();
-		updateDebugDisplay(this);
 		this.updateStats();
 	}
 
@@ -541,83 +540,3 @@ window.addEventListener('DOMContentLoaded', async () => {
 	});
 });
 
-// Debug helper functions
-function toggleDebug() {
-	const debugPanel = document.getElementById('debugPanel');
-	debugPanel.style.display = debugPanel.style.display === 'none' ? 'block' : 'none';
-}
-
-function getDirectionName(direction) {
-	switch (direction) {
-		case Creature.UP: return 'UP';
-		case Creature.DOWN: return 'DOWN';
-		case Creature.LEFT: return 'LEFT';
-		case Creature.RIGHT: return 'RIGHT';
-		case Creature.STATIONARY: return 'STATIONARY';
-		case Creature.UPLEFT: return 'UPLEFT';
-		case Creature.UPRIGHT: return 'UPRIGHT';
-		case Creature.DOWNLEFT: return 'DOWNLEFT';
-		case Creature.DOWNRIGHT: return 'DOWNRIGHT';
-		default: return 'UNKNOWN';
-	}
-}
-
-function getCommandName(command) {
-	switch (command) {
-		case Lad.STOP: return 'STOP';
-		case Lad.LEFT: return 'LEFT';
-		case Lad.RIGHT: return 'RIGHT';
-		case Lad.UP: return 'UP';
-		case Lad.DOWN: return 'DOWN';
-		case Lad.NONE: return 'NONE';
-		case Lad.JUMP: return 'JUMP';
-		case Lad.FALL: return 'FALL';
-		case Lad.UPLEFT: return 'UPLEFT';
-		case Lad.UPRIGHT: return 'UPRIGHT';
-		case Lad.DOWNLEFT: return 'DOWNLEFT';
-		case Lad.DOWNRIGHT: return 'DOWNRIGHT';
-		default: return 'UNKNOWN';
-	}
-}
-
-function updateDebugDisplay(gameCanvas) {
-	// Only update if debug panel is visible
-	const debugPanel = document.getElementById('debugPanel');
-	if (debugPanel.style.display === 'none') {
-		return;
-	}
-
-	const lad = gameCanvas.engine.lad;
-
-	// Update position
-	document.getElementById('debug-pos').textContent = `${lad.getXPos()}, ${lad.getYPos()}`;
-
-	// Update direction
-	document.getElementById('debug-direction').textContent = getDirectionName(lad.direction);
-
-	// Update command
-	document.getElementById('debug-command').textContent = getCommandName(lad.command);
-
-	// Update futureDirection
-	document.getElementById('debug-future-direction').textContent = getDirectionName(lad.futureDirection);
-
-	// Update jumpCommand
-	document.getElementById('debug-jump-command').textContent = lad.jumpCommand ? 'true' : 'false';
-
-	// Update jump counter
-	document.getElementById('debug-jump-counter').textContent = lad.jump;
-
-	// Update next command
-	let cmdStr = 'STOP';
-	if (gameCanvas.nextCommand === Lad.UP) cmdStr = 'UP';
-	else if (gameCanvas.nextCommand === Lad.DOWN) cmdStr = 'DOWN';
-	else if (gameCanvas.nextCommand === Lad.LEFT) cmdStr = 'LEFT';
-	else if (gameCanvas.nextCommand === Lad.RIGHT) cmdStr = 'RIGHT';
-	document.getElementById('debug-keys-held').textContent = 'nextCommand: ' + cmdStr;
-
-	// Update in jump
-	document.getElementById('debug-in-jump').textContent = lad.inAJump() ? 'true' : 'false';
-
-	// Update game speed
-	document.getElementById('debug-game-speed').textContent = gameCanvas.gameSpeed + 'ms';
-}

@@ -117,48 +117,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1335 USA
 			cursor: not-allowed;
 		}
 
-		.debug {
-			padding: 10px;
-			font-size: 12px;
-			text-align: left;
-			background-color: #001;
-			border: 1px solid #0f0;
-			border-radius: 5px;
-			font-family: 'Courier New', monospace;
-			max-width: 400px;
-			display: block;
-			margin: 0;
-			flex-shrink: 0;
-			overflow-y: auto;
-			max-height: 200px;
-		}
-
-		.debug h3 {
-			margin: 0 0 10px 0;
-			color: #f0f;
-		}
-
-		.debug-row {
-			display: grid;
-			grid-template-columns: 200px 1fr;
-			margin: 3px 0;
-			gap: 10px;
-		}
-
-		.debug-label {
-			color: #0ff;
-			font-weight: bold;
-		}
-
-		.debug-toggle {
-			padding: 5px 15px;
-			margin-top: 10px;
-			border-radius: 3px;
-			display: block;
-			margin-left: auto;
-			margin-right: auto;
-			flex-shrink: 0;
-		}
 
 		.game-settings {
 			display: flex;
@@ -196,7 +154,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1335 USA
 			<h3>Controls</h3>
 			<p>Arrow Keys: Move</p>
 			<p>Spacebar: Jump</p>
-			<p>P / Esc: Pause</p>
+			<p>P / Esc: Play and Pause</p>
 		</div>
 
 		<div class="vertical-stack">
@@ -212,53 +170,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1335 USA
 			<label for="levelSelect">Level:</label>
 			<select id="levelSelect"></select>
 
-			<button id="startButton" class="debug-toggle">Start Game</button>
-			<button class="debug-toggle" onclick="toggleDebug()">Toggle Debug</button>
+			<button id="startButton">Start Game</button>
 		</div>
 
-		<div class="debug" id="debugPanel">
-			<h3>Debug Info</h3>
-			<div class="debug-row">
-				<div class="debug-label">Lad Position:</div>
-				<div class="debug-value" id="debug-pos">0, 0</div>
-			</div>
-			<div class="debug-row">
-				<div class="debug-label">Lad Direction:</div>
-				<div class="debug-value" id="debug-direction">-</div>
-			</div>
-			<div class="debug-row">
-				<div class="debug-label">Command:</div>
-				<div class="debug-value" id="debug-command">-</div>
-			</div>
-			<div class="debug-row">
-				<div class="debug-label">Future Direction:</div>
-				<div class="debug-value" id="debug-future-direction">-</div>
-			</div>
-			<div class="debug-row">
-				<div class="debug-label">Jump Command:</div>
-				<div class="debug-value" id="debug-jump-command">-</div>
-			</div>
-			<div class="debug-row">
-				<div class="debug-label">Jump Counter:</div>
-				<div class="debug-value" id="debug-jump-counter">0</div>
-			</div>
-			<div class="debug-row">
-				<div class="debug-label">Keys Held:</div>
-				<div class="debug-value" id="debug-keys-held">none</div>
-			</div>
-			<div class="debug-row">
-				<div class="debug-label">In Jump:</div>
-				<div class="debug-value" id="debug-in-jump">false</div>
-			</div>
-			<div class="debug-row">
-				<div class="debug-label">Can Stay Put:</div>
-				<div class="debug-value" id="debug-can-stay">-</div>
-			</div>
-			<div class="debug-row">
-				<div class="debug-label">Game Speed:</div>
-				<div class="debug-value" id="debug-game-speed">-</div>
-			</div>
-		</div>
 	</div>
 
 	<script src="ladder.js"></script>
