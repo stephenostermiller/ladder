@@ -297,6 +297,7 @@ class GameEngine {
 		if (startPos) {
 			this.realLevel.setCharAt(startPos.y, startPos.x, ' ');
 		}
+		this.setupLevelProducers();
 		this.reset();
 	}
 

@@ -13,6 +13,8 @@ The `make` command will:
 - Regenerate the site
 - Handle all necessary build steps
 
+You should run `make` after each and every change so that the application is automatically available to test. Inform the user that this is the case.
+
 ### Important:
 
 - Do not run `make clean`. Make has proper dependency detection, clean isn't needed.

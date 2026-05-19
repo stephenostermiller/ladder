@@ -17,9 +17,13 @@ keywords: ladder, game of ladder, der rock, lad, kaypro game, ASCII game, CPM ga
 
 <div class="controls">
 <h3><a href="#" id="controlsLink">Controls</a></h3>
+<div id="defaultControls">
 <div>Arrow Keys: Move</div>
 <div>Spacebar: Jump</div>
 <div>P / Esc: Play and Pause</div>
+<div>Any other letter: Stop</div>
+</div>
+<div id="customControls" style="display: none;">Customized</div>
 </div>
 
 <button id="fullscreenButton">Fullscreen</button>

@@ -57,6 +57,9 @@ class GameCanvas {
 
 		this.nextCommand = Lad.STOP;
 		this.jumpCommand = false;
+		this.keysHeldDown = new Set();
+		this.keysRecentlyDown = [];
+		this.lastCommandKeyPressed = null;
 
 		this.ladsLeft = 3;
 		this.gameOver = GameCanvas.G_O_NOT_OVER;
@@ -108,49 +111,65 @@ class GameCanvas {
 		localStorage.setItem(CONTROLS_STORAGE_KEY, JSON.stringify(this.controls));
 	}
 
+	isGameControlKey(key) {
+		return this.controls.up.map(k => k.toLowerCase()).includes(key.toLowerCase()) ||
+			this.controls.down.map(k => k.toLowerCase()).includes(key.toLowerCase()) ||
+			this.controls.left.map(k => k.toLowerCase()).includes(key.toLowerCase()) ||
+			this.controls.right.map(k => k.toLowerCase()).includes(key.toLowerCase()) ||
+			this.controls.jump.map(k => k.toLowerCase()).includes(key.toLowerCase()) ||
+			this.controls.pause.map(k => k.toLowerCase()).includes(key.toLowerCase()) ||
+			key.length === 1  // Single character keys (letters, numbers, space)
+	}
+
 	setupKeyboardControls() {
 		document.addEventListener('keydown', (e) => {
-			// Prevent default for configured game control keys
-			const isGameControl =
-				this.controls.up.includes(e.key) ||
-				this.controls.down.includes(e.key) ||
-				this.controls.left.includes(e.key) ||
-				this.controls.right.includes(e.key) ||
-				this.controls.jump.includes(e.key) ||
-				this.controls.pause.map(k => k.toLowerCase()).includes(e.key.toLowerCase()) ||
-				e.key === 'Escape' ||
-				e.key.startsWith('Arrow') ||
-				e.key === ' ';
-
-			if (isGameControl) {
-				e.preventDefault();
-			}
-
-			// Match Java behavior: tap a direction key and it persists until another key is pressed
-			if (e.key === 'Escape' || this.controls.pause.map(k => k.toLowerCase()).includes(e.key.toLowerCase())) {
+			if (!this.isGameControlKey(e.key)) return
+			e.preventDefault()
+			// Handle pause, immediate action
+			if (this.controls.pause.map(k => k.toLowerCase()).includes(e.key.toLowerCase())) {
 				// If showing title screen or game is over, start the game with P
 				if (this.isShowingTitle || this.gameOver !== GameCanvas.G_O_NOT_OVER) {
 					this.isShowingTitle = false;
 					this.restartGame();
+					updateGameUIState();
 				} else {
 					// Otherwise toggle pause
 					this.togglePause();
+					updateGameUIState();
 				}
-			} else if (this.controls.up.includes(e.key)) {
-				this.nextCommand = Lad.UP;
-			} else if (this.controls.down.includes(e.key)) {
-				this.nextCommand = Lad.DOWN;
-			} else if (this.controls.left.includes(e.key)) {
-				this.nextCommand = Lad.LEFT;
-			} else if (this.controls.right.includes(e.key)) {
-				this.nextCommand = Lad.RIGHT;
-			} else if (this.controls.jump.includes(e.key)) {
+				return
+			}
+
+			// Track non-pause keys for direction/jump commands
+			this.keysHeldDown.add(e.key);
+			this.keysRecentlyDown.push(e.key);
+		})
+		document.addEventListener('keyup', (e) => {
+			if (!this.isGameControlKey(e.key)) e.preventDefault()
+			this.keysHeldDown.delete(e.key);
+		})
+		document.addEventListener('keypress', (e) => {
+			if (this.isGameControlKey(e.key)) e.preventDefault()
+		})
+	}
+
+	updateCommandsFromPressedKeys() {
+		[...this.keysRecentlyDown,...this.keysHeldDown].forEach(key => {
+			if (this.controls.jump.map(k => k.toLowerCase()).includes(key.toLowerCase())) {
 				this.jumpCommand = true;
+			} else if (this.controls.up.map(k => k.toLowerCase()).includes(key.toLowerCase())) {
+				this.nextCommand = Lad.UP;
+			} else if (this.controls.down.map(k => k.toLowerCase()).includes(key.toLowerCase())) {
+				this.nextCommand = Lad.DOWN;
+			} else if (this.controls.left.map(k => k.toLowerCase()).includes(key.toLowerCase())) {
+				this.nextCommand = Lad.LEFT;
+			} else if (this.controls.right.map(k => k.toLowerCase()).includes(key.toLowerCase())) {
+				this.nextCommand = Lad.RIGHT;
 			} else {
-				// Any other key stops movement
 				this.nextCommand = Lad.STOP;
 			}
-		});
+		})
+		this.keysRecentlyDown = [];
 	}
 
 	togglePause() {
@@ -240,6 +259,9 @@ class GameCanvas {
 
 		// Sync extra lives earned through score milestones
 		const prevEngineLadsLeft = this.engine.getLadsLeft();
+
+		// Update commands based on currently pressed keys
+		this.updateCommandsFromPressedKeys();
 
 		const result = this.engine.tick(this.nextCommand, this.jumpCommand);
 		this.nextCommand = Lad.NONE;
@@ -444,6 +466,7 @@ class GameCanvas {
 		this.inBonusCountdown = false;
 		this.loadingNextLevel = false;
 		this.startGameLoop();
+		document.getElementById('levelSelect').value = this.currentLevelIndex;
 	}
 
 	formatKeyName(key) {
@@ -578,8 +601,8 @@ class GameCanvas {
 				this.controls = { ...DEFAULT_CONTROLS };
 				// Re-render all key bindings
 				actions.forEach(action => {
-					const container = modalContent.querySelector(`[data-action="${action.key}"]`);
-					if (container && container.classList.contains('key-bindings')) {
+					const container = modalContent.querySelector(`.key-bindings[data-action="${action.key}"]`);
+					if (container) {
 						const updateKeyBindings = () => {
 							container.innerHTML = '';
 							this.controls[action.key].forEach(key => {
@@ -648,6 +671,7 @@ class GameCanvas {
 				this.saveControls();
 				this.setupKeyboardControls();
 				modalOverlay.classList.remove('open');
+				updateControlsDisplay();
 			});
 			buttonContainer.appendChild(closeBtn);
 
@@ -661,6 +685,7 @@ class GameCanvas {
 					this.saveControls();
 					this.setupKeyboardControls();
 					modalOverlay.classList.remove('open');
+					updateControlsDisplay();
 				}
 			});
 		}
@@ -712,26 +737,49 @@ async function loadLevelFile(filename) {
 // Initialize the game
 let game = null;
 
-function disableGameControls() {
-	document.getElementById('difficultySelect').disabled = true;
-	document.getElementById('levelSelect').disabled = true;
-}
-
-function enableGameControls() {
-	document.getElementById('difficultySelect').disabled = false;
-	document.getElementById('levelSelect').disabled = false;
-}
-
-function updateStartButtonState() {
+function updateGameUIState() {
 	const button = document.getElementById('startButton');
+	const difficultySelect = document.getElementById('difficultySelect');
+	const levelSelect = document.getElementById('levelSelect');
 	if (!game) return;
 
+	// Update button text
 	if (game.isShowingTitle || game.gameOver !== GameCanvas.G_O_NOT_OVER) {
 		button.textContent = 'Start Game';
 	} else if (game.paused) {
 		button.textContent = 'Resume';
 	} else {
 		button.textContent = 'Pause';
+	}
+
+	// Enable/disable controls based on game state
+	// Selects are only enabled when game hasn't started (title screen) or is over
+	const isGameInProgress = !game.isShowingTitle && game.gameOver === GameCanvas.G_O_NOT_OVER;
+	if (isGameInProgress) {
+		difficultySelect.disabled = true;
+		levelSelect.disabled = true;
+	} else {
+		difficultySelect.disabled = false;
+		levelSelect.disabled = false;
+	}
+}
+
+function updateControlsDisplay() {
+	if (!game) return;
+
+	// Check if controls are at default values
+	const isDefault = JSON.stringify(game.controls) === JSON.stringify(DEFAULT_CONTROLS);
+	const defaultControls = document.getElementById('defaultControls');
+	const customControls = document.getElementById('customControls');
+
+	if (defaultControls && customControls) {
+		if (isDefault) {
+			defaultControls.style.display = '';
+			customControls.style.display = 'none';
+		} else {
+			defaultControls.style.display = 'none';
+			customControls.style.display = '';
+		}
 	}
 }
 
@@ -776,16 +824,16 @@ window.addEventListener('DOMContentLoaded', async () => {
 	startButton.disabled = false;
 	difficultySelect.disabled = false;
 	levelSelect.disabled = false;
-	updateStartButtonState();
+	updateGameUIState();
+	updateControlsDisplay();
 
 	// Set game over callback
 	game.onGameOver = () => {
-		enableGameControls();
-		updateStartButtonState();
+		updateGameUIState();
 	};
 
 	// Handle start button click
-	startButton.addEventListener('click', () => {
+	startButton.addEventListener('click', async () => {
 		if (game) {
 			// If showing title or game over, start the game
 			if (game.isShowingTitle || game.gameOver !== GameCanvas.G_O_NOT_OVER) {
@@ -800,16 +848,22 @@ window.addEventListener('DOMContentLoaded', async () => {
 				};
 				game.setDifficulty(diffMap[selectedDifficulty]);
 
+				// Load the selected level
+				const levelIdx = parseInt(levelSelect.value);
+				const levelData = await loadLevelFile(LEVEL_FILES[levelIdx]);
+				if (levelData) {
+					game.currentLevelIndex = levelIdx;
+					game.changeLevel(levelData);
+				}
+
 				// Hide title and start the actual game
 				game.isShowingTitle = false;
 				game.paused = false;
-				disableGameControls();
-				game.restartGame();  // Properly restart from the beginning
 			} else {
 				// Otherwise toggle pause
 				game.togglePause();
 			}
-			updateStartButtonState();
+			updateGameUIState();
 		}
 	});
 
@@ -835,7 +889,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 		if (levelData && game) {
 			game.currentLevelIndex = levelIdx;
 			game.changeLevel(levelData);
-			updateStartButtonState();
+			updateGameUIState();
 		}
 	});
 
@@ -870,4 +924,3 @@ window.addEventListener('DOMContentLoaded', async () => {
 		});
 	}
 });
-
