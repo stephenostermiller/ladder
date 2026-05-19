@@ -10,6 +10,17 @@
 
 "use strict";
 
+// Default control key bindings - each action can have multiple keys
+const DEFAULT_CONTROLS = {
+	up: ['ArrowUp', '8'],
+	down: ['ArrowDown', '2'],
+	left: ['ArrowLeft', '4'],
+	right: ['ArrowRight', '6'],
+	jump: [' '],
+	pause: ['Escape', 'p']
+};
+const CONTROLS_STORAGE_KEY = 'ladderControls';
+
 // Game Canvas/Engine class
 class GameCanvas {
 	static G_O_NOT_OVER = 0;
@@ -75,22 +86,48 @@ class GameCanvas {
 		// Game loop timing
 		this.lastUpdateTime = Date.now();
 
+		// Load custom controls from localStorage
+		this.controls = this.loadControls();
+
 		this.setupKeyboardControls();
 
 		this.gameRunning = false;
 		this.startGameLoop();
 	}
 
+	loadControls() {
+		try {
+			const saved = JSON.parse(localStorage.getItem(CONTROLS_STORAGE_KEY));
+			return saved || { ...DEFAULT_CONTROLS };
+		} catch {
+			return { ...DEFAULT_CONTROLS };
+		}
+	}
+
+	saveControls() {
+		localStorage.setItem(CONTROLS_STORAGE_KEY, JSON.stringify(this.controls));
+	}
 
 	setupKeyboardControls() {
 		document.addEventListener('keydown', (e) => {
-			// Prevent default for arrow keys and space to avoid page scrolling
-			if (e.key === ' ' || e.key.startsWith('Arrow')) {
+			// Prevent default for configured game control keys
+			const isGameControl =
+				this.controls.up.includes(e.key) ||
+				this.controls.down.includes(e.key) ||
+				this.controls.left.includes(e.key) ||
+				this.controls.right.includes(e.key) ||
+				this.controls.jump.includes(e.key) ||
+				this.controls.pause.map(k => k.toLowerCase()).includes(e.key.toLowerCase()) ||
+				e.key === 'Escape' ||
+				e.key.startsWith('Arrow') ||
+				e.key === ' ';
+
+			if (isGameControl) {
 				e.preventDefault();
 			}
 
 			// Match Java behavior: tap a direction key and it persists until another key is pressed
-			if (e.key === 'Escape' || e.key.toLowerCase() === 'p') {
+			if (e.key === 'Escape' || this.controls.pause.map(k => k.toLowerCase()).includes(e.key.toLowerCase())) {
 				// If showing title screen or game is over, start the game with P
 				if (this.isShowingTitle || this.gameOver !== GameCanvas.G_O_NOT_OVER) {
 					this.isShowingTitle = false;
@@ -99,15 +136,15 @@ class GameCanvas {
 					// Otherwise toggle pause
 					this.togglePause();
 				}
-			} else if (e.key === 'ArrowUp' || e.key === '8') {
+			} else if (this.controls.up.includes(e.key)) {
 				this.nextCommand = Lad.UP;
-			} else if (e.key === 'ArrowDown' || e.key === '2') {
+			} else if (this.controls.down.includes(e.key)) {
 				this.nextCommand = Lad.DOWN;
-			} else if (e.key === 'ArrowLeft' || e.key === '4') {
+			} else if (this.controls.left.includes(e.key)) {
 				this.nextCommand = Lad.LEFT;
-			} else if (e.key === 'ArrowRight' || e.key === '6') {
+			} else if (this.controls.right.includes(e.key)) {
 				this.nextCommand = Lad.RIGHT;
-			} else if (e.key === ' ') {
+			} else if (this.controls.jump.includes(e.key)) {
 				this.jumpCommand = true;
 			} else {
 				// Any other key stops movement
@@ -408,6 +445,229 @@ class GameCanvas {
 		this.loadingNextLevel = false;
 		this.startGameLoop();
 	}
+
+	formatKeyName(key) {
+		const keyMap = {
+			' ': 'Space',
+			'ArrowUp': '↑',
+			'ArrowDown': '↓',
+			'ArrowLeft': '←',
+			'ArrowRight': '→',
+			'Escape': 'Esc'
+		};
+		return keyMap[key] || key.toUpperCase();
+	}
+
+	openControlsModal() {
+		let modalOverlay = document.getElementById('controlsModalOverlay');
+
+		// Create modal if it doesn't exist
+		if (!modalOverlay) {
+			modalOverlay = document.createElement('div');
+			modalOverlay.id = 'controlsModalOverlay';
+			modalOverlay.className = 'modal-overlay';
+
+			const modalContent = document.createElement('div');
+			modalContent.className = 'modal-content';
+
+			const title = document.createElement('h3');
+			title.textContent = 'Customize Controls';
+			modalContent.appendChild(title);
+
+			const table = document.createElement('table');
+			table.className = 'controls-table';
+
+			const actions = [
+				{ key: 'up', label: 'Move Up' },
+				{ key: 'down', label: 'Move Down' },
+				{ key: 'left', label: 'Move Left' },
+				{ key: 'right', label: 'Move Right' },
+				{ key: 'jump', label: 'Jump' },
+				{ key: 'pause', label: 'Pause / Play' }
+			];
+
+			actions.forEach(action => {
+				const row = document.createElement('tr');
+
+				const labelCell = document.createElement('td');
+				labelCell.textContent = action.label;
+				row.appendChild(labelCell);
+
+				const keysCell = document.createElement('td');
+				keysCell.className = 'keys-cell';
+				keysCell.setAttribute('data-action', action.key);
+
+				const keysContainer = document.createElement('div');
+				keysContainer.className = 'key-bindings';
+				keysContainer.setAttribute('data-action', action.key);
+
+				const updateKeyBindings = () => {
+					keysContainer.innerHTML = '';
+					this.controls[action.key].forEach(key => {
+						const binding = document.createElement('div');
+						binding.className = 'key-binding';
+						binding.textContent = this.formatKeyName(key);
+
+						const removeBtn = document.createElement('button');
+						removeBtn.className = 'remove-key';
+						removeBtn.textContent = '✕';
+						removeBtn.setAttribute('aria-label', `Remove ${key}`);
+						removeBtn.addEventListener('click', (e) => {
+							e.stopPropagation();
+							this.controls[action.key] = this.controls[action.key].filter(k => k !== key);
+							updateKeyBindings();
+						});
+
+						binding.appendChild(removeBtn);
+						keysContainer.appendChild(binding);
+					});
+
+					const addBtn = document.createElement('button');
+					addBtn.className = 'add-key-btn';
+					addBtn.textContent = '+ Add Key';
+					addBtn.addEventListener('click', () => {
+						addBtn.classList.add('capturing');
+						addBtn.textContent = 'Press any key...';
+						addBtn.disabled = true;
+
+						const captureHandler = (e) => {
+							if (e.key === 'Escape') {
+								// Cancel capture
+								document.removeEventListener('keydown', captureHandler);
+								addBtn.classList.remove('capturing');
+								addBtn.textContent = '+ Add Key';
+								addBtn.disabled = false;
+								return;
+							}
+
+							e.preventDefault();
+							const newKey = e.key;
+
+							// Check if key already exists in this action
+							if (!this.controls[action.key].includes(newKey)) {
+								this.controls[action.key].push(newKey);
+							}
+
+							document.removeEventListener('keydown', captureHandler);
+							addBtn.classList.remove('capturing');
+							addBtn.textContent = '+ Add Key';
+							addBtn.disabled = false;
+							updateKeyBindings();
+						};
+
+						document.addEventListener('keydown', captureHandler);
+					});
+
+					keysContainer.appendChild(addBtn);
+				};
+
+				updateKeyBindings();
+				keysCell.appendChild(keysContainer);
+				row.appendChild(keysCell);
+				table.appendChild(row);
+			});
+
+			modalContent.appendChild(table);
+
+			const buttonContainer = document.createElement('div');
+			buttonContainer.className = 'modal-buttons';
+
+			const resetBtn = document.createElement('button');
+			resetBtn.textContent = 'Reset to Defaults';
+			resetBtn.addEventListener('click', () => {
+				this.controls = { ...DEFAULT_CONTROLS };
+				// Re-render all key bindings
+				actions.forEach(action => {
+					const container = modalContent.querySelector(`[data-action="${action.key}"]`);
+					if (container && container.classList.contains('key-bindings')) {
+						const updateKeyBindings = () => {
+							container.innerHTML = '';
+							this.controls[action.key].forEach(key => {
+								const binding = document.createElement('div');
+								binding.className = 'key-binding';
+								binding.textContent = this.formatKeyName(key);
+
+								const removeBtn = document.createElement('button');
+								removeBtn.className = 'remove-key';
+								removeBtn.textContent = '✕';
+								removeBtn.addEventListener('click', (e) => {
+									e.stopPropagation();
+									this.controls[action.key] = this.controls[action.key].filter(k => k !== key);
+									updateKeyBindings();
+								});
+
+								binding.appendChild(removeBtn);
+								container.appendChild(binding);
+							});
+
+							const addBtn = document.createElement('button');
+							addBtn.className = 'add-key-btn';
+							addBtn.textContent = '+ Add Key';
+							addBtn.addEventListener('click', () => {
+								addBtn.classList.add('capturing');
+								addBtn.textContent = 'Press any key...';
+								addBtn.disabled = true;
+
+								const captureHandler = (e) => {
+									if (e.key === 'Escape') {
+										document.removeEventListener('keydown', captureHandler);
+										addBtn.classList.remove('capturing');
+										addBtn.textContent = '+ Add Key';
+										addBtn.disabled = false;
+										return;
+									}
+
+									e.preventDefault();
+									const newKey = e.key;
+
+									if (!this.controls[action.key].includes(newKey)) {
+										this.controls[action.key].push(newKey);
+									}
+
+									document.removeEventListener('keydown', captureHandler);
+									addBtn.classList.remove('capturing');
+									addBtn.textContent = '+ Add Key';
+									addBtn.disabled = false;
+									updateKeyBindings();
+								};
+
+								document.addEventListener('keydown', captureHandler);
+							});
+
+							container.appendChild(addBtn);
+						};
+						updateKeyBindings();
+					}
+				});
+			});
+			buttonContainer.appendChild(resetBtn);
+
+			const closeBtn = document.createElement('button');
+			closeBtn.textContent = 'Close';
+			closeBtn.addEventListener('click', () => {
+				this.saveControls();
+				this.setupKeyboardControls();
+				modalOverlay.classList.remove('open');
+			});
+			buttonContainer.appendChild(closeBtn);
+
+			modalContent.appendChild(buttonContainer);
+			modalOverlay.appendChild(modalContent);
+			document.body.appendChild(modalOverlay);
+
+			// Close modal on overlay click
+			modalOverlay.addEventListener('click', (e) => {
+				if (e.target === modalOverlay) {
+					this.saveControls();
+					this.setupKeyboardControls();
+					modalOverlay.classList.remove('open');
+				}
+			});
+		}
+
+		// Show the modal
+		modalOverlay.classList.add('open');
+	}
 }
 
 // Available level files
@@ -481,6 +741,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 	const levelSelect = document.getElementById('levelSelect');
 	const startButton = document.getElementById('startButton');
 	const fullscreenButton = document.getElementById('fullscreenButton');
+	const controlsLink = document.getElementById('controlsLink');
 
 	// Populate level select dropdown
 	levelSelect.innerHTML = '';
@@ -598,5 +859,15 @@ window.addEventListener('DOMContentLoaded', async () => {
 			fullscreenButton.textContent = 'Fullscreen';
 		}
 	});
+
+	// Handle controls link click
+	if (controlsLink) {
+		controlsLink.addEventListener('click', (e) => {
+			e.preventDefault();
+			if (game) {
+				game.openControlsModal();
+			}
+		});
+	}
 });
 
