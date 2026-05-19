@@ -261,8 +261,10 @@ class GameCanvas {
 		const levelHeight = this.engine.screenLevel.getHeight();
 
 		// Calculate scale to fit in container while maintaining aspect ratio
+		// Account for stats row at the bottom
+		const statsRowHeight = this.letterHeight;
 		const scaleX = containerWidth / (levelWidth * this.letterWidth);
-		const scaleY = containerHeight / (levelHeight * this.letterHeight);
+		const scaleY = (containerHeight - statsRowHeight) / (levelHeight * this.letterHeight);
 		const scale = Math.max(1, Math.min(scaleX, scaleY));
 
 		// Calculate game content size
@@ -307,7 +309,7 @@ class GameCanvas {
 		// Draw stats at the bottom (not on title screen)
 		if (!this.isShowingTitle) {
 			const levelHeight = this.engine.screenLevel.getHeight();
-			const statsY = this.offsetY + (levelHeight + 1) * this.letterHeight * this.canvasScale;
+			const statsY = this.offsetY + levelHeight * this.letterHeight * this.canvasScale;
 			const statsText = `Score: ${this.engine.getScore()}  Lives: ${this.ladsLeft}  Level: ${this.currentLevelIndex + 1}  Bonus: ${Math.max(0, this.engine.getCycles())}`;
 			this.ctx.fillText(statsText, this.offsetX, statsY + this.letterHeight * this.canvasScale);
 		}
@@ -440,7 +442,7 @@ async function loadLevelFile(filename) {
 		if (!response.ok) {
 			throw new Error(`Failed to load level: ${response.statusText}`);
 		}
-		return await response.text();
+		return (await response.text()).trimEnd();
 	} catch (error) {
 		console.error('Error loading level file:', error);
 		return null;
