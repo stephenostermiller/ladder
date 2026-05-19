@@ -495,6 +495,7 @@ public class LadderCanvas extends JPanel implements Runnable {
 			switch (engine.gameOver){
 			case G_O_BARREL: case G_O_TIME: case G_O_SPIKE:
 				ladDeath();
+				engine.loseLad();
 				if (engine.getLadsLeft() > 0){
 					engine.reset();
 					gameStop = false;

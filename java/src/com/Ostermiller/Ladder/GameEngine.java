@@ -370,7 +370,7 @@ public class GameEngine {
 			callback.onBeep();
 			break;
 		case SCORE_MONEY:
-			score += 10;
+			score += SCORE_MONEY * 10;
 			callback.onBeep();
 			break;
 		}
@@ -401,4 +401,16 @@ public class GameEngine {
 	public int getCycles()    { return cycles; }
 	public int getLadX()      { return lad.getXPos(); }
 	public int getLadY()      { return lad.getYPos(); }
+
+	public void loseLad() {
+		if (ladsLeft > 0) {
+			ladsLeft--;
+			callback.onLadsChanged(ladsLeft);
+		}
+	}
+
+	public void resetLads() {
+		ladsLeft = 3;
+		callback.onLadsChanged(ladsLeft);
+	}
 }

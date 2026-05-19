@@ -262,11 +262,11 @@ class GameEngine {
 				this.score += 200;
 				break;
 			case GameEngine.SCORE_MONEY:
-				this.score += 10;
+				this.score += GameEngine.SCORE_MONEY * 100;
 				break;
 		}
 
-		if (this.score >= this.nextNewLad) {
+		if (this.score > this.nextNewLad) {
 			this.ladsLeft++;
 			this.nextNewLad += 10000;
 		}
@@ -303,6 +303,16 @@ class GameEngine {
 
 	getLadsLeft() {
 		return this.ladsLeft;
+	}
+
+	loseLad() {
+		if (this.ladsLeft > 0) {
+			this.ladsLeft--;
+		}
+	}
+
+	resetLads() {
+		this.ladsLeft = 3;
 	}
 
 	getScreenState() {

@@ -61,7 +61,6 @@ class GameCanvas {
 		this.keysRecentlyDown = [];
 		this.lastCommandKeyPressed = null;
 
-		this.ladsLeft = 3;
 		this.gameOver = GameCanvas.G_O_NOT_OVER;
 		this.inBonusCountdown = false;
 		this.loadingNextLevel = false;
@@ -88,6 +87,9 @@ class GameCanvas {
 
 		// Game loop timing
 		this.lastUpdateTime = Date.now();
+
+		// Track number of levels loaded during play
+		this.levelsLoaded = 0;
 
 		// Load custom controls from localStorage
 		this.controls = this.loadControls();
@@ -241,7 +243,7 @@ class GameCanvas {
 				this.engine.screenLevel.setCharAt(
 					this.deathAnimationY - 1, this.deathAnimationX - 1, ' ');
 
-				if (this.ladsLeft <= 0) {
+				if (this.engine.getLadsLeft() <= 0) {
 					this.setGameOverState(this.pendingGameOver);
 				} else {
 					this.resetLad();
@@ -257,9 +259,6 @@ class GameCanvas {
 			return;
 		}
 
-		// Sync extra lives earned through score milestones
-		const prevEngineLadsLeft = this.engine.getLadsLeft();
-
 		// Update commands based on currently pressed keys
 		this.updateCommandsFromPressedKeys();
 
@@ -267,16 +266,10 @@ class GameCanvas {
 		this.nextCommand = Lad.NONE;
 		this.jumpCommand = false;
 
-		// Sync extra lives from engine
-		const engineLadsIncrease = this.engine.getLadsLeft() - prevEngineLadsLeft;
-		if (engineLadsIncrease > 0) {
-			this.ladsLeft += engineLadsIncrease;
-		}
-
 		if (result === GameEngine.G_O_MONEY) {
 			this.inBonusCountdown = true;
 		} else if (result === GameEngine.G_O_BARREL || result === GameEngine.G_O_TIME || result === GameEngine.G_O_SPIKE) {
-			this.ladsLeft--;
+			this.engine.loseLad();
 			this.pendingGameOver = result;
 			this.startDeathAnimation(this.engine.getLadX(), this.engine.getLadY());
 		}
@@ -300,13 +293,11 @@ class GameCanvas {
 		}
 	}
 
-
 	startDeathAnimation(x, y) {
 		this.deathAnimationFrame = 0;
 		this.deathAnimationX = x;
 		this.deathAnimationY = y;
 	}
-
 
 	resizeCanvas() {
 		const container = this.canvas.parentElement;
@@ -367,7 +358,10 @@ class GameCanvas {
 		if (!this.isShowingTitle) {
 			const levelHeight = this.engine.screenLevel.getHeight();
 			const statsY = this.offsetY + levelHeight * this.letterHeight * this.canvasScale;
-			const statsText = `Score: ${this.engine.getScore()}  Lives: ${this.ladsLeft}  Level: ${this.currentLevelIndex + 1}  Bonus: ${Math.max(0, this.engine.getCycles())}`;
+			const score = String(this.engine.getScore()).padEnd(6);
+			const lives = String(this.engine.getLadsLeft()).padEnd(2);
+			const level = String(this.levelsLoaded).padEnd(2);
+			const statsText = `Score: ${score}  Lives: ${lives}  Level: ${level}  Bonus: ${Math.max(0, this.engine.getCycles())}`;
 			this.ctx.fillText(statsText, this.offsetX, statsY + this.letterHeight * this.canvasScale);
 		}
 
@@ -459,10 +453,10 @@ class GameCanvas {
 		this.engine.setLevel(levelData);
 		this.startLadX = this.engine.ladStartPosX;
 		this.startLadY = this.engine.ladStartPosY;
-		this.ladsLeft = 3;
 		this.gameOver = GameCanvas.G_O_NOT_OVER;
 		this.inBonusCountdown = false;
 		this.loadingNextLevel = false;
+		this.levelsLoaded++;
 		this.startGameLoop();
 		document.getElementById('levelSelect').value = this.currentLevelIndex;
 	}
@@ -851,6 +845,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 				const levelData = await loadLevelFile(LEVEL_FILES[levelIdx]);
 				if (levelData) {
 					game.currentLevelIndex = levelIdx;
+					game.engine.resetLads();
 					game.changeLevel(levelData);
 				}
 
