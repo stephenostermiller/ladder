@@ -1,62 +1,62 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>$title$</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>$title$</title>
 $if(description)$
-  <meta name="description" content="$description$">
+	<meta name="description" content="$description$">
 $endif$
 $if(keywords)$
-  <meta name="keywords" content="$keywords$">
+	<meta name="keywords" content="$keywords$">
 $endif$
-  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-  <link rel="stylesheet" media="screen" title="Web View" href="style.css" type="text/css">
-  <link rel="stylesheet" media="print" href="printable.css" type="text/css">
-  <link rel="alternate stylesheet" media="screen" title="Print Preview" href="printable.css" type="text/css">
+	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" media="screen" title="Web View" href="style.css" type="text/css">
+	<link rel="stylesheet" media="print" href="printable.css" type="text/css">
+	<link rel="alternate stylesheet" media="screen" title="Print Preview" href="printable.css" type="text/css">
 </head>
 <body>
 <header id="header">
-  <div class="header-container">
-    <div class="header-content">
-      <h1><a href="./" class="logo">$title$</a></h1>
-      $if(description)$
-      <p class="tagline">$description$</p>
-      $endif$
-    </div>
-    <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">☰</button>
-  </div>
+	<div class="header-container">
+		<div class="header-content">
+			<h1><a href="./" class="logo">$title$</a></h1>
+			$if(description)$
+			<p class="tagline">$description$</p>
+			$endif$
+		</div>
+		<button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">☰</button>
+	</div>
 </header>
 
 <nav id="nav-menu" class="nav-menu">
-  <ul>
-    <li><a href="./">Ladder</a></li>
-    <li><a href="download.html">Download</a></li>
-    <li><a href="instructions.html">Instructions</a></li>
-    <li class="menu-item-with-submenu">
-      <a href="levels.html">Levels</a>
-      $if(is_levels)$
-      <ul class="submenu">
-        <li><a href="ladder1levels.html">Ladder 1 Levels</a></li>
-        <li><a href="ladder2levels.html">Ladder 2 Levels</a></li>
-        <li><a href="newLevel.html">New Levels</a></li>
-        <li><a href="https://ostermiller.org/contact.pl?regarding=New+Ladder+Level">Submit</a></li>
-      </ul>
-      $endif$
-    </li>
-    <li><a href="differences.html">Differences from Original</a></li>
-    <li><a href="customize.html">Customization</a></li>
-    <li><a href="history.html">Version History</a></li>
-    <li><a href="license.html">License</a></li>
-  </ul>
+	<ul>
+		<li><a href="./">Ladder</a></li>
+		<li><a href="download.html">Download</a></li>
+		<li><a href="instructions.html">Instructions</a></li>
+		<li class="menu-item-with-submenu">
+			<a href="levels.html">Levels</a>
+			$if(is_levels)$
+			<ul class="submenu">
+				<li><a href="ladder1levels.html">Ladder 1 Levels</a></li>
+				<li><a href="ladder2levels.html">Ladder 2 Levels</a></li>
+				<li><a href="newLevel.html">New Levels</a></li>
+				<li><a href="https://ostermiller.org/contact.pl?regarding=New+Ladder+Level">Submit</a></li>
+			</ul>
+			$endif$
+		</li>
+		<li><a href="differences.html">Differences from Original</a></li>
+		<li><a href="customize.html">Customization</a></li>
+		<li><a href="history.html">Version History</a></li>
+		<li><a href="license.html">License</a></li>
+	</ul>
 </nav>
 
 <main id="content" class="main-content">
-  $body$
+	$body$
 </main>
 
 <footer id="foot">
-  <p>Copyright &copy; <a href="https://ostermiller.org/contact.pl?regarding=Ladder" class="contact-link">Stephen Ostermiller</a> 1999-2026</p>
+	<p>Copyright &copy; <a href="https://ostermiller.org/contact.pl?regarding=Ladder" class="contact-link">Stephen Ostermiller</a> 1999-2026</p>
 </footer>
 
 <script>
@@ -64,63 +64,63 @@ const menuToggle = document.getElementById('menu-toggle');
 const navMenu = document.getElementById('nav-menu');
 
 menuToggle.addEventListener('click', function() {
-  const isOpen = navMenu.classList.toggle('open');
-  menuToggle.setAttribute('aria-expanded', isOpen);
-  menuToggle.textContent = isOpen ? '✕' : '☰';
+	const isOpen = navMenu.classList.toggle('open');
+	menuToggle.setAttribute('aria-expanded', isOpen);
+	menuToggle.textContent = isOpen ? '✕' : '☰';
 });
 
 document.addEventListener('click', function(event) {
-  if (!event.target.closest('header') && !event.target.closest('nav')) {
-    navMenu.classList.remove('open');
-    menuToggle.setAttribute('aria-expanded', false);
-    menuToggle.textContent = '☰';
-  }
+	if (!event.target.closest('header') && !event.target.closest('nav')) {
+		navMenu.classList.remove('open');
+		menuToggle.setAttribute('aria-expanded', false);
+		menuToggle.textContent = '☰';
+	}
 });
 
 navMenu.querySelectorAll('a').forEach(link => {
-  link.addEventListener('click', function(e) {
-    const parent = link.parentElement;
-    if (parent.classList.contains('menu-item-with-submenu') &&
-        window.innerWidth <= 1000 &&
-        parent.querySelector('.submenu')) {
-      e.preventDefault();
-      parent.classList.toggle('open');
-    } else {
-      navMenu.classList.remove('open');
-      menuToggle.setAttribute('aria-expanded', false);
-      menuToggle.textContent = '☰';
-    }
-  });
+	link.addEventListener('click', function(e) {
+		const parent = link.parentElement;
+		if (parent.classList.contains('menu-item-with-submenu') &&
+				window.innerWidth <= 1000 &&
+				parent.querySelector('.submenu')) {
+			e.preventDefault();
+			parent.classList.toggle('open');
+		} else {
+			navMenu.classList.remove('open');
+			menuToggle.setAttribute('aria-expanded', false);
+			menuToggle.textContent = '☰';
+		}
+	});
 });
 
 document.addEventListener('DOMContentLoaded', async function() {
-  const preBlocks = document.querySelectorAll('pre[data-level]');
-  for (let pre of preBlocks) {
-    const levelName = pre.getAttribute('data-level');
+	const preBlocks = document.querySelectorAll('pre[data-level]');
+	for (let pre of preBlocks) {
+		const levelName = pre.getAttribute('data-level');
 
-    if (!levelName) {
-      console.log('No level name found, skipping');
-      continue;
-    }
+		if (!levelName) {
+			console.log('No level name found, skipping');
+			continue;
+		}
 
-    const code = pre.querySelector('code');
-    if (!code) {
-      console.error('No code element found in pre for level ' + levelName);
-      continue;
-    }
+		const code = pre.querySelector('code');
+		if (!code) {
+			console.error('No code element found in pre for level ' + levelName);
+			continue;
+		}
 
-    try {
-      const response = await fetch(levelName + '.lvl');
-      if (response.ok) {
-        const text = await response.text();
-        code.textContent = text;
-      } else {
-        console.error('Failed to fetch ' + levelName + '.lvl: ' + response.status);
-      }
-    } catch (e) {
-      console.error('Error loading level ' + levelName + ':', e);
-    }
-  }
+		try {
+			const response = await fetch(levelName + '.lvl');
+			if (response.ok) {
+				const text = await response.text();
+				code.textContent = text;
+			} else {
+				console.error('Failed to fetch ' + levelName + '.lvl: ' + response.status);
+			}
+		} catch (e) {
+			console.error('Error loading level ' + levelName + ':', e);
+		}
+	}
 });
 </script>
 

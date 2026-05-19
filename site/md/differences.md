@@ -20,6 +20,6 @@ Floorboards that disappear when the lad walks on them still work like they used 
 
 Ladder was originally written for the CPM operating system and the game came bundled with Kaypro computers. It is copyrighted by:
 
-Yahoo Software  
-10970 Ashton Ave, Suite 312  
+Yahoo Software
+10970 Ashton Ave, Suite 312
 Los Angeles, CA

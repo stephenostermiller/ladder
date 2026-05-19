@@ -275,9 +275,7 @@ class GameCanvas {
 
 		if (result === GameEngine.G_O_MONEY) {
 			this.inBonusCountdown = true;
-		} else if (result === GameEngine.G_O_BARREL ||
-		           result === GameEngine.G_O_TIME ||
-		           result === GameEngine.G_O_SPIKE) {
+		} else if (result === GameEngine.G_O_BARREL || result === GameEngine.G_O_TIME || result === GameEngine.G_O_SPIKE) {
 			this.ladsLeft--;
 			this.pendingGameOver = result;
 			this.startDeathAnimation(this.engine.getLadX(), this.engine.getLadY());

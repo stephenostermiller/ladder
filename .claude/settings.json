@@ -1,11 +1,11 @@
 {
-  "notes": [
-    "AI agents: Always consult .agents/README.md before starting work. It contains essential build and development instructions.",
-    "Key instruction: After any code changes, run 'make' (not npm commands directly). Make handles all tests and rebuilds automatically."
-  ],
-  "hooks": {
-    "before_tool_use": {
-      "before_bash": "if [ \"$1\" = \"npm\" ] || [ \"$1\" = \"mvn\" ] || [ \"$1\" = \"bash\" ]; then echo '📝 Reminder: Run `make` instead - consult .agents/README.md for build instructions'; fi"
-    }
-  }
+	"notes": [
+		"AI agents: Always consult .agents/README.md before starting work. It contains essential build and development instructions.",
+		"Key instruction: After any code changes, run 'make' (not npm commands directly). Make handles all tests and rebuilds automatically."
+	],
+	"hooks": {
+		"before_tool_use": {
+			"before_bash": "if [ \"$1\" = \"npm\" ] || [ \"$1\" = \"mvn\" ] || [ \"$1\" = \"bash\" ]; then echo '📝 Reminder: Run `make` instead - consult .agents/README.md for build instructions'; fi"
+		}
+	}
 }
