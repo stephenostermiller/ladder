@@ -204,8 +204,60 @@ class GameCanvas {
 
 		// Touch start
 		this.canvas.addEventListener('touchstart', (e) => {
+			// Do fullscreen check FIRST with minimal overhead
+			// Check if any touch is in the fullscreen button area (bottom right)
+			const w = this.canvas.width;
+			const h = this.canvas.height;
+			const fsBtn = w - this.BTN - this.GAP;
+			const fsTop = h - this.BTN - this.GAP;
+
+			let hasFullscreenButton = false;
+			for (const touch of e.changedTouches) {
+				const rect = this.canvas.getBoundingClientRect();
+				const scaleX = w / rect.width;
+				const scaleY = h / rect.height;
+				const x = (touch.clientX - rect.left) * scaleX;
+				const y = (touch.clientY - rect.top) * scaleY;
+
+				if (x >= fsBtn && x <= w - this.GAP && y >= fsTop && y <= h - this.GAP) {
+					hasFullscreenButton = true;
+					break;
+				}
+			}
+
+			// Handle fullscreen with absolute minimal delay - try on parent element
+			if (hasFullscreenButton) {
+				const container = this.canvas.parentElement;
+				const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+				try {
+					if (!isFullscreen) {
+						if (container.requestFullscreen) {
+							container.requestFullscreen();
+						} else if (container.webkitRequestFullscreen) {
+							container.webkitRequestFullscreen();
+						} else if (container.mozRequestFullScreen) {
+							container.mozRequestFullScreen();
+						} else if (container.msRequestFullscreen) {
+							container.msRequestFullscreen();
+						}
+					} else {
+						if (document.exitFullscreen) {
+							document.exitFullscreen();
+						} else if (document.webkitExitFullscreen) {
+							document.webkitExitFullscreen();
+						} else if (document.mozCancelFullScreen) {
+							document.mozCancelFullScreen();
+						} else if (document.msExitFullscreen) {
+							document.msExitFullscreen();
+						}
+					}
+				} catch (err) {
+					// Silently ignore fullscreen errors
+				}
+			}
+
 			e.preventDefault();
-			// Track active touches first to check for fullscreen button
+			// Track active touches
 			for (const touch of e.changedTouches) {
 				const pos = this.getCanvasPos(touch.clientX, touch.clientY);
 				const button = this.getButtonAtPoint(pos.x, pos.y);
@@ -249,10 +301,58 @@ class GameCanvas {
 
 		// Mouse events (for desktop testing)
 		this.canvas.addEventListener('mousedown', (e) => {
+			// Check for fullscreen button with minimal overhead
+			const w = this.canvas.width;
+			const h = this.canvas.height;
+			const rect = this.canvas.getBoundingClientRect();
+			const scaleX = w / rect.width;
+			const scaleY = h / rect.height;
+			const x = (e.clientX - rect.left) * scaleX;
+			const y = (e.clientY - rect.top) * scaleY;
+
+			const fsBtn = w - this.BTN - this.GAP;
+			const fsTop = h - this.BTN - this.GAP;
+
+			let button = null;
+			// Handle fullscreen button immediately (must be called from user gesture)
+			if (x >= fsBtn && x <= w - this.GAP && y >= fsTop && y <= h - this.GAP) {
+				button = 'fullscreen';
+				const container = this.canvas.parentElement;
+				const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+				try {
+					if (!isFullscreen) {
+						if (container.requestFullscreen) {
+							container.requestFullscreen();
+						} else if (container.webkitRequestFullscreen) {
+							container.webkitRequestFullscreen();
+						} else if (container.mozRequestFullScreen) {
+							container.mozRequestFullScreen();
+						} else if (container.msRequestFullscreen) {
+							container.msRequestFullscreen();
+						}
+					} else {
+						if (document.exitFullscreen) {
+							document.exitFullscreen();
+						} else if (document.webkitExitFullscreen) {
+							document.webkitExitFullscreen();
+						} else if (document.mozCancelFullScreen) {
+							document.mozCancelFullScreen();
+						} else if (document.msExitFullscreen) {
+							document.msExitFullscreen();
+						}
+					}
+				} catch (err) {
+					// Silently ignore fullscreen errors
+				}
+			} else {
+				// Do normal button detection for non-fullscreen buttons
+				const pos = this.getCanvasPos(e.clientX, e.clientY);
+				button = this.getButtonAtPoint(pos.x, pos.y);
+			}
+
 			mouseDown = true;
-			const pos = this.getCanvasPos(e.clientX, e.clientY);
-			const button = this.getButtonAtPoint(pos.x, pos.y);
 			this.activeTouches.set('mouse', button);
+
 			// On title/game-over, click to start (but only if no button was clicked)
 			if (this.isShowingTitle || this.gameOver !== GameCanvas.G_O_NOT_OVER) {
 				if (!button) {
@@ -346,6 +446,37 @@ class GameCanvas {
 		return null;
 	}
 
+	toggleFullscreenImmediate() {
+		const container = document.getElementById('gameContainer');
+		const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+
+		if (!isFullscreen) {
+			// Try standard API first, then vendor-specific versions
+			if (container.requestFullscreen) {
+				container.requestFullscreen().catch(err => {
+					console.error(`Error attempting to enable fullscreen: ${err.message}`);
+				});
+			} else if (container.webkitRequestFullscreen) {
+				container.webkitRequestFullscreen();
+			} else if (container.mozRequestFullScreen) {
+				container.mozRequestFullScreen();
+			} else if (container.msRequestFullscreen) {
+				container.msRequestFullscreen();
+			}
+		} else {
+			// Try standard API first, then vendor-specific versions
+			if (document.exitFullscreen) {
+				document.exitFullscreen();
+			} else if (document.webkitExitFullscreen) {
+				document.webkitExitFullscreen();
+			} else if (document.mozCancelFullScreen) {
+				document.mozCancelFullScreen();
+			} else if (document.msExitFullscreen) {
+				document.msExitFullscreen();
+			}
+		}
+	}
+
 	processFullscreenButton() {
 		const activeButtons = [...this.activeTouches.values()].filter(b => b);
 		const fullscreenButtonIsActive = activeButtons.includes('fullscreen');
@@ -353,12 +484,32 @@ class GameCanvas {
 		// Toggle fullscreen only on button press (transition from inactive to active)
 		if (fullscreenButtonIsActive && !this.fullscreenButtonWasActive) {
 			const container = document.getElementById('gameContainer');
-			if (!document.fullscreenElement) {
-				container.requestFullscreen().catch(err => {
-					console.error(`Error attempting to enable fullscreen: ${err.message}`);
-				});
+			const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+
+			if (!isFullscreen) {
+				// Try standard API first, then vendor-specific versions
+				if (container.requestFullscreen) {
+					container.requestFullscreen().catch(err => {
+						console.error(`Error attempting to enable fullscreen: ${err.message}`);
+					});
+				} else if (container.webkitRequestFullscreen) {
+					container.webkitRequestFullscreen();
+				} else if (container.mozRequestFullScreen) {
+					container.mozRequestFullScreen();
+				} else if (container.msRequestFullscreen) {
+					container.msRequestFullscreen();
+				}
 			} else {
-				document.exitFullscreen();
+				// Try standard API first, then vendor-specific versions
+				if (document.exitFullscreen) {
+					document.exitFullscreen();
+				} else if (document.webkitExitFullscreen) {
+					document.webkitExitFullscreen();
+				} else if (document.mozCancelFullScreen) {
+					document.mozCancelFullScreen();
+				} else if (document.msExitFullscreen) {
+					document.msExitFullscreen();
+				}
 			}
 		}
 
@@ -634,7 +785,7 @@ class GameCanvas {
 
 		// Calculate offsets to center the game with letterboxing
 		this.offsetX = (containerWidth - gameWidth) / 2;
-		this.offsetY = (containerHeight - gameHeight) / 2;
+		this.offsetY = (containerHeight - gameHeight - statsRowHeight) / 2;
 
 		// Store scale for use in rendering
 		this.canvasScale = scale;
