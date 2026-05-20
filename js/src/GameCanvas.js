@@ -17,7 +17,8 @@ const DEFAULT_CONTROLS = {
 	left: ['ArrowLeft', '4'],
 	right: ['ArrowRight', '6'],
 	jump: [' '],
-	pause: ['Escape', 'p']
+	pause: ['Escape', 'p'],
+	keypadEnabled: false
 };
 const CONTROLS_STORAGE_KEY = 'ladderControls';
 
@@ -43,14 +44,14 @@ class GameCanvas {
 
 	static BUTTON_GRID = [
 		[
-			[{ label: 'JUMP', name: 'jump-left' }, { label: '↑', name: 'up-left' }],
-			[{ label: '←', name: 'left-left' }, { label: '→', name: 'right-left' }],
-			[{ label: 'STOP', name: 'stop-left' }, { label: '↓', name: 'down-left' }]
+			[{ label: 'PAUSE', name: 'pause-left' }],
+			[{ label: 'JUMP', name: 'jump-left' }],
+			[{ label: 'STOP', name: 'stop-left' }]
 		],
 		[
-			[{ label: '↑', name: 'up-right' }, { label: 'JUMP', name: 'jump-right' }],
+			[{}, { label: '↑', name: 'up-right' }],
 			[{ label: '←', name: 'left-right' }, { label: '→', name: 'right-right' }],
-			[{ label: '↓', name: 'down-right' }, { label: 'STOP', name: 'stop-right' }]
+			[{}, { label: '↓', name: 'down-right' }]
 		]
 	];
 
@@ -74,6 +75,7 @@ class GameCanvas {
 		this.keysRecentlyDown = [];
 		this.lastCommandKeyPressed = null;
 		this.pauseKeyPressed = false;
+		this.pauseTouchWasActive = false;
 
 		this.gameOver = GameCanvas.G_O_NOT_OVER;
 		this.inBonusCountdown = false;
@@ -126,14 +128,13 @@ class GameCanvas {
 	loadControls(defaultKeypadEnabled) {
 		try {
 			const saved = JSON.parse(localStorage.getItem(CONTROLS_STORAGE_KEY));
-			if (!saved) return { ...DEFAULT_CONTROLS, keypad: defaultKeypadEnabled ? ['left', 'right'] : [] };
-			// Ensure keypad property exists
-			if (!saved.keypad) {
-				saved.keypad = defaultKeypadEnabled ? ['left', 'right'] : [];
+			if (!saved) return { ...DEFAULT_CONTROLS, keypadEnabled: defaultKeypadEnabled };
+			if (!('keypadEnabled' in saved)) {
+				saved.keypadEnabled = defaultKeypadEnabled;
 			}
 			return saved;
 		} catch {
-			return { ...DEFAULT_CONTROLS, keypad: defaultKeypadEnabled ? ['left', 'right'] : [] };
+			return { ...DEFAULT_CONTROLS, keypadEnabled: defaultKeypadEnabled };
 		}
 	}
 
@@ -158,19 +159,7 @@ class GameCanvas {
 			e.preventDefault()
 			// Handle pause, immediate action (only once per key press)
 			if (this.controls.pause.map(k => k.toLowerCase()).includes(e.key.toLowerCase())) {
-				if (!this.pauseKeyPressed) {
-					this.pauseKeyPressed = true;
-					// If showing title screen or game is over, start the game with P
-					if (this.isShowingTitle || this.gameOver !== GameCanvas.G_O_NOT_OVER) {
-						this.isShowingTitle = false;
-						this.restartGame();
-						updateGameUIState();
-					} else {
-						// Otherwise toggle pause
-						this.togglePause();
-						updateGameUIState();
-					}
-				}
+				this.handlePauseAction('key');
 				return
 			}
 
@@ -316,15 +305,18 @@ class GameCanvas {
 			const col2End = gridX + 2*this.BTN + this.GAP;
 
 			for (let row = 0; row < 3; row++) {
+				if (!GameCanvas.BUTTON_GRID[side][row]) continue;
 				const rowStart = gridTop + row * (this.BTN + this.GAP);
 				const rowEnd = rowStart + this.BTN;
 
 				if (y >= rowStart && y < rowEnd) {
 					if (x >= col1Start && x < col1End) {
-						return GameCanvas.BUTTON_GRID[side][row][0].name;
+						const button = GameCanvas.BUTTON_GRID[side][row][0];
+						if (button && button.name) return button.name;
 					}
 					if (x >= col2Start && x < col2End) {
-						return GameCanvas.BUTTON_GRID[side][row][1].name;
+						const button = GameCanvas.BUTTON_GRID[side][row][1];
+						if (button && button.name) return button.name;
 					}
 				}
 			}
@@ -424,26 +416,22 @@ class GameCanvas {
 
 		const drawGrid = (gridX, side) => {
 			for (let row = 0; row < 3; row++) {
+				if (!GameCanvas.BUTTON_GRID[side][row]) continue;
 				const rowY = gridTop + row * (this.BTN + this.GAP);
 				for (let col = 0; col < 2; col++) {
 					const colX = gridX + col * (this.BTN + this.GAP);
 					const button = GameCanvas.BUTTON_GRID[side][row][col];
-					drawButton(colX, rowY, this.BTN, this.BTN, button.label, button.name);
+					if (button && button.label && button.name) {
+						drawButton(colX, rowY, this.BTN, this.BTN, button.label, button.name);
+					}
 				}
 			}
 		};
 
-		// Draw keypads only if not on title screen
-		if (!this.isShowingTitle) {
-			// Draw left side grid if enabled
-			if (this.controls.keypad.includes('left')) {
-				drawGrid(gridLeft, 0);
-			}
-
-			// Draw right side grid if enabled
-			if (this.controls.keypad.includes('right')) {
-				drawGrid(w - gridWidth - gridLeft, 1);
-			}
+		// Draw keypads only if not on title screen and keypad is enabled
+		if (!this.isShowingTitle && this.controls.keypadEnabled) {
+			drawGrid(gridLeft, 0);
+			drawGrid(w - gridWidth - gridLeft, 1);
 		}
 
 		// Always draw fullscreen button
@@ -454,6 +442,41 @@ class GameCanvas {
 
 	togglePause() {
 		this.paused = !this.paused;
+	}
+
+	handlePauseAction(inputSource) {
+		if (inputSource === 'key') {
+			if (!this.pauseKeyPressed) {
+				this.pauseKeyPressed = true;
+				this.executePauseAction();
+			}
+		} else if (inputSource === 'touch') {
+			if (!this.pauseTouchWasActive) {
+				this.pauseTouchWasActive = true;
+				this.executePauseAction();
+			}
+		}
+	}
+
+	executePauseAction() {
+		// If showing title screen or game is over, start the game
+		if (this.isShowingTitle || this.gameOver !== GameCanvas.G_O_NOT_OVER) {
+			this.isShowingTitle = false;
+			this.restartGame();
+		} else {
+			// Otherwise toggle pause
+			this.togglePause();
+		}
+		updateGameUIState();
+	}
+
+	processPauseButtonInput() {
+		const activeButtons = [...this.activeTouches.values()].filter(b => b);
+		if (activeButtons.some(b => b === 'pause-left' || b === 'pause-right')) {
+			this.handlePauseAction('touch');
+		} else {
+			this.pauseTouchWasActive = false;
+		}
 	}
 
 	setGameOverState(state) {
@@ -487,6 +510,10 @@ class GameCanvas {
 
 
 	updateGame() {
+		// Check for pause button input before checking pause state
+		// This allows unpausing via the pause button while paused
+		this.processPauseButtonInput();
+
 		// Handle bonus countdown (UI concern)
 		if (this.inBonusCountdown) {
 			if (this.engine.cycles > 0) {
@@ -541,7 +568,7 @@ class GameCanvas {
 		// Update commands based on currently pressed keys
 		this.updateCommandsFromPressedKeys();
 
-		// Update commands from touch/mouse input
+		// Update commands from touch/mouse input (excluding pause button)
 		this.updateCommandsFromTouches();
 
 		const result = this.engine.tick(this.nextCommand, this.jumpCommand);
@@ -884,41 +911,27 @@ class GameCanvas {
 			const keypadCell = document.createElement('td');
 			keypadCell.className = 'keys-cell';
 
-			const keypadContainer = document.createElement('div');
-			keypadContainer.style.display = 'flex';
-			keypadContainer.style.gap = '15px';
+			const checkboxContainer = document.createElement('div');
+			checkboxContainer.style.display = 'flex';
+			checkboxContainer.style.alignItems = 'center';
+			checkboxContainer.style.gap = '5px';
 
-			['left', 'right'].forEach(side => {
-				const checkboxContainer = document.createElement('div');
-				checkboxContainer.style.display = 'flex';
-				checkboxContainer.style.alignItems = 'center';
-				checkboxContainer.style.gap = '5px';
-
-				const checkbox = document.createElement('input');
-				checkbox.type = 'checkbox';
-				checkbox.id = `keypad-${side}`;
-				checkbox.checked = this.controls.keypad.includes(side);
-				checkbox.addEventListener('change', () => {
-					if (checkbox.checked) {
-						if (!this.controls.keypad.includes(side)) {
-							this.controls.keypad.push(side);
-						}
-					} else {
-						this.controls.keypad = this.controls.keypad.filter(s => s !== side);
-					}
-				});
-
-				const label = document.createElement('label');
-				label.htmlFor = `keypad-${side}`;
-				label.textContent = side.charAt(0).toUpperCase() + side.slice(1);
-				label.style.cursor = 'pointer';
-
-				checkboxContainer.appendChild(checkbox);
-				checkboxContainer.appendChild(label);
-				keypadContainer.appendChild(checkboxContainer);
+			const checkbox = document.createElement('input');
+			checkbox.type = 'checkbox';
+			checkbox.id = 'keypad-toggle';
+			checkbox.checked = this.controls.keypadEnabled;
+			checkbox.addEventListener('change', () => {
+				this.controls.keypadEnabled = checkbox.checked;
 			});
 
-			keypadCell.appendChild(keypadContainer);
+			const label = document.createElement('label');
+			label.htmlFor = 'keypad-toggle';
+			label.textContent = 'Enabled';
+			label.style.cursor = 'pointer';
+
+			checkboxContainer.appendChild(checkbox);
+			checkboxContainer.appendChild(label);
+			keypadCell.appendChild(checkboxContainer);
 			keypadRow.appendChild(keypadCell);
 			table.appendChild(keypadRow);
 
@@ -932,15 +945,13 @@ class GameCanvas {
 			resetBtn.addEventListener('click', () => {
 				this.controls = {
 					...DEFAULT_CONTROLS,
-					keypad: this.hasPointerInput ? [] : ['left', 'right']
+					keypadEnabled: !this.hasPointerInput
 				};
-				// Update keypad checkboxes
-				['left', 'right'].forEach(side => {
-					const checkbox = modalContent.querySelector(`#keypad-${side}`);
-					if (checkbox) {
-						checkbox.checked = this.controls.keypad.includes(side);
-					}
-				});
+				// Update keypad checkbox
+				const keypadCheckbox = modalContent.querySelector('#keypad-toggle');
+				if (keypadCheckbox) {
+					keypadCheckbox.checked = this.controls.keypadEnabled;
+				}
 				// Re-render all key bindings
 				actions.forEach(action => {
 					const container = modalContent.querySelector(`.key-bindings[data-action="${action.key}"]`);
