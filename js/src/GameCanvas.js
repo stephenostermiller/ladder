@@ -41,6 +41,19 @@ class GameCanvas {
 	static VERY_HARD_SPEED = 65;
 	static IMPOSSIBLE_SPEED = 55;
 
+	static BUTTON_GRID = [
+		[
+			[{ label: 'JUMP', name: 'jump-left' }, { label: '↑', name: 'up-left' }],
+			[{ label: '←', name: 'left-left' }, { label: '→', name: 'right-left' }],
+			[{ label: 'STOP', name: 'stop-left' }, { label: '↓', name: 'down-left' }]
+		],
+		[
+			[{ label: '↑', name: 'up-right' }, { label: 'JUMP', name: 'jump-right' }],
+			[{ label: '←', name: 'left-right' }, { label: '→', name: 'right-right' }],
+			[{ label: '↓', name: 'down-right' }, { label: 'STOP', name: 'stop-right' }]
+		]
+	];
+
 	constructor(canvas, levelString, levelIndex = 0) {
 		this.canvas = canvas;
 		this.ctx = canvas.getContext('2d');
@@ -60,6 +73,7 @@ class GameCanvas {
 		this.keysHeldDown = new Set();
 		this.keysRecentlyDown = [];
 		this.lastCommandKeyPressed = null;
+		this.pauseKeyPressed = false;
 
 		this.gameOver = GameCanvas.G_O_NOT_OVER;
 		this.inBonusCountdown = false;
@@ -88,24 +102,38 @@ class GameCanvas {
 		// Game loop timing
 		this.lastUpdateTime = Date.now();
 
-		// Track number of levels loaded during play
-		this.levelsLoaded = 0;
+		// Track number of levels played
+		this.levelsPlayed = 1;
 
 		// Load custom controls from localStorage
-		this.controls = this.loadControls();
+		const hasPointerInput = window.matchMedia && window.matchMedia("(pointer:fine)").matches;
+		this.hasPointerInput = hasPointerInput;
+		this.controls = this.loadControls(!hasPointerInput);
+
+		// Touch controls
+		this.activeTouches = new Map();
+		this.BTN = 50;   // Button size
+		this.GAP = 8;   // Gap between buttons
+		this.fullscreenButtonWasActive = false;
 
 		this.setupKeyboardControls();
+		this.setupTouchControls();
 
 		this.gameRunning = false;
 		this.startGameLoop();
 	}
 
-	loadControls() {
+	loadControls(defaultKeypadEnabled) {
 		try {
 			const saved = JSON.parse(localStorage.getItem(CONTROLS_STORAGE_KEY));
-			return saved || { ...DEFAULT_CONTROLS };
+			if (!saved) return { ...DEFAULT_CONTROLS, keypad: defaultKeypadEnabled ? ['left', 'right'] : [] };
+			// Ensure keypad property exists
+			if (!saved.keypad) {
+				saved.keypad = defaultKeypadEnabled ? ['left', 'right'] : [];
+			}
+			return saved;
 		} catch {
-			return { ...DEFAULT_CONTROLS };
+			return { ...DEFAULT_CONTROLS, keypad: defaultKeypadEnabled ? ['left', 'right'] : [] };
 		}
 	}
 
@@ -113,31 +141,35 @@ class GameCanvas {
 		localStorage.setItem(CONTROLS_STORAGE_KEY, JSON.stringify(this.controls));
 	}
 
-	isGameControlKey(key) {
-		return this.controls.up.map(k => k.toLowerCase()).includes(key.toLowerCase()) ||
-			this.controls.down.map(k => k.toLowerCase()).includes(key.toLowerCase()) ||
-			this.controls.left.map(k => k.toLowerCase()).includes(key.toLowerCase()) ||
-			this.controls.right.map(k => k.toLowerCase()).includes(key.toLowerCase()) ||
-			this.controls.jump.map(k => k.toLowerCase()).includes(key.toLowerCase()) ||
-			this.controls.pause.map(k => k.toLowerCase()).includes(key.toLowerCase()) ||
-			key.length === 1  // Single character keys (letters, numbers, space)
+	isGameControlKeyEvent(e) {
+		if (e.ctrlKey || e.altKey || e.metaKey) return false;
+		return this.controls.up.map(k => k.toLowerCase()).includes(e.key.toLowerCase()) ||
+			this.controls.down.map(k => k.toLowerCase()).includes(e.key.toLowerCase()) ||
+			this.controls.left.map(k => k.toLowerCase()).includes(e.key.toLowerCase()) ||
+			this.controls.right.map(k => k.toLowerCase()).includes(e.key.toLowerCase()) ||
+			this.controls.jump.map(k => k.toLowerCase()).includes(e.key.toLowerCase()) ||
+			this.controls.pause.map(k => k.toLowerCase()).includes(e.key.toLowerCase()) ||
+			e.key.length === 1  // Single character keys (letters, numbers, space)
 	}
 
 	setupKeyboardControls() {
 		document.addEventListener('keydown', (e) => {
-			if (!this.isGameControlKey(e.key)) return
+			if (!this.isGameControlKeyEvent(e)) return
 			e.preventDefault()
-			// Handle pause, immediate action
+			// Handle pause, immediate action (only once per key press)
 			if (this.controls.pause.map(k => k.toLowerCase()).includes(e.key.toLowerCase())) {
-				// If showing title screen or game is over, start the game with P
-				if (this.isShowingTitle || this.gameOver !== GameCanvas.G_O_NOT_OVER) {
-					this.isShowingTitle = false;
-					this.restartGame();
-					updateGameUIState();
-				} else {
-					// Otherwise toggle pause
-					this.togglePause();
-					updateGameUIState();
+				if (!this.pauseKeyPressed) {
+					this.pauseKeyPressed = true;
+					// If showing title screen or game is over, start the game with P
+					if (this.isShowingTitle || this.gameOver !== GameCanvas.G_O_NOT_OVER) {
+						this.isShowingTitle = false;
+						this.restartGame();
+						updateGameUIState();
+					} else {
+						// Otherwise toggle pause
+						this.togglePause();
+						updateGameUIState();
+					}
 				}
 				return
 			}
@@ -147,11 +179,15 @@ class GameCanvas {
 			this.keysRecentlyDown.push(e.key);
 		})
 		document.addEventListener('keyup', (e) => {
-			if (!this.isGameControlKey(e.key)) e.preventDefault()
+			if (!this.isGameControlKeyEvent(e)) e.preventDefault()
+			// Reset pause key flag on key up
+			if (this.controls.pause.map(k => k.toLowerCase()).includes(e.key.toLowerCase())) {
+				this.pauseKeyPressed = false;
+			}
 			this.keysHeldDown.delete(e.key);
 		})
 		document.addEventListener('keypress', (e) => {
-			if (this.isGameControlKey(e.key)) e.preventDefault()
+			if (this.isGameControlKeyEvent(e)) e.preventDefault()
 		})
 	}
 
@@ -172,6 +208,248 @@ class GameCanvas {
 			}
 		})
 		this.keysRecentlyDown = [];
+	}
+
+	setupTouchControls() {
+		let mouseDown = false;
+
+		// Touch start
+		this.canvas.addEventListener('touchstart', (e) => {
+			e.preventDefault();
+			// Track active touches first to check for fullscreen button
+			for (const touch of e.changedTouches) {
+				const pos = this.getCanvasPos(touch.clientX, touch.clientY);
+				const button = this.getButtonAtPoint(pos.x, pos.y);
+				this.activeTouches.set(touch.identifier, button);
+			}
+			// On title/game-over, tap to start (but only if no button was touched)
+			if (this.isShowingTitle || this.gameOver !== GameCanvas.G_O_NOT_OVER) {
+				const buttons = [...this.activeTouches.values()];
+				if (!buttons.some(b => b)) {
+					this.isShowingTitle = false;
+					this.restartGame();
+					updateGameUIState();
+				}
+			}
+		}, { passive: false });
+
+		// Touch move
+		this.canvas.addEventListener('touchmove', (e) => {
+			e.preventDefault();
+			for (const touch of e.changedTouches) {
+				const pos = this.getCanvasPos(touch.clientX, touch.clientY);
+				this.activeTouches.set(touch.identifier, this.getButtonAtPoint(pos.x, pos.y));
+			}
+		}, { passive: false });
+
+		// Touch end
+		this.canvas.addEventListener('touchend', (e) => {
+			e.preventDefault();
+			for (const touch of e.changedTouches) {
+				this.activeTouches.delete(touch.identifier);
+			}
+		}, { passive: false });
+
+		// Touch cancel
+		this.canvas.addEventListener('touchcancel', (e) => {
+			e.preventDefault();
+			for (const touch of e.changedTouches) {
+				this.activeTouches.delete(touch.identifier);
+			}
+		}, { passive: false });
+
+		// Mouse events (for desktop testing)
+		this.canvas.addEventListener('mousedown', (e) => {
+			mouseDown = true;
+			const pos = this.getCanvasPos(e.clientX, e.clientY);
+			const button = this.getButtonAtPoint(pos.x, pos.y);
+			this.activeTouches.set('mouse', button);
+			// On title/game-over, click to start (but only if no button was clicked)
+			if (this.isShowingTitle || this.gameOver !== GameCanvas.G_O_NOT_OVER) {
+				if (!button) {
+					this.isShowingTitle = false;
+					this.restartGame();
+					updateGameUIState();
+				}
+			}
+		});
+
+		this.canvas.addEventListener('mousemove', (e) => {
+			if (!mouseDown) return;
+			const pos = this.getCanvasPos(e.clientX, e.clientY);
+			this.activeTouches.set('mouse', this.getButtonAtPoint(pos.x, pos.y));
+		});
+
+		this.canvas.addEventListener('mouseup', () => {
+			mouseDown = false;
+			this.activeTouches.delete('mouse');
+		});
+
+		this.canvas.addEventListener('mouseleave', () => {
+			mouseDown = false;
+			this.activeTouches.delete('mouse');
+		});
+	}
+
+	getCanvasPos(clientX, clientY) {
+		const rect = this.canvas.getBoundingClientRect();
+		const scaleX = this.canvas.width / rect.width;
+		const scaleY = this.canvas.height / rect.height;
+		return {
+			x: (clientX - rect.left) * scaleX,
+			y: (clientY - rect.top) * scaleY
+		};
+	}
+
+	getButtonAtPoint(x, y) {
+		const w = this.canvas.width;
+		const h = this.canvas.height;
+		const gridLeft = this.GAP;
+		const gridHeight = 3 * this.BTN + 2 * this.GAP;
+		const gridTop = (h - gridHeight) / 2;
+		const gridWidth = 2 * this.BTN + this.GAP;
+
+		const checkGrid = (gridX, side) => {
+			const col1Start = gridX;
+			const col1End = gridX + this.BTN;
+			const col2Start = gridX + this.BTN + this.GAP;
+			const col2End = gridX + 2*this.BTN + this.GAP;
+
+			for (let row = 0; row < 3; row++) {
+				const rowStart = gridTop + row * (this.BTN + this.GAP);
+				const rowEnd = rowStart + this.BTN;
+
+				if (y >= rowStart && y < rowEnd) {
+					if (x >= col1Start && x < col1End) {
+						return GameCanvas.BUTTON_GRID[side][row][0].name;
+					}
+					if (x >= col2Start && x < col2End) {
+						return GameCanvas.BUTTON_GRID[side][row][1].name;
+					}
+				}
+			}
+			return null;
+		};
+
+		// Check left side grid (x: 0 to w/2)
+		if (x >= 0 && x < w/2) {
+			const result = checkGrid(gridLeft, 0);
+			if (result) return result;
+		}
+
+		// Check right side grid (x: w/2 to w)
+		if (x >= w/2 && x <= w) {
+			const gridXRight = w - gridWidth - gridLeft;
+			const result = checkGrid(gridXRight, 1);
+			if (result) return result;
+		}
+
+		// Check fullscreen button in bottom right
+		const fsBtn = w - this.BTN - this.GAP;
+		const fsTop = h - this.BTN - this.GAP;
+		if (x >= fsBtn && x <= w - this.GAP && y >= fsTop && y <= h - this.GAP) {
+			return 'fullscreen';
+		}
+
+		return null;
+	}
+
+	processFullscreenButton() {
+		const activeButtons = [...this.activeTouches.values()].filter(b => b);
+		const fullscreenButtonIsActive = activeButtons.includes('fullscreen');
+
+		// Toggle fullscreen only on button press (transition from inactive to active)
+		if (fullscreenButtonIsActive && !this.fullscreenButtonWasActive) {
+			const container = document.getElementById('gameContainer');
+			if (!document.fullscreenElement) {
+				container.requestFullscreen().catch(err => {
+					console.error(`Error attempting to enable fullscreen: ${err.message}`);
+				});
+			} else {
+				document.exitFullscreen();
+			}
+		}
+
+		this.fullscreenButtonWasActive = fullscreenButtonIsActive;
+	}
+
+	updateCommandsFromTouches() {
+		const activeButtons = [...this.activeTouches.values()].filter(b => b);
+
+		// Jump is independent - check for jump on either side
+		if (activeButtons.some(b => b === 'jump-left' || b === 'jump-right')) {
+			this.jumpCommand = true;
+		}
+
+		// Direction: priority left/right > up/down > stop
+		if (activeButtons.some(b => b === 'left-left' || b === 'left-right')) {
+			this.nextCommand = Lad.LEFT;
+		} else if (activeButtons.some(b => b === 'right-left' || b === 'right-right')) {
+			this.nextCommand = Lad.RIGHT;
+		} else if (activeButtons.some(b => b === 'up-left' || b === 'up-right')) {
+			this.nextCommand = Lad.UP;
+		} else if (activeButtons.some(b => b === 'down-left' || b === 'down-right')) {
+			this.nextCommand = Lad.DOWN;
+		} else if (activeButtons.some(b => b === 'stop-left' || b === 'stop-right')) {
+			this.nextCommand = Lad.STOP;
+		}
+	}
+
+	renderTouchControls() {
+		const w = this.canvas.width;
+		const h = this.canvas.height;
+		const active = new Set([...this.activeTouches.values()].filter(b => b));
+
+		const drawButton = (x, y, width, height, label, buttonName) => {
+			const isActive = active.has(buttonName);
+			this.ctx.fillStyle = isActive ? 'rgba(0, 200, 0, 0.35)' : 'rgba(0, 80, 0, 0.25)';
+			this.ctx.fillRect(x, y, width, height);
+
+			this.ctx.strokeStyle = 'rgba(0, 150, 0, 0.30)';
+			this.ctx.lineWidth = 1;
+			this.ctx.strokeRect(x, y, width, height);
+
+			const fontSize = Math.max(12, Math.floor(height * 0.3));
+			this.ctx.font = fontSize + 'px monospace';
+			this.ctx.fillStyle = isActive ? 'rgba(0, 255, 0, 0.70)' : 'rgba(0, 180, 0, 0.40)';
+			this.ctx.textAlign = 'center';
+			this.ctx.textBaseline = 'middle';
+			this.ctx.fillText(label, x + width / 2, y + height / 2);
+		};
+
+		const gridLeft = this.GAP;
+		const gridHeight = 3 * this.BTN + 2 * this.GAP;
+		const gridTop = (h - gridHeight) / 2;
+		const gridWidth = 2 * this.BTN + this.GAP;
+
+		const drawGrid = (gridX, side) => {
+			for (let row = 0; row < 3; row++) {
+				const rowY = gridTop + row * (this.BTN + this.GAP);
+				for (let col = 0; col < 2; col++) {
+					const colX = gridX + col * (this.BTN + this.GAP);
+					const button = GameCanvas.BUTTON_GRID[side][row][col];
+					drawButton(colX, rowY, this.BTN, this.BTN, button.label, button.name);
+				}
+			}
+		};
+
+		// Draw keypads only if not on title screen
+		if (!this.isShowingTitle) {
+			// Draw left side grid if enabled
+			if (this.controls.keypad.includes('left')) {
+				drawGrid(gridLeft, 0);
+			}
+
+			// Draw right side grid if enabled
+			if (this.controls.keypad.includes('right')) {
+				drawGrid(w - gridWidth - gridLeft, 1);
+			}
+		}
+
+		// Always draw fullscreen button
+		const fsX = w - this.BTN - this.GAP;
+		const fsY = h - this.BTN - this.GAP;
+		drawButton(fsX, fsY, this.BTN, this.BTN, '⛶', 'fullscreen');
 	}
 
 	togglePause() {
@@ -217,6 +495,7 @@ class GameCanvas {
 			} else {
 				this.inBonusCountdown = false;
 				this.loadingNextLevel = true;
+				this.levelsPlayed++;
 				this.nextLevel();
 			}
 			this.render();
@@ -261,6 +540,9 @@ class GameCanvas {
 
 		// Update commands based on currently pressed keys
 		this.updateCommandsFromPressedKeys();
+
+		// Update commands from touch/mouse input
+		this.updateCommandsFromTouches();
 
 		const result = this.engine.tick(this.nextCommand, this.jumpCommand);
 		this.nextCommand = Lad.NONE;
@@ -313,7 +595,7 @@ class GameCanvas {
 		const statsRowHeight = this.letterHeight;
 		const scaleX = containerWidth / (levelWidth * this.letterWidth);
 		const scaleY = (containerHeight - statsRowHeight) / (levelHeight * this.letterHeight);
-		const scale = Math.max(1, Math.min(scaleX, scaleY));
+		const scale = Math.min(scaleX, scaleY);
 
 		// Calculate game content size
 		const gameWidth = levelWidth * this.letterWidth * scale;
@@ -339,10 +621,15 @@ class GameCanvas {
 		this.ctx.fillStyle = '#000';
 		this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
+		// Draw touch control overlays
+		this.renderTouchControls();
+
 		// Set text properties with scaled font
 		const fontSize = Math.floor(14 * this.canvasScale);
 		this.ctx.font = fontSize + 'px monospace';
 		this.ctx.fillStyle = '#0f0';
+		this.ctx.textAlign = 'start';
+		this.ctx.textBaseline = 'alphabetic';
 
 		// Draw level (iterate 0-based array, use 0-based for getCharAt)
 		for (let y = 0; y < this.engine.screenLevel.getHeight(); y++) {
@@ -360,7 +647,7 @@ class GameCanvas {
 			const statsY = this.offsetY + levelHeight * this.letterHeight * this.canvasScale;
 			const score = String(this.engine.getScore()).padEnd(6);
 			const lives = String(this.engine.getLadsLeft()).padEnd(2);
-			const level = String(this.levelsLoaded).padEnd(2);
+			const level = String(this.levelsPlayed).padEnd(2);
 			const statsText = `Score: ${score}  Lives: ${lives}  Level: ${level}  Bonus: ${Math.max(0, this.engine.getCycles())}`;
 			this.ctx.fillText(statsText, this.offsetX, statsY + this.letterHeight * this.canvasScale);
 		}
@@ -371,7 +658,7 @@ class GameCanvas {
 			const levelWidth = this.engine.screenLevel.getWidth();
 			const levelHeight = this.engine.screenLevel.getHeight();
 			const gameWidth = levelWidth * this.letterWidth * this.canvasScale;
-			const gameHeight = (levelHeight + 1) * this.letterHeight * this.canvasScale;
+			const gameHeight = (levelHeight + 1) * this.letterHeight * this.canvasScale + 4 * this.canvasScale;
 			this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
 			this.ctx.fillRect(this.offsetX, this.offsetY, gameWidth, gameHeight);
 			this.ctx.fillStyle = '#0f0';
@@ -386,7 +673,7 @@ class GameCanvas {
 			const levelWidth = this.engine.screenLevel.getWidth();
 			const levelHeight = this.engine.screenLevel.getHeight();
 			const gameWidth = levelWidth * this.letterWidth * this.canvasScale;
-			const gameHeight = (levelHeight + 1) * this.letterHeight * this.canvasScale;
+			const gameHeight = (levelHeight + 1) * this.letterHeight * this.canvasScale + 4 * this.canvasScale;
 			this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
 			this.ctx.fillRect(this.offsetX, this.offsetY, gameWidth, gameHeight);
 			this.ctx.fillStyle = '#f00';
@@ -407,6 +694,9 @@ class GameCanvas {
 		const gameLoop = () => {
 			const currentTime = Date.now();
 			const elapsed = currentTime - this.lastUpdateTime;
+
+			// Process fullscreen button every frame
+			this.processFullscreenButton();
 
 			if (this.isShowingTitle) {
 				// Show title screen and wait for start
@@ -430,6 +720,9 @@ class GameCanvas {
 	restartGame() {
 		// Restart the current level from the beginning
 		if (this.currentLevelData) {
+			this.engine.resetLads();
+			this.engine.resetScore();
+			this.levelsPlayed = 1;
 			this.changeLevel(this.currentLevelData);
 		}
 	}
@@ -456,7 +749,6 @@ class GameCanvas {
 		this.gameOver = GameCanvas.G_O_NOT_OVER;
 		this.inBonusCountdown = false;
 		this.loadingNextLevel = false;
-		this.levelsLoaded++;
 		this.startGameLoop();
 		document.getElementById('levelSelect').value = this.currentLevelIndex;
 	}
@@ -582,6 +874,54 @@ class GameCanvas {
 				table.appendChild(row);
 			});
 
+			// Add onscreen keypad settings as a table row
+			const keypadRow = document.createElement('tr');
+
+			const keypadLabel = document.createElement('td');
+			keypadLabel.textContent = 'Onscreen Keypad';
+			keypadRow.appendChild(keypadLabel);
+
+			const keypadCell = document.createElement('td');
+			keypadCell.className = 'keys-cell';
+
+			const keypadContainer = document.createElement('div');
+			keypadContainer.style.display = 'flex';
+			keypadContainer.style.gap = '15px';
+
+			['left', 'right'].forEach(side => {
+				const checkboxContainer = document.createElement('div');
+				checkboxContainer.style.display = 'flex';
+				checkboxContainer.style.alignItems = 'center';
+				checkboxContainer.style.gap = '5px';
+
+				const checkbox = document.createElement('input');
+				checkbox.type = 'checkbox';
+				checkbox.id = `keypad-${side}`;
+				checkbox.checked = this.controls.keypad.includes(side);
+				checkbox.addEventListener('change', () => {
+					if (checkbox.checked) {
+						if (!this.controls.keypad.includes(side)) {
+							this.controls.keypad.push(side);
+						}
+					} else {
+						this.controls.keypad = this.controls.keypad.filter(s => s !== side);
+					}
+				});
+
+				const label = document.createElement('label');
+				label.htmlFor = `keypad-${side}`;
+				label.textContent = side.charAt(0).toUpperCase() + side.slice(1);
+				label.style.cursor = 'pointer';
+
+				checkboxContainer.appendChild(checkbox);
+				checkboxContainer.appendChild(label);
+				keypadContainer.appendChild(checkboxContainer);
+			});
+
+			keypadCell.appendChild(keypadContainer);
+			keypadRow.appendChild(keypadCell);
+			table.appendChild(keypadRow);
+
 			modalContent.appendChild(table);
 
 			const buttonContainer = document.createElement('div');
@@ -590,7 +930,17 @@ class GameCanvas {
 			const resetBtn = document.createElement('button');
 			resetBtn.textContent = 'Reset to Defaults';
 			resetBtn.addEventListener('click', () => {
-				this.controls = { ...DEFAULT_CONTROLS };
+				this.controls = {
+					...DEFAULT_CONTROLS,
+					keypad: this.hasPointerInput ? [] : ['left', 'right']
+				};
+				// Update keypad checkboxes
+				['left', 'right'].forEach(side => {
+					const checkbox = modalContent.querySelector(`#keypad-${side}`);
+					if (checkbox) {
+						checkbox.checked = this.controls.keypad.includes(side);
+					}
+				});
 				// Re-render all key bindings
 				actions.forEach(action => {
 					const container = modalContent.querySelector(`.key-bindings[data-action="${action.key}"]`);
@@ -780,7 +1130,6 @@ window.addEventListener('DOMContentLoaded', async () => {
 	const difficultySelect = document.getElementById('difficultySelect');
 	const levelSelect = document.getElementById('levelSelect');
 	const startButton = document.getElementById('startButton');
-	const fullscreenButton = document.getElementById('fullscreenButton');
 	const controlsLink = document.getElementById('controlsLink');
 
 	// Populate level select dropdown
@@ -845,8 +1194,8 @@ window.addEventListener('DOMContentLoaded', async () => {
 				const levelData = await loadLevelFile(LEVEL_FILES[levelIdx]);
 				if (levelData) {
 					game.currentLevelIndex = levelIdx;
-					game.engine.resetLads();
-					game.changeLevel(levelData);
+					game.currentLevelData = levelData;
+					game.restartGame();
 				}
 
 				// Hide title and start the actual game
@@ -881,29 +1230,14 @@ window.addEventListener('DOMContentLoaded', async () => {
 		const levelData = await loadLevelFile(LEVEL_FILES[levelIdx]);
 		if (levelData && game) {
 			game.currentLevelIndex = levelIdx;
-			game.changeLevel(levelData);
+			game.currentLevelData = levelData;
+			// Reset lives if game is not in progress (showing title or game over)
+			if (game.isShowingTitle || game.gameOver !== GameCanvas.G_O_NOT_OVER) {
+				game.restartGame();
+			} else {
+				game.changeLevel(levelData);
+			}
 			updateGameUIState();
-		}
-	});
-
-	// Handle fullscreen button
-	fullscreenButton.addEventListener('click', () => {
-		const container = document.getElementById('gameContainer');
-		if (!document.fullscreenElement) {
-			container.requestFullscreen().catch(err => {
-				console.error(`Error attempting to enable fullscreen: ${err.message}`);
-			});
-		} else {
-			document.exitFullscreen();
-		}
-	});
-
-	// Update button text when fullscreen changes
-	document.addEventListener('fullscreenchange', () => {
-		if (document.fullscreenElement) {
-			fullscreenButton.textContent = 'Exit Fullscreen';
-		} else {
-			fullscreenButton.textContent = 'Fullscreen';
 		}
 	});
 

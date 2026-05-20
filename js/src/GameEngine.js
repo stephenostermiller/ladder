@@ -315,6 +315,11 @@ class GameEngine {
 		this.ladsLeft = 3;
 	}
 
+	resetScore() {
+		this.score = 0;
+		this.nextNewLad = 10000;
+	}
+
 	getScreenState() {
 		let result = '';
 		for (let y = 0; y < this.screenLevel.getHeight(); y++) {

@@ -25,8 +25,6 @@ keywords: ladder, game of ladder, der rock, lad, kaypro game, ASCII game, CPM ga
 </div>
 <div id="customControls" style="display: none;">Customized</div>
 </div>
-
-<button id="fullscreenButton">Fullscreen</button>
 </div>
 
 <script src="ladder.js"></script>
